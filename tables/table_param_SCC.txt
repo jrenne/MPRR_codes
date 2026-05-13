@@ -1,0 +1,26 @@
+\begin{table}[ht]
+\centering
+\caption{This table reports the parameterization of the model used in Example~\ref{exm.SCC}.}
+\label{tab:model_parameters}
+\begin{tabularx}{\textwidth}{l r r X}
+\hline
+Parameter & Value && Description \\
+\hline
+$\mu_c$ &  0.075 && Mean consumption growth rate (5 years) \\
+$\gamma$ &   1.45 && Risk aversion coefficient \\
+$e_t$ & 0.0375 && Initial carbon growth rate (5 years) \\
+$\mathcal{E}_0$ &   2170 && Pre-industrial carbon stock (GtCO$_2$) \\
+$\mathcal{E}_t$ &   3315 && Current carbon stock (GtCO$_2$) \\
+$\delta$ &   0.95 && Time discount factor (5 years time step) \\
+$\mu_e$ &  0.001 && Scale of carbon growth rate shocks \\
+$\rho_e$ &    0.8 && Persistence of carbon growth rate \\
+$S$ &      3 && Equilibrium climate sensitivity (°C per doubling) \\
+$\rho_*$ &    0.9 && Persistence of tipping threshold \\
+$\sigma(\tau_t^*)$ &    0.5 && Unconditional volatility of tipping threshold ($\sqrt{\mathbb{V}ar(\tau_t^*)}$, in °C) \\
+$C_t$ &  6e+13 && Global consumption (USD) \\
+\hline
+\end{tabularx}
+% ---- Add explanatory note below ----
+\vspace{0.3em}
+\parbox{1.0\textwidth}{\footnotesize\textit{Notes}: Calibration values are based on standard IAM assumptions for consumption growth and equilibrium climate sensitivity. Carbon stock and temperature parameters are consistent with historical data. The unconditional volatility of the threshold satisfies $\sigma(\tau_t^*) = \sqrt{1-\rho_*^2}\sigma_*$.}
+\end{table}

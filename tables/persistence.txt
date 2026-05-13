@@ -1,0 +1,35 @@
+\begin{table}[t]
+\centering
+\caption{Persistence of zero-coupon yields across maturities}
+\label{tab:persistence}
+
+\begin{tabularx}{\textwidth}{l *{4}{>{\centering\arraybackslash}X}}
+\toprule
+Maturity
+& $\mathrm{ACF}(1)$
+& $\mathrm{ACF}(12)$
+& $\mathrm{PACF}(2)$
+& $\mathrm{PACF}(12)$ \\
+\midrule
+3-month & 0.990 & 0.856 & -0.161 & -0.066 \\
+1-year & 0.991 & 0.879 & -0.178 & -0.146 \\
+3-year & 0.993 & 0.909 & -0.119 & -0.119 \\
+5-year & 0.993 & 0.918 & -0.084 & -0.090 \\
+7-year & 0.994 & 0.922 & -0.058 & -0.103 \\
+10-year & 0.994 & 0.928 & -0.069 & -0.134 \\
+15-year & 0.994 & 0.931 & -0.032 & -0.109 \\
+20-year & 0.989 & 0.867 & -0.121 & -0.030 \\
+30-year & 0.988 & 0.901 & 0.016 & -0.008 \\
+\bottomrule
+\end{tabularx}
+
+\vspace{0.3em}
+\parbox{1.0\textwidth}{\footnotesize\textit{Notes}: 
+The table reports autocorrelations (ACF) and partial autocorrelations (PACF)
+of monthly zero-coupon yields at selected maturities.
+$\mathrm{ACF}(1)$ and $\mathrm{ACF}(12)$ correspond to lags of 1 and 12 months, respectively.
+$\mathrm{PACF}(2)$ and $\mathrm{PACF}(12)$ report partial autocorrelations at lags 2 and 12.
+Yields are constructed from zero-coupon curve estimates of \citet{Liu_Wu_2021}.}
+
+\end{table}
+

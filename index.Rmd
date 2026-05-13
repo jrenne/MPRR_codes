@@ -1,0 +1,38 @@
+--- 
+title: "Asset Pricing with Discrete-Time Affine processes"
+author: "Alain Monfort, Fulvio Pegoraro, Jean-Paul Renne, and Guillaume Roussellet"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+documentclass: book
+bibliography: [book.bib, packages.bib]
+# url: your book url like https://bookdown.org/yihui/bookdown
+# cover-image: path to the social sharing image like images/cover.jpg
+description: |
+  This website gathers the code used to replicate the tables and figures of the book.
+link-citations: yes
+github-repo: rstudio/bookdown-demo
+---
+
+# About
+
+This Bookdown project gathers the R code used to reproduce the tables, figures, and numerical illustrations of *Asset Pricing with Discrete-Time Affine Processes*.
+
+The chapters are organized around the themes of the book and illustrate how the theoretical objects introduced in the text can be implemented, simulated, and visualized in practice. Whenever possible, the examples rely on the companion package `DTAM`, which provides the core routines for simulation, affine transforms, filtering, shadow-rate models, credit-risk applications, and related asset-pricing exercises.
+
+The aim of this material is twofold. First, it documents how the main figures and quantitative examples of the book are produced. Second, it provides a practical entry point for readers who want to adapt the code to their own applications.
+
+To run the examples, users should first install the companion package `DTAM`. The package can be installed either from the local source folder or from GitHub, for instance with `devtools::install_github("jrenne/DTAM")`, and then loaded in the usual way with `library(DTAM)`. Most chapters assume that `DTAM` is already available in the R session before the code chunks are executed.
+
+In several cases, the same objects also appear in the Overleaf project used to typeset the book. In this Bookdown version, the focus is on transparent and reproducible code, with one chapter per block of applications.
+
+```{r include=FALSE}
+knitr::opts_chunk$set(
+  warning = FALSE,
+  message = FALSE
+)
+
+# automatically create a bib database for R packages
+knitr::write_bib(c(
+  .packages(), 'bookdown', 'knitr', 'rmarkdown'
+), 'packages.bib')
+```
