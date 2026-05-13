@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 10 Consumption Capital Asset Pricing Model | Asset Pricing with Discrete-Time Affine processes</title>
+  <meta name="description" content="This website gathers the code used to replicate the tables and figures of the book." />
+  <meta name="generator" content="bookdown 0.43 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 10 Consumption Capital Asset Pricing Model | Asset Pricing with Discrete-Time Affine processes" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="This website gathers the code used to replicate the tables and figures of the book." />
+  <meta name="github-repo" content="rstudio/bookdown-demo" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 10 Consumption Capital Asset Pricing Model | Asset Pricing with Discrete-Time Affine processes" />
+  
+  <meta name="twitter:description" content="This website gathers the code used to replicate the tables and figures of the book." />
+  
+
+<meta name="author" content="Alain Monfort, Fulvio Pegoraro, Jean-Paul Renne, and Guillaume Roussellet" />
+
+
+<meta name="date" content="2026-05-13" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="CreditLiquidity.html"/>
+<link rel="next" href="recursive.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Asset Pricing with Discrete-Time Affine Processes</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> About</a></li>
+<li class="chapter" data-level="2" data-path="affine.html"><a href="affine.html"><i class="fa fa-check"></i><b>2</b> Affine processes</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="affine.html"><a href="affine.html#a-simple-gaussian-ar1-generates-nonlinear-transforms-such-as-squared-states"><i class="fa fa-check"></i><b>2.1</b> A simple Gaussian AR(1) generates nonlinear transforms such as squared states</a></li>
+<li class="chapter" data-level="2.2" data-path="affine.html"><a href="affine.html#standard-arg-and-arg0-processes"><i class="fa fa-check"></i><b>2.2</b> Standard ARG and ARG0 processes</a></li>
+<li class="chapter" data-level="2.3" data-path="affine.html"><a href="affine.html#the-jump-like-dynamics-generated-by-a-compound-poisson-process"><i class="fa fa-check"></i><b>2.3</b> The jump-like dynamics generated by a compound Poisson process</a></li>
+<li class="chapter" data-level="2.4" data-path="affine.html"><a href="affine.html#recursive-gaussian-arg-model-with-crisis-and-gdp-growth-components"><i class="fa fa-check"></i><b>2.4</b> Recursive Gaussian-ARG model with crisis and GDP-growth components</a></li>
+<li class="chapter" data-level="2.5" data-path="affine.html"><a href="affine.html#gdp-forecasts-under-different-crisis-states"><i class="fa fa-check"></i><b>2.5</b> GDP forecasts under different crisis states</a></li>
+<li class="chapter" data-level="2.6" data-path="affine.html"><a href="affine.html#laplace-transforms-can-recover-the-full-conditional-distribution-of-future-gdp-growth"><i class="fa fa-check"></i><b>2.6</b> Laplace transforms can recover the full conditional distribution of future GDP growth</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="Stylized.html"><a href="Stylized.html"><i class="fa fa-check"></i><b>3</b> Stylized facts and a first simple model</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="Stylized.html"><a href="Stylized.html#several-standard-yield-objects-can-be-derived-from-a-single-discount-curve"><i class="fa fa-check"></i><b>3.1</b> Several standard yield objects can be derived from a single discount curve</a></li>
+<li class="chapter" data-level="3.2" data-path="Stylized.html"><a href="Stylized.html#a-few-observed-us-yield-curves-with-different-shapes"><i class="fa fa-check"></i><b>3.2</b> A few observed US yield curves with different shapes</a></li>
+<li class="chapter" data-level="3.3" data-path="Stylized.html"><a href="Stylized.html#a-small-number-of-principal-components-summarize-most-yield-curve-variation"><i class="fa fa-check"></i><b>3.3</b> A small number of principal components summarize most yield-curve variation</a></li>
+<li class="chapter" data-level="3.4" data-path="Stylized.html"><a href="Stylized.html#the-level-and-slope-of-the-yield-curve-over-time"><i class="fa fa-check"></i><b>3.4</b> The level and slope of the yield curve over time</a></li>
+<li class="chapter" data-level="3.5" data-path="Stylized.html"><a href="Stylized.html#overlays-yields-of-several-maturities-to-visualize-their-joint-time-series-behavior"><i class="fa fa-check"></i><b>3.5</b> Overlays yields of several maturities to visualize their joint time-series behavior</a></li>
+<li class="chapter" data-level="3.6" data-path="Stylized.html"><a href="Stylized.html#the-distributions-of-yield-levels-and-monthly-yield-changes-at-short-and-long-maturities"><i class="fa fa-check"></i><b>3.6</b> The distributions of yield levels and monthly yield changes at short and long maturities</a></li>
+<li class="chapter" data-level="3.7" data-path="Stylized.html"><a href="Stylized.html#how-average-yields-and-yield-volatilities-vary-with-maturity"><i class="fa fa-check"></i><b>3.7</b> How average yields and yield volatilities vary with maturity</a></li>
+<li class="chapter" data-level="3.8" data-path="Stylized.html"><a href="Stylized.html#the-behavior-of-us-and-euro-area-yield-curves-around-the-zero-lower-bound-period"><i class="fa fa-check"></i><b>3.8</b> The behavior of US and euro-area yield curves around the zero lower bound period</a></li>
+<li class="chapter" data-level="3.9" data-path="Stylized.html"><a href="Stylized.html#time-varying-yield-volatility-across-maturities"><i class="fa fa-check"></i><b>3.9</b> Time-varying yield volatility across maturities</a></li>
+<li class="chapter" data-level="3.10" data-path="Stylized.html"><a href="Stylized.html#the-covariance-and-correlation-structure-of-the-yield-curve"><i class="fa fa-check"></i><b>3.10</b> The covariance and correlation structure of the yield curve</a></li>
+<li class="chapter" data-level="3.11" data-path="Stylized.html"><a href="Stylized.html#a-simple-hac-robust-inference-exercise-for-the-average-term-spread"><i class="fa fa-check"></i><b>3.11</b> A simple HAC-robust inference exercise for the average term spread</a></li>
+<li class="chapter" data-level="3.12" data-path="Stylized.html"><a href="Stylized.html#bond-excess-returns-across-holding-periods-and-maturities"><i class="fa fa-check"></i><b>3.12</b> Bond excess returns across holding periods and maturities</a></li>
+<li class="chapter" data-level="3.13" data-path="Stylized.html"><a href="Stylized.html#the-term-structure-of-average-excess-returns-volatility-and-sharpe-ratios"><i class="fa fa-check"></i><b>3.13</b> The term structure of average excess returns, volatility, and Sharpe ratios</a></li>
+<li class="chapter" data-level="3.14" data-path="Stylized.html"><a href="Stylized.html#a-few-principal-components-also-summarize-excess-return-dynamics"><i class="fa fa-check"></i><b>3.14</b> A few principal components also summarize excess-return dynamics</a></li>
+<li class="chapter" data-level="3.15" data-path="Stylized.html"><a href="Stylized.html#campbell-shiller-regression-coefficients"><i class="fa fa-check"></i><b>3.15</b> Campbell-Shiller regression coefficients</a></li>
+<li class="chapter" data-level="3.16" data-path="Stylized.html"><a href="Stylized.html#the-unconditional-mean-and-volatility-of-the-short-rate"><i class="fa fa-check"></i><b>3.16</b> The unconditional mean and volatility of the short rate</a></li>
+<li class="chapter" data-level="3.17" data-path="Stylized.html"><a href="Stylized.html#two-widely-used-term-premium-estimates-across-maturities"><i class="fa fa-check"></i><b>3.17</b> Two widely used term-premium estimates across maturities</a></li>
+<li class="chapter" data-level="3.18" data-path="Stylized.html"><a href="Stylized.html#market-based-and-survey-based-expectations-for-short-rates-long-rates-and-inflation"><i class="fa fa-check"></i><b>3.18</b> Market-based and survey-based expectations for short rates, long rates, and inflation</a></li>
+<li class="chapter" data-level="3.19" data-path="Stylized.html"><a href="Stylized.html#a-simple-ar1-short-rate-model-can-generate-average-yield-curves-and-term-premia"><i class="fa fa-check"></i><b>3.19</b> A simple AR(1) short-rate model can generate average yield curves and term premia</a></li>
+<li class="chapter" data-level="3.20" data-path="Stylized.html"><a href="Stylized.html#short-rate-simulations-and-term-premia-in-the-ar1-model"><i class="fa fa-check"></i><b>3.20</b> Short-rate simulations and term premia in the AR(1) model</a></li>
+<li class="chapter" data-level="3.21" data-path="Stylized.html"><a href="Stylized.html#nominal-real-and-breakeven-curves-across-states"><i class="fa fa-check"></i><b>3.21</b> Nominal, real, and breakeven curves across states</a></li>
+<li class="chapter" data-level="3.22" data-path="Stylized.html"><a href="Stylized.html#nominal-and-real-yield-curves-with-and-without-risk-premia"><i class="fa fa-check"></i><b>3.22</b> Nominal and real yield curves with and without risk premia</a></li>
+<li class="chapter" data-level="3.23" data-path="Stylized.html"><a href="Stylized.html#time-variation-in-nominal-real-and-inflation-risk-premia"><i class="fa fa-check"></i><b>3.23</b> Time variation in nominal, real, and inflation risk premia</a></li>
+<li class="chapter" data-level="3.24" data-path="Stylized.html"><a href="Stylized.html#treasury-issuance-and-outstanding-debt-by-maturity"><i class="fa fa-check"></i><b>3.24</b> Treasury issuance and outstanding debt by maturity</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="NonGATSM.html"><a href="NonGATSM.html"><i class="fa fa-check"></i><b>4</b> Non-Gaussian affine term structure models</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="NonGATSM.html"><a href="NonGATSM.html#a-varg-term-structure-model-can-generate-movements"><i class="fa fa-check"></i><b>4.1</b> A VARG term-structure model can generate movements</a></li>
+<li class="chapter" data-level="4.2" data-path="NonGATSM.html"><a href="NonGATSM.html#a-three-regime-gaussian-regime-switching-short-rate"><i class="fa fa-check"></i><b>4.2</b> A three-regime Gaussian regime-switching short-rate</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="GATSM.html"><a href="GATSM.html"><i class="fa fa-check"></i><b>5</b> Gaussian affine term structure models</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="GATSM.html"><a href="GATSM.html#macro-spanning-regressions"><i class="fa fa-check"></i><b>5.1</b> Macro-spanning regressions</a></li>
+<li class="chapter" data-level="5.2" data-path="GATSM.html"><a href="GATSM.html#acm-style-regression-estimation"><i class="fa fa-check"></i><b>5.2</b> ACM-style regression estimation</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="NonLinear.html"><a href="NonLinear.html"><i class="fa fa-check"></i><b>6</b> Non-linear models of the term structure of interest rates</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="NonLinear.html"><a href="NonLinear.html#shadow-rate-and-unconstrained-gaussian-term-structures-in-the-simple-wu-xia-setting"><i class="fa fa-check"></i><b>6.1</b> Shadow-rate and unconstrained Gaussian term structures in the simple Wu-Xia setting</a></li>
+<li class="chapter" data-level="6.2" data-path="NonLinear.html"><a href="NonLinear.html#shadow-rate-bond-pricing-and-monte-carlo-validation"><i class="fa fa-check"></i><b>6.2</b> Shadow-rate bond pricing and Monte Carlo validation</a></li>
+<li class="chapter" data-level="6.3" data-path="NonLinear.html"><a href="NonLinear.html#the-lower-bound-changes-conditional-rate-volatility-across-maturities"><i class="fa fa-check"></i><b>6.3</b> The lower bound changes conditional rate volatility across maturities</a></li>
+<li class="chapter" data-level="6.4" data-path="NonLinear.html"><a href="NonLinear.html#the-shadow-rate-idea-in-a-small-new-keynesian-model-with-nominal-and-real-curves"><i class="fa fa-check"></i><b>6.4</b> The shadow-rate idea in a small New Keynesian model with nominal and real curves</a></li>
+<li class="chapter" data-level="6.5" data-path="NonLinear.html"><a href="NonLinear.html#shadow-rate-pricing-of-defaultable-bond-spreads"><i class="fa fa-check"></i><b>6.5</b> Shadow-rate pricing of defaultable bond spreads</a></li>
+<li class="chapter" data-level="6.6" data-path="NonLinear.html"><a href="NonLinear.html#shadow-default-intensity-and-credit-spreads-in-a-fiscal-limits-setting"><i class="fa fa-check"></i><b>6.6</b> Shadow default intensity and credit spreads in a fiscal-limits setting</a></li>
+<li class="chapter" data-level="6.7" data-path="NonLinear.html"><a href="NonLinear.html#non-gaussian-shadow-rate-model-with-jump-like-factors"><i class="fa fa-check"></i><b>6.7</b> Non-Gaussian shadow-rate model with jump-like factors</a></li>
+<li class="chapter" data-level="6.8" data-path="NonLinear.html"><a href="NonLinear.html#shadow-rate-with-arg-stochastic-volatility"><i class="fa fa-check"></i><b>6.8</b> Shadow rate with ARG stochastic volatility</a></li>
+<li class="chapter" data-level="6.9" data-path="NonLinear.html"><a href="NonLinear.html#affine-transform-methods-to-a-simple-climate-finance-model"><i class="fa fa-check"></i><b>6.9</b> Affine-transform methods to a simple climate-finance model</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="forward-futures-dividends-commodity-pricing-and-convenience-yields.html"><a href="forward-futures-dividends-commodity-pricing-and-convenience-yields.html"><i class="fa fa-check"></i><b>7</b> Forward, futures, dividends, commodity pricing, and convenience yields</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="forward-futures-dividends-commodity-pricing-and-convenience-yields.html"><a href="forward-futures-dividends-commodity-pricing-and-convenience-yields.html#persistent-seasonal-factors-can-generate-recurring-convenience-yield-patterns"><i class="fa fa-check"></i><b>7.1</b> Persistent seasonal factors can generate recurring convenience-yield patterns</a></li>
+<li class="chapter" data-level="7.2" data-path="forward-futures-dividends-commodity-pricing-and-convenience-yields.html"><a href="forward-futures-dividends-commodity-pricing-and-convenience-yields.html#observed-futures-term-structures-at-a-few-selected-dates"><i class="fa fa-check"></i><b>7.2</b> Observed futures term structures at a few selected dates</a></li>
+<li class="chapter" data-level="7.3" data-path="forward-futures-dividends-commodity-pricing-and-convenience-yields.html"><a href="forward-futures-dividends-commodity-pricing-and-convenience-yields.html#gaussian-state-space-model-for-commodity-futures"><i class="fa fa-check"></i><b>7.3</b> Gaussian state-space model for commodity futures</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="options.html"><a href="options.html"><i class="fa fa-check"></i><b>8</b> Options</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="options.html"><a href="options.html#stock-call-and-put-prices-in-a-two-factor-affine-model-with-stochastic-volatility"><i class="fa fa-check"></i><b>8.1</b> Stock call and put prices in a two-factor affine model with stochastic volatility</a></li>
+<li class="chapter" data-level="8.2" data-path="options.html"><a href="options.html#the-pricing-of-interest-rate-caps-and-floors-in-a-two-factor-varg-term-structure-model"><i class="fa fa-check"></i><b>8.2</b> The pricing of interest-rate caps and floors in a two-factor VARG term-structure model</a></li>
+<li class="chapter" data-level="8.3" data-path="options.html"><a href="options.html#kim-style-swaption-exercise-boundary-approximations-in-a-non-gaussian-affine-setting"><i class="fa fa-check"></i><b>8.3</b> Kim-style swaption exercise-boundary approximations in a non-Gaussian affine setting</a></li>
+<li class="chapter" data-level="8.4" data-path="options.html"><a href="options.html#kim-style-swaption-boundary-approximations-in-a-gaussian-affine-model"><i class="fa fa-check"></i><b>8.4</b> Kim-style swaption boundary approximations in a Gaussian affine model</a></li>
+<li class="chapter" data-level="8.5" data-path="options.html"><a href="options.html#prices-inflation-caps-and-floors-in-a-two-factor-affine-inflation-model"><i class="fa fa-check"></i><b>8.5</b> Prices inflation caps and floors in a two-factor affine inflation model</a></li>
+<li class="chapter" data-level="8.6" data-path="options.html"><a href="options.html#inflation-cap-prices-vary-across-states-and-strike-levels"><i class="fa fa-check"></i><b>8.6</b> Inflation cap prices vary across states and strike levels</a></li>
+<li class="chapter" data-level="8.7" data-path="options.html"><a href="options.html#the-price-and-yield-effect-of-a-deflation-floor-across-states-and-horizons"><i class="fa fa-check"></i><b>8.7</b> The price and yield effect of a deflation floor across states and horizons</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="CreditLiquidity.html"><a href="CreditLiquidity.html"><i class="fa fa-check"></i><b>9</b> Credit and liquidity risks</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="CreditLiquidity.html"><a href="CreditLiquidity.html#standard-framework"><i class="fa fa-check"></i><b>9.1</b> Standard framework</a></li>
+<li class="chapter" data-level="9.2" data-path="CreditLiquidity.html"><a href="CreditLiquidity.html#credit-ratings"><i class="fa fa-check"></i><b>9.2</b> Credit ratings</a></li>
+<li class="chapter" data-level="9.3" data-path="CreditLiquidity.html"><a href="CreditLiquidity.html#varg"><i class="fa fa-check"></i><b>9.3</b> VARG</a>
+<ul>
+<li class="chapter" data-level="9.3.1" data-path="CreditLiquidity.html"><a href="CreditLiquidity.html#cds-spreads-vary-with-the-state-variables-in-the-varg-credit-model"><i class="fa fa-check"></i><b>9.3.1</b> CDS spreads vary with the state variables in the VARG credit model</a></li>
+</ul></li>
+<li class="chapter" data-level="9.4" data-path="CreditLiquidity.html"><a href="CreditLiquidity.html#top-down-approach"><i class="fa fa-check"></i><b>9.4</b> Top-down approach</a>
+<ul>
+<li class="chapter" data-level="9.4.1" data-path="CreditLiquidity.html"><a href="CreditLiquidity.html#prices-cds-index-spreads-in-the-top-down-model"><i class="fa fa-check"></i><b>9.4.1</b> Prices CDS index spreads in the top-down model</a></li>
+<li class="chapter" data-level="9.4.2" data-path="CreditLiquidity.html"><a href="CreditLiquidity.html#tranche-pricing-across-attachment-points-in-the-top-down-framework"><i class="fa fa-check"></i><b>9.4.2</b> Tranche pricing across attachment points in the top-down framework</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="CCAPM.html"><a href="CCAPM.html"><i class="fa fa-check"></i><b>10</b> Consumption Capital Asset Pricing Model</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="CCAPM.html"><a href="CCAPM.html#risk-aversion-and-intertemporal-substitution-in-the-ccapm"><i class="fa fa-check"></i><b>10.1</b> Risk aversion and intertemporal substitution in the CCAPM</a></li>
+<li class="chapter" data-level="10.2" data-path="CCAPM.html"><a href="CCAPM.html#asset-pricing-implications-of-risk-aversion-and-eis-calibrations"><i class="fa fa-check"></i><b>10.2</b> Asset-pricing implications of risk-aversion and EIS calibrations</a></li>
+<li class="chapter" data-level="10.3" data-path="CCAPM.html"><a href="CCAPM.html#smoothing-preferences-affect-consumption-and-pricing-dynamics"><i class="fa fa-check"></i><b>10.3</b> Smoothing preferences affect consumption and pricing dynamics</a></li>
+<li class="chapter" data-level="10.4" data-path="CCAPM.html"><a href="CCAPM.html#empirical-correlations-between-key-macro-financial-variables"><i class="fa fa-check"></i><b>10.4</b> Empirical correlations between key macro-financial variables</a></li>
+<li class="chapter" data-level="10.5" data-path="CCAPM.html"><a href="CCAPM.html#term-structures-under-a-ccapm-based-pricing-kernel"><i class="fa fa-check"></i><b>10.5</b> Term structures under a CCAPM-based pricing kernel</a></li>
+<li class="chapter" data-level="10.6" data-path="CCAPM.html"><a href="CCAPM.html#decomposes-the-real-term-premium-in-the-baseline-ccapm-setting"><i class="fa fa-check"></i><b>10.6</b> Decomposes the real term premium in the baseline CCAPM setting</a></li>
+<li class="chapter" data-level="10.7" data-path="CCAPM.html"><a href="CCAPM.html#model-implied-yield-curve-moments-with-ccapm-restrictions"><i class="fa fa-check"></i><b>10.7</b> Model-implied yield-curve moments with CCAPM restrictions</a></li>
+<li class="chapter" data-level="10.8" data-path="CCAPM.html"><a href="CCAPM.html#separates-trend-and-cycle-contributions-to-the-real-term-premium"><i class="fa fa-check"></i><b>10.8</b> Separates trend and cycle contributions to the real term premium</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="recursive.html"><a href="recursive.html"><i class="fa fa-check"></i><b>11</b> Recursive preferences</a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="recursive.html"><a href="recursive.html#external-habits-amplify-variation-in-marginal-utility"><i class="fa fa-check"></i><b>11.1</b> External habits amplify variation in marginal utility</a></li>
+<li class="chapter" data-level="11.2" data-path="recursive.html"><a href="recursive.html#exponentially-smoothed-consumption-growth-enters-recursive-preferences"><i class="fa fa-check"></i><b>11.2</b> Exponentially smoothed consumption growth enters recursive preferences</a></li>
+<li class="chapter" data-level="11.3" data-path="recursive.html"><a href="recursive.html#the-fixed-point-resolution-behind-epstein-zin-preferences"><i class="fa fa-check"></i><b>11.3</b> The fixed-point resolution behind Epstein-Zin preferences</a></li>
+<li class="chapter" data-level="11.4" data-path="recursive.html"><a href="recursive.html#epstein-zin-pricing-implications-vary-with-preference-parameters"><i class="fa fa-check"></i><b>11.4</b> Epstein-Zin pricing implications vary with preference parameters</a></li>
+<li class="chapter" data-level="11.5" data-path="recursive.html"><a href="recursive.html#the-bansal-yaron-long-run-risk-environment-and-its-state-variables"><i class="fa fa-check"></i><b>11.5</b> The Bansal-Yaron long-run-risk environment and its state variables</a></li>
+<li class="chapter" data-level="11.6" data-path="recursive.html"><a href="recursive.html#yields-returns-and-premia-in-the-bansal-yaron-model"><i class="fa fa-check"></i><b>11.6</b> Yields, returns, and premia in the Bansal-Yaron model</a></li>
+<li class="chapter" data-level="11.7" data-path="recursive.html"><a href="recursive.html#the-bansal-shaliastovich-specification-for-bond-and-currency-risk-premia"><i class="fa fa-check"></i><b>11.7</b> The Bansal-Shaliastovich specification for bond and currency risk premia</a></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="PreferredHabitat.html"><a href="PreferredHabitat.html"><i class="fa fa-check"></i><b>12</b> Preferred-habitat model</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="PreferredHabitat.html"><a href="PreferredHabitat.html#the-preferred-habitat-specification-and-the-maturity-demand-function"><i class="fa fa-check"></i><b>12.1</b> The preferred-habitat specification and the maturity-demand function</a></li>
+<li class="chapter" data-level="12.2" data-path="PreferredHabitat.html"><a href="PreferredHabitat.html#factor-loadings-in-the-preferred-habitat-model"><i class="fa fa-check"></i><b>12.2</b> Factor loadings in the preferred-habitat model</a></li>
+<li class="chapter" data-level="12.3" data-path="PreferredHabitat.html"><a href="PreferredHabitat.html#how-bond-supply-shocks-affect-the-yield-curve-under-preferred-habitat"><i class="fa fa-check"></i><b>12.3</b> How bond supply shocks affect the yield curve under preferred habitat</a></li>
+<li class="chapter" data-level="12.4" data-path="PreferredHabitat.html"><a href="PreferredHabitat.html#the-excess-return-implications-of-the-preferred-habitat-model"><i class="fa fa-check"></i><b>12.4</b> The excess-return implications of the preferred-habitat model</a></li>
+<li class="chapter" data-level="12.5" data-path="PreferredHabitat.html"><a href="PreferredHabitat.html#the-preferred-habitat-setup-to-exchange-rate-implications"><i class="fa fa-check"></i><b>12.5</b> The preferred-habitat setup to exchange-rate implications</a></li>
+<li class="chapter" data-level="12.6" data-path="PreferredHabitat.html"><a href="PreferredHabitat.html#nominal-and-real-term-structures-in-the-preferred-habitat-framework"><i class="fa fa-check"></i><b>12.6</b> Nominal and real term structures in the preferred-habitat framework</a></li>
+<li class="chapter" data-level="12.7" data-path="PreferredHabitat.html"><a href="PreferredHabitat.html#how-preferred-habitat-shapes-inflation-compensation-and-term-premia"><i class="fa fa-check"></i><b>12.7</b> How preferred habitat shapes inflation compensation and term premia</a></li>
+<li class="chapter" data-level="12.8" data-path="PreferredHabitat.html"><a href="PreferredHabitat.html#additional-nominal-real-yield-curve-implications-of-habitat-demand"><i class="fa fa-check"></i><b>12.8</b> Additional nominal-real yield-curve implications of habitat demand</a></li>
+<li class="chapter" data-level="12.9" data-path="PreferredHabitat.html"><a href="PreferredHabitat.html#preferred-habitat-bond-demand-to-stock-market-valuation-effects"><i class="fa fa-check"></i><b>12.9</b> Preferred-habitat bond demand to stock-market valuation effects</a></li>
+</ul></li>
+<li class="chapter" data-level="13" data-path="Filtering.html"><a href="Filtering.html"><i class="fa fa-check"></i><b>13</b> Filtering</a>
+<ul>
+<li class="chapter" data-level="13.1" data-path="Filtering.html"><a href="Filtering.html#modified-kalman-filter"><i class="fa fa-check"></i><b>13.1</b> Modified Kalman filter</a></li>
+<li class="chapter" data-level="13.2" data-path="Filtering.html"><a href="Filtering.html#kalman-filter"><i class="fa fa-check"></i><b>13.2</b> Kalman filter</a>
+<ul>
+<li class="chapter" data-level="13.2.1" data-path="Filtering.html"><a href="Filtering.html#the-mechanics-of-the-linear-kalman-filter-in-a-simple-state-space-model"><i class="fa fa-check"></i><b>13.2.1</b> The mechanics of the linear Kalman filter in a simple state-space model</a></li>
+<li class="chapter" data-level="13.2.2" data-path="Filtering.html"><a href="Filtering.html#filtered-and-smoothed-estimates-in-a-multivariate-gaussian-system"><i class="fa fa-check"></i><b>13.2.2</b> Filtered and smoothed estimates in a multivariate Gaussian system</a></li>
+<li class="chapter" data-level="13.2.3" data-path="Filtering.html"><a href="Filtering.html#latent-state-recovery-under-alternative-measurement-equations"><i class="fa fa-check"></i><b>13.2.3</b> Latent-state recovery under alternative measurement equations</a></li>
+<li class="chapter" data-level="13.2.4" data-path="Filtering.html"><a href="Filtering.html#a-richer-affine-term-structure-filtering-exercise"><i class="fa fa-check"></i><b>13.2.4</b> A richer affine term-structure filtering exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="13.3" data-path="Filtering.html"><a href="Filtering.html#quadratic-kalman-filter"><i class="fa fa-check"></i><b>13.3</b> Quadratic Kalman Filter</a></li>
+<li class="chapter" data-level="13.4" data-path="Filtering.html"><a href="Filtering.html#kitagawa-hamilton-filter"><i class="fa fa-check"></i><b>13.4</b> Kitagawa-Hamilton filter</a></li>
+</ul></li>
+<li class="chapter" data-level="14" data-path="Estimation.html"><a href="Estimation.html"><i class="fa fa-check"></i><b>14</b> Estimation</a>
+<ul>
+<li class="chapter" data-level="14.1" data-path="Estimation.html"><a href="Estimation.html#maximum-likelihood-estimation-with-observed-variables"><i class="fa fa-check"></i><b>14.1</b> Maximum likelihood estimation with observed variables</a>
+<ul>
+<li class="chapter" data-level="14.1.1" data-path="Estimation.html"><a href="Estimation.html#the-likelihood-surface-and-basic-ingredients-of-maximum-likelihood-estimation"><i class="fa fa-check"></i><b>14.1.1</b> The likelihood surface and basic ingredients of maximum-likelihood estimation</a></li>
+<li class="chapter" data-level="14.1.2" data-path="Estimation.html"><a href="Estimation.html#initialization-affects-likelihood-based-estimation-results"><i class="fa fa-check"></i><b>14.1.2</b> Initialization affects likelihood-based estimation results</a></li>
+<li class="chapter" data-level="14.1.3" data-path="Estimation.html"><a href="Estimation.html#observed-variables-with-their-fitted-counterparts-under-the-estimated-model"><i class="fa fa-check"></i><b>14.1.3</b> Observed variables with their fitted counterparts under the estimated model</a></li>
+</ul></li>
+<li class="chapter" data-level="14.2" data-path="Estimation.html"><a href="Estimation.html#maximum-likelihood-with-the-kalman-filter"><i class="fa fa-check"></i><b>14.2</b> Maximum Likelihood with the Kalman filter</a>
+<ul>
+<li class="chapter" data-level="14.2.1" data-path="Estimation.html"><a href="Estimation.html#estimated-latent-factors-from-the-maximum-likelihood-exercise"><i class="fa fa-check"></i><b>14.2.1</b> Estimated latent factors from the maximum-likelihood exercise</a></li>
+</ul></li>
+<li class="chapter" data-level="14.3" data-path="Estimation.html"><a href="Estimation.html#kitagawa-hamilton"><i class="fa fa-check"></i><b>14.3</b> Kitagawa-Hamilton</a>
+<ul>
+<li class="chapter" data-level="14.3.1" data-path="Estimation.html"><a href="Estimation.html#additional-diagnostics-for-the-regime-switching-stock-model"><i class="fa fa-check"></i><b>14.3.1</b> Additional diagnostics for the regime-switching stock model</a></li>
+</ul></li>
+<li class="chapter" data-level="14.4" data-path="Estimation.html"><a href="Estimation.html#inversion-technique-plus-regime-switching"><i class="fa fa-check"></i><b>14.4</b> Inversion technique plus regime switching</a>
+<ul>
+<li class="chapter" data-level="14.4.1" data-path="Estimation.html"><a href="Estimation.html#kitagawa-hamilton-inversion-in-a-regime-switching-environment"><i class="fa fa-check"></i><b>14.4.1</b> Kitagawa-Hamilton inversion in a regime-switching environment</a></li>
+<li class="chapter" data-level="14.4.2" data-path="Estimation.html"><a href="Estimation.html#inversion-output-and-state-probabilities"><i class="fa fa-check"></i><b>14.4.2</b> Inversion output and state probabilities</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="15" data-path="YieldCurveData.html"><a href="YieldCurveData.html"><i class="fa fa-check"></i><b>15</b> Imperfect information and rational expectations</a>
+<ul>
+<li class="chapter" data-level="15.1" data-path="YieldCurveData.html"><a href="YieldCurveData.html#imperfect-information"><i class="fa fa-check"></i><b>15.1</b> Imperfect information</a>
+<ul>
+<li class="chapter" data-level="15.1.1" data-path="YieldCurveData.html"><a href="YieldCurveData.html#filtered-beliefs-and-true-states-under-imperfect-information"><i class="fa fa-check"></i><b>15.1.1</b> Filtered beliefs and true states under imperfect information</a></li>
+<li class="chapter" data-level="15.1.2" data-path="YieldCurveData.html"><a href="YieldCurveData.html#imperfect-information-in-a-long-run-risk-environment"><i class="fa fa-check"></i><b>15.1.2</b> Imperfect information in a long-run-risk environment</a></li>
+<li class="chapter" data-level="15.1.3" data-path="YieldCurveData.html"><a href="YieldCurveData.html#how-optimistic-beliefs-affect-asset-prices-and-macro-dynamics"><i class="fa fa-check"></i><b>15.1.3</b> How optimistic beliefs affect asset prices and macro dynamics</a></li>
+</ul></li>
+<li class="chapter" data-level="15.2" data-path="YieldCurveData.html"><a href="YieldCurveData.html#rational-expectations"><i class="fa fa-check"></i><b>15.2</b> Rational Expectations</a>
+<ul>
+<li class="chapter" data-level="15.2.1" data-path="YieldCurveData.html"><a href="YieldCurveData.html#additional-implications-of-the-bcm-imperfect-information-model"><i class="fa fa-check"></i><b>15.2.1</b> Additional implications of the BCM imperfect-information model</a></li>
+<li class="chapter" data-level="15.2.2" data-path="YieldCurveData.html"><a href="YieldCurveData.html#rational-expectation-framework-with-longer-horizon"><i class="fa fa-check"></i><b>15.2.2</b> Rational Expectation framework with longer horizon</a></li>
+<li class="chapter" data-level="15.2.3" data-path="YieldCurveData.html"><a href="YieldCurveData.html#the-imperfect-information-framework-to-an-ireland-style-new-keynesian-model"><i class="fa fa-check"></i><b>15.2.3</b> The imperfect-information framework to an Ireland-style New Keynesian model</a></li>
+</ul></li>
+<li class="chapter" data-level="15.3" data-path="YieldCurveData.html"><a href="YieldCurveData.html#imperfect-information-and-rational-expectations"><i class="fa fa-check"></i><b>15.3</b> Imperfect information and rational expectations</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Asset Pricing with Discrete-Time Affine processes</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="CCAPM" class="section level1 hasAnchor" number="10">
+<h1><span class="header-section-number">Chapter 10</span> Consumption Capital Asset Pricing Model<a href="CCAPM.html#CCAPM" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="risk-aversion-and-intertemporal-substitution-in-the-ccapm" class="section level2 hasAnchor" number="10.1">
+<h2><span class="header-section-number">10.1</span> Risk aversion and intertemporal substitution in the CCAPM<a href="CCAPM.html#risk-aversion-and-intertemporal-substitution-in-the-ccapm" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>This example contrasts the roles of risk aversion and intertemporal substitution in the CCAPM.</p>
+<div class="sourceCode" id="cb98"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb98-1"><a href="CCAPM.html#cb98-1" tabindex="-1"></a><span class="co"># Purpose: This example contrasts the roles of risk aversion and intertemporal substitution in</span></span>
+<span id="cb98-2"><a href="CCAPM.html#cb98-2" tabindex="-1"></a><span class="co"># the CCAPM</span></span>
+<span id="cb98-3"><a href="CCAPM.html#cb98-3" tabindex="-1"></a></span>
+<span id="cb98-4"><a href="CCAPM.html#cb98-4" tabindex="-1"></a><span class="co"># Define the two-state consumption lottery.</span></span>
+<span id="cb98-5"><a href="CCAPM.html#cb98-5" tabindex="-1"></a>C.l <span class="ot">&lt;-</span> .<span class="dv">8</span></span>
+<span id="cb98-6"><a href="CCAPM.html#cb98-6" tabindex="-1"></a>C.h <span class="ot">&lt;-</span> <span class="fl">1.2</span></span>
+<span id="cb98-7"><a href="CCAPM.html#cb98-7" tabindex="-1"></a>cc <span class="ot">&lt;-</span> <span class="fu">c</span>(C.l,C.h)</span>
+<span id="cb98-8"><a href="CCAPM.html#cb98-8" tabindex="-1"></a></span>
+<span id="cb98-9"><a href="CCAPM.html#cb98-9" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))</span>
+<span id="cb98-10"><a href="CCAPM.html#cb98-10" tabindex="-1"></a><span class="fu">par</span>(<span class="at">plt=</span><span class="fu">c</span>(.<span class="dv">15</span>,.<span class="dv">95</span>,.<span class="dv">25</span>,.<span class="dv">85</span>))</span>
+<span id="cb98-11"><a href="CCAPM.html#cb98-11" tabindex="-1"></a></span>
+<span id="cb98-12"><a href="CCAPM.html#cb98-12" tabindex="-1"></a>C <span class="ot">&lt;-</span> <span class="fu">seq</span>(.<span class="dv">7</span>,<span class="fl">1.5</span>,<span class="at">by=</span>.<span class="dv">01</span>)</span>
+<span id="cb98-13"><a href="CCAPM.html#cb98-13" tabindex="-1"></a></span>
+<span id="cb98-14"><a href="CCAPM.html#cb98-14" tabindex="-1"></a><span class="co"># Plot certainty equivalents for moderate risk aversion.</span></span>
+<span id="cb98-15"><a href="CCAPM.html#cb98-15" tabindex="-1"></a>gamma <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb98-16"><a href="CCAPM.html#cb98-16" tabindex="-1"></a>E.u <span class="ot">&lt;-</span> <span class="fu">mean</span>(cc<span class="sc">^</span>(<span class="dv">1</span><span class="sc">-</span>gamma)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma))</span>
+<span id="cb98-17"><a href="CCAPM.html#cb98-17" tabindex="-1"></a>c.CE <span class="ot">&lt;-</span> (E.u<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>gamma))<span class="sc">^</span>(<span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma))</span>
+<span id="cb98-18"><a href="CCAPM.html#cb98-18" tabindex="-1"></a>U <span class="ot">&lt;-</span> C<span class="sc">^</span>(<span class="dv">1</span><span class="sc">-</span>gamma)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma)</span>
+<span id="cb98-19"><a href="CCAPM.html#cb98-19" tabindex="-1"></a><span class="fu">plot</span>(C,U,<span class="at">type=</span><span class="st">&quot;l&quot;</span>,<span class="at">lwd=</span><span class="dv">2</span>,<span class="at">las=</span><span class="dv">1</span>,</span>
+<span id="cb98-20"><a href="CCAPM.html#cb98-20" tabindex="-1"></a>     <span class="at">xlab=</span><span class="st">&quot;Consumption&quot;</span>,<span class="at">ylab=</span><span class="st">&quot;Utility&quot;</span>,</span>
+<span id="cb98-21"><a href="CCAPM.html#cb98-21" tabindex="-1"></a>     <span class="at">main=</span><span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;(a) &quot;</span>,gamma,<span class="st">&quot; = 2&quot;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>)))</span>
+<span id="cb98-22"><a href="CCAPM.html#cb98-22" tabindex="-1"></a><span class="fu">points</span>(cc,cc<span class="sc">^</span>(<span class="dv">1</span><span class="sc">-</span>gamma)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma),<span class="at">pch=</span><span class="dv">19</span>,<span class="at">col=</span><span class="st">&quot;black&quot;</span>,<span class="at">cex=</span><span class="fl">1.5</span>)</span>
+<span id="cb98-23"><a href="CCAPM.html#cb98-23" tabindex="-1"></a><span class="fu">lines</span>(cc,cc<span class="sc">^</span>(<span class="dv">1</span><span class="sc">-</span>gamma)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma),<span class="at">col=</span><span class="st">&quot;black&quot;</span>)</span>
+<span id="cb98-24"><a href="CCAPM.html#cb98-24" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">c</span>(c.CE,<span class="fu">mean</span>(cc)),<span class="fu">c</span>(E.u,E.u),<span class="at">lty=</span><span class="dv">1</span>,<span class="at">col=</span><span class="st">&quot;darkgrey&quot;</span>,<span class="at">lwd=</span><span class="dv">1</span>)</span>
+<span id="cb98-25"><a href="CCAPM.html#cb98-25" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">c</span>(c.CE,c.CE),<span class="fu">c</span>(<span class="sc">-</span><span class="dv">1000</span>,E.u),<span class="at">lty=</span><span class="dv">1</span>,<span class="at">col=</span><span class="st">&quot;darkgrey&quot;</span>,<span class="at">lwd=</span><span class="dv">1</span>)</span>
+<span id="cb98-26"><a href="CCAPM.html#cb98-26" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">c</span>(<span class="fu">mean</span>(cc),<span class="fu">mean</span>(cc)),<span class="fu">c</span>(<span class="sc">-</span><span class="dv">1000</span>,<span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma)),<span class="at">lty=</span><span class="dv">1</span>,<span class="at">col=</span><span class="st">&quot;darkgrey&quot;</span>,<span class="at">lwd=</span><span class="dv">1</span>)</span>
+<span id="cb98-27"><a href="CCAPM.html#cb98-27" tabindex="-1"></a><span class="fu">points</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>),<span class="fu">c</span>(<span class="fu">mean</span>(cc<span class="sc">^</span>(<span class="dv">1</span><span class="sc">-</span>gamma)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma)),<span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma)),<span class="at">col=</span><span class="st">&quot;darkgrey&quot;</span>,<span class="at">pch=</span><span class="dv">19</span>)</span>
+<span id="cb98-28"><a href="CCAPM.html#cb98-28" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>),<span class="fu">c</span>(<span class="fu">mean</span>(cc<span class="sc">^</span>(<span class="dv">1</span><span class="sc">-</span>gamma)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma)),<span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma)),<span class="at">col=</span><span class="st">&quot;darkgrey&quot;</span>)</span>
+<span id="cb98-29"><a href="CCAPM.html#cb98-29" tabindex="-1"></a>rp <span class="ot">&lt;-</span> <span class="sc">-</span> <span class="fu">mean</span>(cc<span class="sc">^</span>(<span class="dv">1</span><span class="sc">-</span>gamma)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma)) <span class="sc">+</span> <span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma)</span>
+<span id="cb98-30"><a href="CCAPM.html#cb98-30" tabindex="-1"></a></span>
+<span id="cb98-31"><a href="CCAPM.html#cb98-31" tabindex="-1"></a><span class="co"># Annotate the certainty equivalent and the risk-premium gap.</span></span>
+<span id="cb98-32"><a href="CCAPM.html#cb98-32" tabindex="-1"></a><span class="fu">text</span>(<span class="at">x =</span> <span class="fl">1.3</span>,<span class="at">y=</span><span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma) <span class="sc">-</span> .<span class="dv">2</span>,</span>
+<span id="cb98-33"><a href="CCAPM.html#cb98-33" tabindex="-1"></a>     <span class="at">labels =</span> <span class="fu">paste</span>(<span class="st">&quot;Risk premium = &quot;</span>,<span class="fu">toString</span>(<span class="fu">round</span>(<span class="fu">mean</span>(cc)<span class="sc">-</span>c.CE,<span class="dv">2</span>)),<span class="at">sep=</span><span class="st">&quot;&quot;</span>),</span>
+<span id="cb98-34"><a href="CCAPM.html#cb98-34" tabindex="-1"></a>     <span class="at">col=</span><span class="st">&quot;black&quot;</span>)</span>
+<span id="cb98-35"><a href="CCAPM.html#cb98-35" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">c</span>(<span class="fu">mean</span>(<span class="fu">c</span>(c.CE,<span class="dv">1</span>)),<span class="fl">1.2</span>),<span class="fu">c</span>(C[<span class="dv">1</span>]<span class="sc">^</span>(<span class="dv">1</span><span class="sc">-</span>gamma)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma),<span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma) <span class="sc">-</span> .<span class="dv">22</span>),<span class="at">col=</span><span class="st">&quot;black&quot;</span>)</span>
+<span id="cb98-36"><a href="CCAPM.html#cb98-36" tabindex="-1"></a></span>
+<span id="cb98-37"><a href="CCAPM.html#cb98-37" tabindex="-1"></a><span class="co"># Repeat the same construction with higher risk aversion.</span></span>
+<span id="cb98-38"><a href="CCAPM.html#cb98-38" tabindex="-1"></a>gamma <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb98-39"><a href="CCAPM.html#cb98-39" tabindex="-1"></a>E.u <span class="ot">&lt;-</span> <span class="fu">mean</span>(cc<span class="sc">^</span>(<span class="dv">1</span><span class="sc">-</span>gamma)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma))</span>
+<span id="cb98-40"><a href="CCAPM.html#cb98-40" tabindex="-1"></a>c.CE <span class="ot">&lt;-</span> (E.u<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>gamma))<span class="sc">^</span>(<span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma))</span>
+<span id="cb98-41"><a href="CCAPM.html#cb98-41" tabindex="-1"></a>U <span class="ot">&lt;-</span> C<span class="sc">^</span>(<span class="dv">1</span><span class="sc">-</span>gamma)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma)</span>
+<span id="cb98-42"><a href="CCAPM.html#cb98-42" tabindex="-1"></a></span>
+<span id="cb98-43"><a href="CCAPM.html#cb98-43" tabindex="-1"></a><span class="fu">plot</span>(C,U,<span class="at">type=</span><span class="st">&quot;l&quot;</span>,<span class="at">lwd=</span><span class="dv">2</span>,<span class="at">las=</span><span class="dv">1</span>,</span>
+<span id="cb98-44"><a href="CCAPM.html#cb98-44" tabindex="-1"></a>     <span class="at">xlab=</span><span class="st">&quot;Consumption&quot;</span>,<span class="at">ylab=</span><span class="st">&quot;Utility&quot;</span>,</span>
+<span id="cb98-45"><a href="CCAPM.html#cb98-45" tabindex="-1"></a>     <span class="at">main=</span><span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;(b) &quot;</span>,gamma,<span class="st">&quot; = 10&quot;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>)))</span>
+<span id="cb98-46"><a href="CCAPM.html#cb98-46" tabindex="-1"></a><span class="fu">points</span>(cc,cc<span class="sc">^</span>(<span class="dv">1</span><span class="sc">-</span>gamma)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma),<span class="at">pch=</span><span class="dv">19</span>,<span class="at">col=</span><span class="st">&quot;black&quot;</span>,<span class="at">cex=</span><span class="fl">1.5</span>)</span>
+<span id="cb98-47"><a href="CCAPM.html#cb98-47" tabindex="-1"></a><span class="fu">lines</span>(cc,cc<span class="sc">^</span>(<span class="dv">1</span><span class="sc">-</span>gamma)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma),<span class="at">col=</span><span class="st">&quot;black&quot;</span>)</span>
+<span id="cb98-48"><a href="CCAPM.html#cb98-48" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">c</span>(c.CE,<span class="fu">mean</span>(cc)),<span class="fu">c</span>(E.u,E.u),<span class="at">lty=</span><span class="dv">1</span>,<span class="at">col=</span><span class="st">&quot;darkgrey&quot;</span>,<span class="at">lwd=</span><span class="dv">1</span>)</span>
+<span id="cb98-49"><a href="CCAPM.html#cb98-49" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">c</span>(c.CE,c.CE),<span class="fu">c</span>(<span class="sc">-</span><span class="dv">1000</span>,E.u),<span class="at">lty=</span><span class="dv">1</span>,<span class="at">col=</span><span class="st">&quot;darkgrey&quot;</span>,<span class="at">lwd=</span><span class="dv">1</span>)</span>
+<span id="cb98-50"><a href="CCAPM.html#cb98-50" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">c</span>(<span class="fu">mean</span>(cc),<span class="fu">mean</span>(cc)),<span class="fu">c</span>(<span class="sc">-</span><span class="dv">1000</span>,<span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma)),<span class="at">lty=</span><span class="dv">1</span>,<span class="at">col=</span><span class="st">&quot;darkgrey&quot;</span>,<span class="at">lwd=</span><span class="dv">1</span>)</span>
+<span id="cb98-51"><a href="CCAPM.html#cb98-51" tabindex="-1"></a><span class="fu">points</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>),<span class="fu">c</span>(<span class="fu">mean</span>(cc<span class="sc">^</span>(<span class="dv">1</span><span class="sc">-</span>gamma)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma)),<span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma)),<span class="at">col=</span><span class="st">&quot;darkgrey&quot;</span>,<span class="at">pch=</span><span class="dv">19</span>)</span>
+<span id="cb98-52"><a href="CCAPM.html#cb98-52" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>),<span class="fu">c</span>(<span class="fu">mean</span>(cc<span class="sc">^</span>(<span class="dv">1</span><span class="sc">-</span>gamma)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma)),<span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma)),<span class="at">col=</span><span class="st">&quot;darkgrey&quot;</span>)</span>
+<span id="cb98-53"><a href="CCAPM.html#cb98-53" tabindex="-1"></a>rp <span class="ot">&lt;-</span> <span class="sc">-</span> <span class="fu">mean</span>(cc<span class="sc">^</span>(<span class="dv">1</span><span class="sc">-</span>gamma)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma)) <span class="sc">+</span> <span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma)</span>
+<span id="cb98-54"><a href="CCAPM.html#cb98-54" tabindex="-1"></a><span class="fu">text</span>(<span class="at">x =</span> <span class="fl">1.3</span>,<span class="at">y=</span><span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma) <span class="sc">-</span> <span class="dv">1</span>,</span>
+<span id="cb98-55"><a href="CCAPM.html#cb98-55" tabindex="-1"></a>     <span class="at">labels =</span> <span class="fu">paste</span>(<span class="st">&quot;Risk premium = &quot;</span>,<span class="fu">toString</span>(<span class="fu">round</span>(<span class="fu">mean</span>(cc)<span class="sc">-</span>c.CE,<span class="dv">2</span>)),<span class="at">sep=</span><span class="st">&quot;&quot;</span>),</span>
+<span id="cb98-56"><a href="CCAPM.html#cb98-56" tabindex="-1"></a>     <span class="at">col=</span><span class="st">&quot;black&quot;</span>)</span>
+<span id="cb98-57"><a href="CCAPM.html#cb98-57" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">c</span>(<span class="fu">mean</span>(<span class="fu">c</span>(c.CE,<span class="dv">1</span>)),<span class="fl">1.2</span>),<span class="fu">c</span>(C[<span class="dv">1</span>]<span class="sc">^</span>(<span class="dv">1</span><span class="sc">-</span>gamma)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma),<span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma) <span class="sc">-</span> <span class="fl">1.05</span>),<span class="at">col=</span><span class="st">&quot;black&quot;</span>)</span></code></pre></div>
+<p><img src="_main_files/figure-html/fig_RRAIESCCAPM0-1.png" width="768" /></p>
+</div>
+<div id="asset-pricing-implications-of-risk-aversion-and-eis-calibrations" class="section level2 hasAnchor" number="10.2">
+<h2><span class="header-section-number">10.2</span> Asset-pricing implications of risk-aversion and EIS calibrations<a href="CCAPM.html#asset-pricing-implications-of-risk-aversion-and-eis-calibrations" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>This example visualizes asset-pricing implications of different risk-aversion and EIS calibrations.</p>
+<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb99-1"><a href="CCAPM.html#cb99-1" tabindex="-1"></a><span class="co"># Purpose: This example visualizes asset-pricing implications of different risk-aversion and EIS</span></span>
+<span id="cb99-2"><a href="CCAPM.html#cb99-2" tabindex="-1"></a><span class="co"># calibrations</span></span>
+<span id="cb99-3"><a href="CCAPM.html#cb99-3" tabindex="-1"></a></span>
+<span id="cb99-4"><a href="CCAPM.html#cb99-4" tabindex="-1"></a><span class="co"># Define the two-state consumption lottery.</span></span>
+<span id="cb99-5"><a href="CCAPM.html#cb99-5" tabindex="-1"></a>C.l <span class="ot">&lt;-</span> .<span class="dv">8</span></span>
+<span id="cb99-6"><a href="CCAPM.html#cb99-6" tabindex="-1"></a>C.h <span class="ot">&lt;-</span> <span class="fl">1.2</span></span>
+<span id="cb99-7"><a href="CCAPM.html#cb99-7" tabindex="-1"></a>cc <span class="ot">&lt;-</span> <span class="fu">c</span>(C.l,C.h)</span>
+<span id="cb99-8"><a href="CCAPM.html#cb99-8" tabindex="-1"></a></span>
+<span id="cb99-9"><a href="CCAPM.html#cb99-9" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</span>
+<span id="cb99-10"><a href="CCAPM.html#cb99-10" tabindex="-1"></a><span class="fu">par</span>(<span class="at">plt=</span><span class="fu">c</span>(.<span class="dv">15</span>,.<span class="dv">95</span>,.<span class="dv">25</span>,.<span class="dv">95</span>))</span>
+<span id="cb99-11"><a href="CCAPM.html#cb99-11" tabindex="-1"></a></span>
+<span id="cb99-12"><a href="CCAPM.html#cb99-12" tabindex="-1"></a>C <span class="ot">&lt;-</span> <span class="fu">seq</span>(.<span class="dv">7</span>,<span class="fl">1.5</span>,<span class="at">by=</span>.<span class="dv">01</span>)</span>
+<span id="cb99-13"><a href="CCAPM.html#cb99-13" tabindex="-1"></a></span>
+<span id="cb99-14"><a href="CCAPM.html#cb99-14" tabindex="-1"></a><span class="co"># Plot the certainty equivalent and the implied risk premium.</span></span>
+<span id="cb99-15"><a href="CCAPM.html#cb99-15" tabindex="-1"></a>gamma <span class="ot">&lt;-</span> <span class="dv">5</span></span>
+<span id="cb99-16"><a href="CCAPM.html#cb99-16" tabindex="-1"></a>E.u <span class="ot">&lt;-</span> <span class="fu">mean</span>(cc<span class="sc">^</span>(<span class="dv">1</span><span class="sc">-</span>gamma)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma))</span>
+<span id="cb99-17"><a href="CCAPM.html#cb99-17" tabindex="-1"></a>c.CE <span class="ot">&lt;-</span> (E.u<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>gamma))<span class="sc">^</span>(<span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma))</span>
+<span id="cb99-18"><a href="CCAPM.html#cb99-18" tabindex="-1"></a>U <span class="ot">&lt;-</span> C<span class="sc">^</span>(<span class="dv">1</span><span class="sc">-</span>gamma)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma)</span>
+<span id="cb99-19"><a href="CCAPM.html#cb99-19" tabindex="-1"></a><span class="fu">plot</span>(C,U,<span class="at">type=</span><span class="st">&quot;l&quot;</span>,<span class="at">lwd=</span><span class="dv">2</span>,<span class="at">las=</span><span class="dv">1</span>,</span>
+<span id="cb99-20"><a href="CCAPM.html#cb99-20" tabindex="-1"></a>     <span class="at">xlab=</span><span class="st">&quot;Consumption&quot;</span>,<span class="at">ylab=</span><span class="st">&quot;Utility&quot;</span>)</span>
+<span id="cb99-21"><a href="CCAPM.html#cb99-21" tabindex="-1"></a><span class="fu">grid</span>()</span>
+<span id="cb99-22"><a href="CCAPM.html#cb99-22" tabindex="-1"></a><span class="fu">points</span>(cc,cc<span class="sc">^</span>(<span class="dv">1</span><span class="sc">-</span>gamma)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma),<span class="at">pch=</span><span class="dv">19</span>,<span class="at">col=</span><span class="st">&quot;black&quot;</span>,<span class="at">cex=</span><span class="fl">1.5</span>)</span>
+<span id="cb99-23"><a href="CCAPM.html#cb99-23" tabindex="-1"></a><span class="fu">lines</span>(cc,cc<span class="sc">^</span>(<span class="dv">1</span><span class="sc">-</span>gamma)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma),<span class="at">col=</span><span class="st">&quot;black&quot;</span>)</span>
+<span id="cb99-24"><a href="CCAPM.html#cb99-24" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">c</span>(c.CE,<span class="fu">mean</span>(cc)),<span class="fu">c</span>(E.u,E.u),<span class="at">lty=</span><span class="dv">1</span>,<span class="at">col=</span><span class="st">&quot;darkgrey&quot;</span>,<span class="at">lwd=</span><span class="dv">1</span>)</span>
+<span id="cb99-25"><a href="CCAPM.html#cb99-25" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">c</span>(c.CE,c.CE),<span class="fu">c</span>(<span class="sc">-</span><span class="dv">1000</span>,E.u),<span class="at">lty=</span><span class="dv">1</span>,<span class="at">col=</span><span class="st">&quot;darkgrey&quot;</span>,<span class="at">lwd=</span><span class="dv">1</span>)</span>
+<span id="cb99-26"><a href="CCAPM.html#cb99-26" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">c</span>(<span class="fu">mean</span>(cc),<span class="fu">mean</span>(cc)),<span class="fu">c</span>(<span class="sc">-</span><span class="dv">1000</span>,<span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma)),<span class="at">lty=</span><span class="dv">1</span>,<span class="at">col=</span><span class="st">&quot;darkgrey&quot;</span>,<span class="at">lwd=</span><span class="dv">1</span>)</span>
+<span id="cb99-27"><a href="CCAPM.html#cb99-27" tabindex="-1"></a><span class="fu">points</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>),<span class="fu">c</span>(<span class="fu">mean</span>(cc<span class="sc">^</span>(<span class="dv">1</span><span class="sc">-</span>gamma)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma)),<span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma)),<span class="at">col=</span><span class="st">&quot;darkgrey&quot;</span>,<span class="at">pch=</span><span class="dv">19</span>)</span>
+<span id="cb99-28"><a href="CCAPM.html#cb99-28" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>),<span class="fu">c</span>(<span class="fu">mean</span>(cc<span class="sc">^</span>(<span class="dv">1</span><span class="sc">-</span>gamma)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma)),<span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma)),<span class="at">col=</span><span class="st">&quot;darkgrey&quot;</span>)</span>
+<span id="cb99-29"><a href="CCAPM.html#cb99-29" tabindex="-1"></a>rp <span class="ot">&lt;-</span> <span class="sc">-</span> <span class="fu">mean</span>(cc<span class="sc">^</span>(<span class="dv">1</span><span class="sc">-</span>gamma)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma)) <span class="sc">+</span> <span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma)</span>
+<span id="cb99-30"><a href="CCAPM.html#cb99-30" tabindex="-1"></a><span class="fu">text</span>(<span class="at">x =</span> <span class="fl">1.3</span>,<span class="at">y=</span><span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma) <span class="sc">-</span> .<span class="dv">2</span>,</span>
+<span id="cb99-31"><a href="CCAPM.html#cb99-31" tabindex="-1"></a>     <span class="at">labels =</span> <span class="fu">paste</span>(<span class="st">&quot;Risk premium = &quot;</span>,<span class="fu">toString</span>(<span class="fu">round</span>(<span class="fu">mean</span>(cc)<span class="sc">-</span>c.CE,<span class="dv">2</span>)),<span class="at">sep=</span><span class="st">&quot;&quot;</span>),</span>
+<span id="cb99-32"><a href="CCAPM.html#cb99-32" tabindex="-1"></a>     <span class="at">col=</span><span class="st">&quot;black&quot;</span>)</span>
+<span id="cb99-33"><a href="CCAPM.html#cb99-33" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">c</span>(<span class="fu">mean</span>(<span class="fu">c</span>(c.CE,<span class="dv">1</span>)),<span class="fl">1.2</span>),<span class="fu">c</span>(C[<span class="dv">3</span>]<span class="sc">^</span>(<span class="dv">1</span><span class="sc">-</span>gamma)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma),<span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma) <span class="sc">-</span> .<span class="dv">24</span>),<span class="at">col=</span><span class="st">&quot;black&quot;</span>)</span>
+<span id="cb99-34"><a href="CCAPM.html#cb99-34" tabindex="-1"></a><span class="fu">text</span>(<span class="at">x=</span>C.l,<span class="at">y=</span><span class="fu">min</span>(U),<span class="at">labels =</span> <span class="fu">expression</span>(C[L]),<span class="at">pos=</span><span class="dv">2</span>)</span>
+<span id="cb99-35"><a href="CCAPM.html#cb99-35" tabindex="-1"></a><span class="fu">text</span>(<span class="at">x=</span>C.h,<span class="at">y=</span><span class="fu">min</span>(U),<span class="at">labels =</span> <span class="fu">expression</span>(C[H]),<span class="at">pos=</span><span class="dv">2</span>)</span>
+<span id="cb99-36"><a href="CCAPM.html#cb99-36" tabindex="-1"></a><span class="fu">text</span>(<span class="at">x=</span>c.CE,<span class="at">y=</span><span class="fu">min</span>(U),<span class="at">labels =</span> <span class="fu">expression</span>(<span class="fu">tilde</span>(C)),<span class="at">pos=</span><span class="dv">2</span>)</span>
+<span id="cb99-37"><a href="CCAPM.html#cb99-37" tabindex="-1"></a><span class="fu">text</span>(<span class="at">x=</span><span class="dv">1</span>,<span class="at">y=</span><span class="fu">min</span>(U),<span class="at">labels =</span> <span class="fu">expression</span>(<span class="fu">bar</span>(C)),<span class="at">pos=</span><span class="dv">2</span>)</span>
+<span id="cb99-38"><a href="CCAPM.html#cb99-38" tabindex="-1"></a></span>
+<span id="cb99-39"><a href="CCAPM.html#cb99-39" tabindex="-1"></a><span class="co"># Mark the risk-premium distance on the consumption axis.</span></span>
+<span id="cb99-40"><a href="CCAPM.html#cb99-40" tabindex="-1"></a><span class="fu">arrows</span>(c.CE,C[<span class="dv">3</span>]<span class="sc">^</span>(<span class="dv">1</span><span class="sc">-</span>gamma)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma),<span class="dv">1</span>,C[<span class="dv">3</span>]<span class="sc">^</span>(<span class="dv">1</span><span class="sc">-</span>gamma)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>gamma),<span class="at">lwd=</span><span class="dv">2</span>,</span>
+<span id="cb99-41"><a href="CCAPM.html#cb99-41" tabindex="-1"></a>       <span class="at">angle =</span> <span class="dv">20</span>,<span class="at">code =</span> <span class="dv">3</span>,<span class="at">length =</span> <span class="fl">0.1</span>)</span></code></pre></div>
+<p><img src="_main_files/figure-html/fig_RRAIESCCAPM-1.png" width="672" /></p>
+<p>The following codes makes a table that illustrates the equity premium puzzle.</p>
+<p>This table summarizes the long-run joint behavior of macro-financial variables used in the CCAPM discussion.</p>
+<div class="sourceCode" id="cb100"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb100-1"><a href="CCAPM.html#cb100-1" tabindex="-1"></a><span class="co"># Purpose: This table summarizes the long-run joint behavior of macro-financial variables used</span></span>
+<span id="cb100-2"><a href="CCAPM.html#cb100-2" tabindex="-1"></a><span class="co"># in the CCAPM discussion</span></span>
+<span id="cb100-3"><a href="CCAPM.html#cb100-3" tabindex="-1"></a></span>
+<span id="cb100-4"><a href="CCAPM.html#cb100-4" tabindex="-1"></a><span class="fu">library</span>(DTAM)</span>
+<span id="cb100-5"><a href="CCAPM.html#cb100-5" tabindex="-1"></a></span>
+<span id="cb100-6"><a href="CCAPM.html#cb100-6" tabindex="-1"></a>lag_exp_infl <span class="ot">&lt;-</span> <span class="dv">5</span> <span class="co"># order of moving average process used to capture inflation expectations</span></span>
+<span id="cb100-7"><a href="CCAPM.html#cb100-7" tabindex="-1"></a></span>
+<span id="cb100-8"><a href="CCAPM.html#cb100-8" tabindex="-1"></a>matrix_periods <span class="ot">&lt;-</span> <span class="fu">rbind</span>(<span class="fu">c</span>(<span class="dv">1950</span>,<span class="dv">2019</span>),</span>
+<span id="cb100-9"><a href="CCAPM.html#cb100-9" tabindex="-1"></a>                        <span class="fu">c</span>(<span class="dv">1980</span>,<span class="dv">2019</span>))</span>
+<span id="cb100-10"><a href="CCAPM.html#cb100-10" tabindex="-1"></a></span>
+<span id="cb100-11"><a href="CCAPM.html#cb100-11" tabindex="-1"></a>list.of.JST.ctries <span class="ot">&lt;-</span> <span class="fu">levels</span>(<span class="fu">as.factor</span>(JSTdataset<span class="sc">$</span>iso))</span>
+<span id="cb100-12"><a href="CCAPM.html#cb100-12" tabindex="-1"></a><span class="co"># remove countries with no equity return data:</span></span>
+<span id="cb100-13"><a href="CCAPM.html#cb100-13" tabindex="-1"></a>list.of.JST.ctries <span class="ot">&lt;-</span> list.of.JST.ctries[<span class="sc">!</span>(list.of.JST.ctries <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;CAN&quot;</span>,<span class="st">&quot;IRL&quot;</span>))]</span>
+<span id="cb100-14"><a href="CCAPM.html#cb100-14" tabindex="-1"></a></span>
+<span id="cb100-15"><a href="CCAPM.html#cb100-15" tabindex="-1"></a>matrix_corresp_ctries <span class="ot">&lt;-</span> <span class="fu">rbind</span>(<span class="fu">c</span>(<span class="st">&quot;AUS&quot;</span>,<span class="st">&quot;BEL&quot;</span>,<span class="st">&quot;CAN&quot;</span>,<span class="st">&quot;CHE&quot;</span>,<span class="st">&quot;DEU&quot;</span>,<span class="st">&quot;DNK&quot;</span>,<span class="st">&quot;ESP&quot;</span>,</span>
+<span id="cb100-16"><a href="CCAPM.html#cb100-16" tabindex="-1"></a>                                 <span class="st">&quot;FIN&quot;</span>,<span class="st">&quot;FRA&quot;</span>,<span class="st">&quot;GBR&quot;</span>,<span class="st">&quot;IRL&quot;</span>,<span class="st">&quot;ITA&quot;</span>,<span class="st">&quot;JPN&quot;</span>,<span class="st">&quot;NLD&quot;</span>,<span class="st">&quot;NOR&quot;</span>,</span>
+<span id="cb100-17"><a href="CCAPM.html#cb100-17" tabindex="-1"></a>                                 <span class="st">&quot;PRT&quot;</span>,<span class="st">&quot;SWE&quot;</span>,<span class="st">&quot;USA&quot;</span>),</span>
+<span id="cb100-18"><a href="CCAPM.html#cb100-18" tabindex="-1"></a>                               <span class="fu">c</span>(<span class="st">&quot;Australia&quot;</span>,<span class="st">&quot;Belgium&quot;</span>,<span class="st">&quot;Canada&quot;</span>,<span class="st">&quot;Switzerland&quot;</span>,<span class="st">&quot;Germany&quot;</span>,</span>
+<span id="cb100-19"><a href="CCAPM.html#cb100-19" tabindex="-1"></a>                                 <span class="st">&quot;Denmark&quot;</span>,<span class="st">&quot;Spain&quot;</span>,<span class="st">&quot;Finland&quot;</span>,<span class="st">&quot;France&quot;</span>,<span class="st">&quot;U.K.&quot;</span>,</span>
+<span id="cb100-20"><a href="CCAPM.html#cb100-20" tabindex="-1"></a>                                 <span class="st">&quot;Ireland&quot;</span>,<span class="st">&quot;Italy&quot;</span>,<span class="st">&quot;Japan&quot;</span>,<span class="st">&quot;Netherlands&quot;</span>,<span class="st">&quot;Norway&quot;</span>,</span>
+<span id="cb100-21"><a href="CCAPM.html#cb100-21" tabindex="-1"></a>                                 <span class="st">&quot;Portugal&quot;</span>,<span class="st">&quot;Sweden&quot;</span>,<span class="st">&quot;U.S.A.&quot;</span>))</span>
+<span id="cb100-22"><a href="CCAPM.html#cb100-22" tabindex="-1"></a></span>
+<span id="cb100-23"><a href="CCAPM.html#cb100-23" tabindex="-1"></a><span class="co"># outputs: Sample-period,</span></span>
+<span id="cb100-24"><a href="CCAPM.html#cb100-24" tabindex="-1"></a><span class="co">#          Average excess return, sd(return), sd(dc), Cor(dc,er), Cov(dc,er),</span></span>
+<span id="cb100-25"><a href="CCAPM.html#cb100-25" tabindex="-1"></a><span class="co">#          Sharpe ratio, RRA1, RRA2</span></span>
+<span id="cb100-26"><a href="CCAPM.html#cb100-26" tabindex="-1"></a>matrix_result <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="cn">NaN</span>,<span class="fu">c</span>(<span class="fu">length</span>(list.of.JST.ctries),<span class="dv">9</span>,<span class="fu">dim</span>(matrix_periods)[<span class="dv">1</span>]))</span>
+<span id="cb100-27"><a href="CCAPM.html#cb100-27" tabindex="-1"></a></span>
+<span id="cb100-28"><a href="CCAPM.html#cb100-28" tabindex="-1"></a>DATA <span class="ot">&lt;-</span> JSTdataset[,<span class="fu">c</span>(<span class="st">&quot;year&quot;</span>,<span class="st">&quot;iso&quot;</span>,<span class="st">&quot;cpi&quot;</span>,<span class="st">&quot;stir&quot;</span>,<span class="st">&quot;ltrate&quot;</span>,<span class="st">&quot;eq_tr&quot;</span>,</span>
+<span id="cb100-29"><a href="CCAPM.html#cb100-29" tabindex="-1"></a>                      <span class="st">&quot;rconsbarro&quot;</span>)]</span>
+<span id="cb100-30"><a href="CCAPM.html#cb100-30" tabindex="-1"></a></span>
+<span id="cb100-31"><a href="CCAPM.html#cb100-31" tabindex="-1"></a><span class="cf">for</span>(period <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">dim</span>(matrix_periods)[<span class="dv">1</span>]){</span>
+<span id="cb100-32"><a href="CCAPM.html#cb100-32" tabindex="-1"></a>  first.year <span class="ot">&lt;-</span> matrix_periods[period,<span class="dv">1</span>]</span>
+<span id="cb100-33"><a href="CCAPM.html#cb100-33" tabindex="-1"></a>  last.year  <span class="ot">&lt;-</span> matrix_periods[period,<span class="dv">2</span>]</span>
+<span id="cb100-34"><a href="CCAPM.html#cb100-34" tabindex="-1"></a>  </span>
+<span id="cb100-35"><a href="CCAPM.html#cb100-35" tabindex="-1"></a>  count_ctry <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb100-36"><a href="CCAPM.html#cb100-36" tabindex="-1"></a>  <span class="cf">for</span>(ctry <span class="cf">in</span> list.of.JST.ctries){</span>
+<span id="cb100-37"><a href="CCAPM.html#cb100-37" tabindex="-1"></a>    count_ctry <span class="ot">&lt;-</span>   count_ctry <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb100-38"><a href="CCAPM.html#cb100-38" tabindex="-1"></a>    DATA.reduced <span class="ot">&lt;-</span> <span class="fu">subset</span>(DATA,iso<span class="sc">==</span>ctry)</span>
+<span id="cb100-39"><a href="CCAPM.html#cb100-39" tabindex="-1"></a>    T <span class="ot">&lt;-</span> <span class="fu">dim</span>(DATA.reduced)[<span class="dv">1</span>]</span>
+<span id="cb100-40"><a href="CCAPM.html#cb100-40" tabindex="-1"></a>    DATA.reduced<span class="sc">$</span>dc <span class="ot">&lt;-</span> <span class="cn">NaN</span></span>
+<span id="cb100-41"><a href="CCAPM.html#cb100-41" tabindex="-1"></a>    DATA.reduced<span class="sc">$</span>dc <span class="ot">&lt;-</span> </span>
+<span id="cb100-42"><a href="CCAPM.html#cb100-42" tabindex="-1"></a>      <span class="fu">c</span>(<span class="cn">NaN</span>,<span class="fu">log</span>(DATA.reduced<span class="sc">$</span>rconsbarro[<span class="dv">2</span><span class="sc">:</span>T]<span class="sc">/</span>DATA.reduced<span class="sc">$</span>rconsbarro[<span class="dv">1</span><span class="sc">:</span>(T<span class="dv">-1</span>)]))</span>
+<span id="cb100-43"><a href="CCAPM.html#cb100-43" tabindex="-1"></a>    DATA.reduced<span class="sc">$</span>eq_tr</span>
+<span id="cb100-44"><a href="CCAPM.html#cb100-44" tabindex="-1"></a>    DATA.reduced<span class="sc">$</span>infl <span class="ot">&lt;-</span></span>
+<span id="cb100-45"><a href="CCAPM.html#cb100-45" tabindex="-1"></a>      <span class="fu">c</span>(<span class="cn">NaN</span>,<span class="fu">log</span>(DATA.reduced<span class="sc">$</span>cpi[<span class="dv">2</span><span class="sc">:</span>T]<span class="sc">/</span>DATA.reduced<span class="sc">$</span>cpi[<span class="dv">1</span><span class="sc">:</span>(T<span class="dv">-1</span>)]))</span>
+<span id="cb100-46"><a href="CCAPM.html#cb100-46" tabindex="-1"></a>    DATA.reduced<span class="sc">$</span>exp_infl <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb100-47"><a href="CCAPM.html#cb100-47" tabindex="-1"></a>    <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>lag_exp_infl){</span>
+<span id="cb100-48"><a href="CCAPM.html#cb100-48" tabindex="-1"></a>      DATA.reduced<span class="sc">$</span>exp_infl <span class="ot">&lt;-</span> DATA.reduced<span class="sc">$</span>exp_infl <span class="sc">+</span> <span class="dv">1</span><span class="sc">/</span>lag_exp_infl<span class="sc">*</span></span>
+<span id="cb100-49"><a href="CCAPM.html#cb100-49" tabindex="-1"></a>        <span class="fu">c</span>(<span class="fu">rep</span>(<span class="cn">NaN</span>,i),DATA.reduced<span class="sc">$</span>infl[<span class="dv">1</span><span class="sc">:</span>(T<span class="sc">-</span>i)])</span>
+<span id="cb100-50"><a href="CCAPM.html#cb100-50" tabindex="-1"></a>    }</span>
+<span id="cb100-51"><a href="CCAPM.html#cb100-51" tabindex="-1"></a>    DATA.reduced<span class="sc">$</span>rstir <span class="ot">&lt;-</span> DATA.reduced<span class="sc">$</span>stir<span class="sc">/</span><span class="dv">100</span> <span class="sc">-</span> DATA.reduced<span class="sc">$</span>exp_infl</span>
+<span id="cb100-52"><a href="CCAPM.html#cb100-52" tabindex="-1"></a>    DATA.reduced<span class="sc">$</span>req_tr <span class="ot">&lt;-</span> DATA.reduced<span class="sc">$</span>eq_tr <span class="sc">-</span> DATA.reduced<span class="sc">$</span>infl</span>
+<span id="cb100-53"><a href="CCAPM.html#cb100-53" tabindex="-1"></a>    DATA.reduced <span class="ot">&lt;-</span> DATA.reduced[<span class="fu">which</span>(DATA.reduced<span class="sc">$</span>year<span class="sc">==</span>first.year)<span class="sc">:</span></span>
+<span id="cb100-54"><a href="CCAPM.html#cb100-54" tabindex="-1"></a>                                   <span class="fu">which</span>(DATA.reduced<span class="sc">$</span>year<span class="sc">==</span>last.year),]</span>
+<span id="cb100-55"><a href="CCAPM.html#cb100-55" tabindex="-1"></a>    </span>
+<span id="cb100-56"><a href="CCAPM.html#cb100-56" tabindex="-1"></a>    sample <span class="ot">&lt;-</span> <span class="fu">range</span>(DATA.reduced<span class="sc">$</span>year[<span class="fu">complete.cases</span>(DATA.reduced)])</span>
+<span id="cb100-57"><a href="CCAPM.html#cb100-57" tabindex="-1"></a>    </span>
+<span id="cb100-58"><a href="CCAPM.html#cb100-58" tabindex="-1"></a>    DATA.reduced<span class="sc">$</span>Excess_return <span class="ot">&lt;-</span> DATA.reduced<span class="sc">$</span>req_tr <span class="sc">-</span> DATA.reduced<span class="sc">$</span>rstir</span>
+<span id="cb100-59"><a href="CCAPM.html#cb100-59" tabindex="-1"></a>    </span>
+<span id="cb100-60"><a href="CCAPM.html#cb100-60" tabindex="-1"></a>    mean_er <span class="ot">&lt;-</span> <span class="fu">mean</span>(DATA.reduced<span class="sc">$</span>Excess_return,<span class="at">na.rm=</span><span class="cn">TRUE</span>)</span>
+<span id="cb100-61"><a href="CCAPM.html#cb100-61" tabindex="-1"></a>    sd_er   <span class="ot">&lt;-</span> <span class="fu">sd</span>(DATA.reduced<span class="sc">$</span>Excess_return,<span class="at">na.rm=</span><span class="cn">TRUE</span>)</span>
+<span id="cb100-62"><a href="CCAPM.html#cb100-62" tabindex="-1"></a>    sd_dc   <span class="ot">&lt;-</span> <span class="fu">sd</span>(DATA.reduced<span class="sc">$</span>dc,<span class="at">na.rm=</span><span class="cn">TRUE</span>)</span>
+<span id="cb100-63"><a href="CCAPM.html#cb100-63" tabindex="-1"></a>    cor_er_dc <span class="ot">&lt;-</span> <span class="fu">cor</span>(DATA.reduced<span class="sc">$</span>dc,DATA.reduced<span class="sc">$</span>req_tr,<span class="at">use=</span><span class="st">&quot;complete.obs&quot;</span>)</span>
+<span id="cb100-64"><a href="CCAPM.html#cb100-64" tabindex="-1"></a>    cov_er_dc <span class="ot">&lt;-</span> <span class="fu">cov</span>(DATA.reduced<span class="sc">$</span>dc,DATA.reduced<span class="sc">$</span>req_tr,<span class="at">use=</span><span class="st">&quot;complete.obs&quot;</span>)</span>
+<span id="cb100-65"><a href="CCAPM.html#cb100-65" tabindex="-1"></a>    SR <span class="ot">&lt;-</span> mean_er<span class="sc">/</span>sd_er</span>
+<span id="cb100-66"><a href="CCAPM.html#cb100-66" tabindex="-1"></a>    mean_Rf <span class="ot">&lt;-</span> <span class="fu">mean</span>(DATA.reduced<span class="sc">$</span>rstir,<span class="at">na.rm=</span><span class="cn">TRUE</span>)</span>
+<span id="cb100-67"><a href="CCAPM.html#cb100-67" tabindex="-1"></a>    RRA1 <span class="ot">&lt;-</span> mean_er<span class="sc">/</span>(<span class="dv">1</span> <span class="sc">+</span> mean_Rf)<span class="sc">/</span>cov_er_dc</span>
+<span id="cb100-68"><a href="CCAPM.html#cb100-68" tabindex="-1"></a>    RRA2 <span class="ot">&lt;-</span> mean_er<span class="sc">/</span>(<span class="dv">1</span> <span class="sc">+</span> mean_Rf)<span class="sc">/</span>sd_er<span class="sc">/</span>sd_dc</span>
+<span id="cb100-69"><a href="CCAPM.html#cb100-69" tabindex="-1"></a>    </span>
+<span id="cb100-70"><a href="CCAPM.html#cb100-70" tabindex="-1"></a>    matrix_result[count_ctry,,period] <span class="ot">&lt;-</span> </span>
+<span id="cb100-71"><a href="CCAPM.html#cb100-71" tabindex="-1"></a>      <span class="fu">c</span>(<span class="fu">paste</span>(sample[<span class="dv">1</span>],<span class="st">&quot;-&quot;</span>,sample[<span class="dv">2</span>],<span class="at">sep=</span><span class="st">&quot;&quot;</span>),</span>
+<span id="cb100-72"><a href="CCAPM.html#cb100-72" tabindex="-1"></a>        <span class="fu">round</span>(<span class="dv">100</span><span class="sc">*</span>mean_Rf,<span class="dv">2</span>),</span>
+<span id="cb100-73"><a href="CCAPM.html#cb100-73" tabindex="-1"></a>        <span class="fu">round</span>(<span class="dv">100</span><span class="sc">*</span>mean_er,<span class="dv">2</span>),<span class="fu">round</span>(<span class="dv">100</span><span class="sc">*</span>sd_er,<span class="dv">2</span>),</span>
+<span id="cb100-74"><a href="CCAPM.html#cb100-74" tabindex="-1"></a>        <span class="fu">round</span>(<span class="dv">100</span><span class="sc">*</span>sd_dc,<span class="dv">2</span>),</span>
+<span id="cb100-75"><a href="CCAPM.html#cb100-75" tabindex="-1"></a>        <span class="fu">round</span>(cor_er_dc,<span class="dv">2</span>),</span>
+<span id="cb100-76"><a href="CCAPM.html#cb100-76" tabindex="-1"></a>        <span class="fu">round</span>(SR,<span class="dv">2</span>),<span class="fu">round</span>(RRA1,<span class="dv">1</span>),<span class="fu">round</span>(RRA2,<span class="dv">1</span>))</span>
+<span id="cb100-77"><a href="CCAPM.html#cb100-77" tabindex="-1"></a>  }</span>
+<span id="cb100-78"><a href="CCAPM.html#cb100-78" tabindex="-1"></a>}</span>
+<span id="cb100-79"><a href="CCAPM.html#cb100-79" tabindex="-1"></a></span>
+<span id="cb100-80"><a href="CCAPM.html#cb100-80" tabindex="-1"></a></span>
+<span id="cb100-81"><a href="CCAPM.html#cb100-81" tabindex="-1"></a>make_entry <span class="ot">&lt;-</span> <span class="cf">function</span>(x,format.nb){</span>
+<span id="cb100-82"><a href="CCAPM.html#cb100-82" tabindex="-1"></a>  output <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">&quot;$&quot;</span>,<span class="fu">sprintf</span>(<span class="fu">paste</span>(<span class="st">&quot;%.&quot;</span>,format.nb,<span class="st">&quot;f&quot;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>),x),<span class="st">&quot;$&quot;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>)</span>
+<span id="cb100-83"><a href="CCAPM.html#cb100-83" tabindex="-1"></a>  <span class="fu">return</span>(output)</span>
+<span id="cb100-84"><a href="CCAPM.html#cb100-84" tabindex="-1"></a>}</span>
+<span id="cb100-85"><a href="CCAPM.html#cb100-85" tabindex="-1"></a></span>
+<span id="cb100-86"><a href="CCAPM.html#cb100-86" tabindex="-1"></a>format.nb <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb100-87"><a href="CCAPM.html#cb100-87" tabindex="-1"></a></span>
+<span id="cb100-88"><a href="CCAPM.html#cb100-88" tabindex="-1"></a><span class="co"># Build LaTeX table</span></span>
+<span id="cb100-89"><a href="CCAPM.html#cb100-89" tabindex="-1"></a>latex.table <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
+<span id="cb100-90"><a href="CCAPM.html#cb100-90" tabindex="-1"></a>  <span class="st">&quot;Country&amp;Sample&amp;$R_f$&amp;$</span><span class="sc">\\</span><span class="st">overline{er}$&amp;$</span><span class="sc">\\</span><span class="st">sigma(er)$&quot;</span>,</span>
+<span id="cb100-91"><a href="CCAPM.html#cb100-91" tabindex="-1"></a>  <span class="st">&quot;&amp;$</span><span class="sc">\\</span><span class="st">sigma(</span><span class="sc">\\</span><span class="st">Delta c)$&amp;$</span><span class="sc">\\</span><span class="st">rho(</span><span class="sc">\\</span><span class="st">Delta c,er)$&amp;$SR$&quot;</span>,</span>
+<span id="cb100-92"><a href="CCAPM.html#cb100-92" tabindex="-1"></a>  <span class="st">&quot;&amp;$RRA1$&amp;$RRA2$</span><span class="sc">\\\\</span><span class="st">&quot;</span></span>
+<span id="cb100-93"><a href="CCAPM.html#cb100-93" tabindex="-1"></a>)</span>
+<span id="cb100-94"><a href="CCAPM.html#cb100-94" tabindex="-1"></a><span class="cf">for</span>(period <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">dim</span>(matrix_periods)[<span class="dv">1</span>]){</span>
+<span id="cb100-95"><a href="CCAPM.html#cb100-95" tabindex="-1"></a>  latex.table <span class="ot">&lt;-</span> <span class="fu">rbind</span>(latex.table,</span>
+<span id="cb100-96"><a href="CCAPM.html#cb100-96" tabindex="-1"></a>                       <span class="st">&quot;</span><span class="sc">\\</span><span class="st">hline&quot;</span>,</span>
+<span id="cb100-97"><a href="CCAPM.html#cb100-97" tabindex="-1"></a>                       <span class="fu">paste</span>(<span class="st">&quot;&amp;</span><span class="sc">\\</span><span class="st">multicolumn{9}{l}{</span><span class="sc">\\</span><span class="st">textbf{&quot;</span>,LETTERS[period],<span class="st">&quot;. Sample: &quot;</span>,</span>
+<span id="cb100-98"><a href="CCAPM.html#cb100-98" tabindex="-1"></a>                             matrix_periods[period,<span class="dv">1</span>],<span class="st">&quot;-&quot;</span>,matrix_periods[period,<span class="dv">2</span>],<span class="st">&quot;}}</span><span class="sc">\\\\</span><span class="st">&quot;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>),</span>
+<span id="cb100-99"><a href="CCAPM.html#cb100-99" tabindex="-1"></a>                       <span class="st">&quot;</span><span class="sc">\\</span><span class="st">hline&quot;</span>)</span>
+<span id="cb100-100"><a href="CCAPM.html#cb100-100" tabindex="-1"></a>  count_ctry <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb100-101"><a href="CCAPM.html#cb100-101" tabindex="-1"></a>  <span class="cf">for</span>(ctry <span class="cf">in</span> list.of.JST.ctries){</span>
+<span id="cb100-102"><a href="CCAPM.html#cb100-102" tabindex="-1"></a>    count_ctry <span class="ot">&lt;-</span> count_ctry <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb100-103"><a href="CCAPM.html#cb100-103" tabindex="-1"></a>    this.line <span class="ot">&lt;-</span> matrix_corresp_ctries[<span class="dv">2</span>,<span class="fu">which</span>(ctry<span class="sc">==</span>matrix_corresp_ctries[<span class="dv">1</span>,])]</span>
+<span id="cb100-104"><a href="CCAPM.html#cb100-104" tabindex="-1"></a>    <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">dim</span>(matrix_result)[<span class="dv">2</span>]){</span>
+<span id="cb100-105"><a href="CCAPM.html#cb100-105" tabindex="-1"></a>      <span class="cf">if</span>(j<span class="sc">==</span><span class="dv">1</span>){</span>
+<span id="cb100-106"><a href="CCAPM.html#cb100-106" tabindex="-1"></a>        this.line <span class="ot">&lt;-</span> <span class="fu">paste</span>(this.line,<span class="st">&quot;&amp;&quot;</span>,</span>
+<span id="cb100-107"><a href="CCAPM.html#cb100-107" tabindex="-1"></a>                           matrix_result[count_ctry,j,period],<span class="at">sep=</span><span class="st">&quot;&quot;</span>)</span>
+<span id="cb100-108"><a href="CCAPM.html#cb100-108" tabindex="-1"></a>      }<span class="cf">else</span>{</span>
+<span id="cb100-109"><a href="CCAPM.html#cb100-109" tabindex="-1"></a>        num_value <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(matrix_result[count_ctry,j,period])</span>
+<span id="cb100-110"><a href="CCAPM.html#cb100-110" tabindex="-1"></a>        <span class="cf">if</span>((num_value<span class="sc">&lt;</span><span class="dv">0</span>)<span class="sc">&amp;</span>(j<span class="sc">&gt;</span><span class="dv">7</span>)){</span>
+<span id="cb100-111"><a href="CCAPM.html#cb100-111" tabindex="-1"></a>          this.line <span class="ot">&lt;-</span> <span class="fu">paste</span>(this.line,<span class="st">&quot;&amp;$ &lt; 0$&quot;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>)</span>
+<span id="cb100-112"><a href="CCAPM.html#cb100-112" tabindex="-1"></a>        }<span class="cf">else</span>{</span>
+<span id="cb100-113"><a href="CCAPM.html#cb100-113" tabindex="-1"></a>          this.line <span class="ot">&lt;-</span> <span class="fu">paste</span>(this.line,<span class="st">&quot;&amp;&quot;</span>,<span class="fu">make_entry</span>(num_value,format.nb),<span class="at">sep=</span><span class="st">&quot;&quot;</span>)</span>
+<span id="cb100-114"><a href="CCAPM.html#cb100-114" tabindex="-1"></a>        }</span>
+<span id="cb100-115"><a href="CCAPM.html#cb100-115" tabindex="-1"></a>      }</span>
+<span id="cb100-116"><a href="CCAPM.html#cb100-116" tabindex="-1"></a>    }</span>
+<span id="cb100-117"><a href="CCAPM.html#cb100-117" tabindex="-1"></a>    latex.table <span class="ot">&lt;-</span> <span class="fu">rbind</span>(latex.table,</span>
+<span id="cb100-118"><a href="CCAPM.html#cb100-118" tabindex="-1"></a>                         <span class="fu">paste</span>(this.line,<span class="st">&quot;</span><span class="sc">\\\\</span><span class="st">&quot;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>))</span>
+<span id="cb100-119"><a href="CCAPM.html#cb100-119" tabindex="-1"></a>  }</span>
+<span id="cb100-120"><a href="CCAPM.html#cb100-120" tabindex="-1"></a>}</span>
+<span id="cb100-121"><a href="CCAPM.html#cb100-121" tabindex="-1"></a>latex.table <span class="ot">&lt;-</span> <span class="fu">rbind</span>(latex.table,</span>
+<span id="cb100-122"><a href="CCAPM.html#cb100-122" tabindex="-1"></a>                     <span class="st">&quot;</span><span class="sc">\\</span><span class="st">hline&quot;</span>)</span>
+<span id="cb100-123"><a href="CCAPM.html#cb100-123" tabindex="-1"></a></span>
+<span id="cb100-124"><a href="CCAPM.html#cb100-124" tabindex="-1"></a>latex.file <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">&quot;tables/table_EquityPuzzle.txt&quot;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>)</span>
+<span id="cb100-125"><a href="CCAPM.html#cb100-125" tabindex="-1"></a><span class="fu">write</span>(latex.table, <span class="at">file =</span> latex.file)</span></code></pre></div>
+<p>The following code illustrates the link between IES and smoothness of the optimal consumption path.</p>
+</div>
+<div id="smoothing-preferences-affect-consumption-and-pricing-dynamics" class="section level2 hasAnchor" number="10.3">
+<h2><span class="header-section-number">10.3</span> Smoothing preferences affect consumption and pricing dynamics<a href="CCAPM.html#smoothing-preferences-affect-consumption-and-pricing-dynamics" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>This example shows how smoothing preferences affect consumption and pricing dynamics.</p>
+<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb101-1"><a href="CCAPM.html#cb101-1" tabindex="-1"></a><span class="co"># Purpose: This example shows how smoothing preferences affect consumption and pricing dynamics</span></span>
+<span id="cb101-2"><a href="CCAPM.html#cb101-2" tabindex="-1"></a></span>
+<span id="cb101-3"><a href="CCAPM.html#cb101-3" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</span>
+<span id="cb101-4"><a href="CCAPM.html#cb101-4" tabindex="-1"></a><span class="fu">par</span>(<span class="at">plt=</span><span class="fu">c</span>(.<span class="dv">15</span>,.<span class="dv">95</span>,.<span class="dv">25</span>,.<span class="dv">95</span>))</span>
+<span id="cb101-5"><a href="CCAPM.html#cb101-5" tabindex="-1"></a></span>
+<span id="cb101-6"><a href="CCAPM.html#cb101-6" tabindex="-1"></a><span class="co"># Set the two-period saving problem.</span></span>
+<span id="cb101-7"><a href="CCAPM.html#cb101-7" tabindex="-1"></a>W <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb101-8"><a href="CCAPM.html#cb101-8" tabindex="-1"></a>delta <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb101-9"><a href="CCAPM.html#cb101-9" tabindex="-1"></a>R <span class="ot">&lt;-</span> .<span class="dv">05</span></span>
+<span id="cb101-10"><a href="CCAPM.html#cb101-10" tabindex="-1"></a></span>
+<span id="cb101-11"><a href="CCAPM.html#cb101-11" tabindex="-1"></a><span class="co"># Compute and plot optimal consumption paths for several IES values.</span></span>
+<span id="cb101-12"><a href="CCAPM.html#cb101-12" tabindex="-1"></a>gamma <span class="ot">&lt;-</span> <span class="fl">1.5</span></span>
+<span id="cb101-13"><a href="CCAPM.html#cb101-13" tabindex="-1"></a>C1 <span class="ot">&lt;-</span> W <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">+</span> R) <span class="sc">/</span> ((<span class="dv">1</span><span class="sc">/</span>delta <span class="sc">*</span> <span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span><span class="sc">+</span>R))<span class="sc">^</span>(<span class="sc">-</span><span class="dv">1</span><span class="sc">/</span>gamma) <span class="sc">+</span> (<span class="dv">1</span><span class="sc">+</span>R))</span>
+<span id="cb101-14"><a href="CCAPM.html#cb101-14" tabindex="-1"></a>C2 <span class="ot">&lt;-</span> (W <span class="sc">-</span> C1) <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">+</span> R)</span>
+<span id="cb101-15"><a href="CCAPM.html#cb101-15" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mgp =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="fl">0.5</span>, <span class="dv">0</span>))</span>
+<span id="cb101-16"><a href="CCAPM.html#cb101-16" tabindex="-1"></a></span>
+<span id="cb101-17"><a href="CCAPM.html#cb101-17" tabindex="-1"></a><span class="co"># Draw the baseline path before overlaying alternative IES cases.</span></span>
+<span id="cb101-18"><a href="CCAPM.html#cb101-18" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">c</span>(C1,C2),<span class="at">pch=</span><span class="dv">19</span>,<span class="at">xlab=</span><span class="st">&quot;Period&quot;</span>,<span class="at">ylab=</span><span class="st">&quot;Optimal consumption path&quot;</span>,<span class="at">ylim=</span><span class="fu">c</span>(.<span class="dv">50</span>,.<span class="dv">525</span>),</span>
+<span id="cb101-19"><a href="CCAPM.html#cb101-19" tabindex="-1"></a>     <span class="at">xaxt=</span><span class="st">&quot;n&quot;</span>,<span class="at">xlim=</span><span class="fu">c</span>(.<span class="dv">75</span>,<span class="fl">2.25</span>),<span class="at">lwd=</span><span class="dv">2</span>,<span class="at">cex=</span><span class="fl">1.3</span>,<span class="at">las=</span><span class="dv">1</span>)</span>
+<span id="cb101-20"><a href="CCAPM.html#cb101-20" tabindex="-1"></a><span class="fu">grid</span>()</span>
+<span id="cb101-21"><a href="CCAPM.html#cb101-21" tabindex="-1"></a><span class="fu">axis</span>(<span class="at">side=</span><span class="dv">1</span>,<span class="at">at=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>),<span class="at">labels=</span><span class="fu">c</span>(<span class="st">&quot;t = 0&quot;</span>,<span class="st">&quot;t = 1&quot;</span>))</span>
+<span id="cb101-22"><a href="CCAPM.html#cb101-22" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">c</span>(C1,C2),<span class="at">lwd=</span><span class="dv">2</span>)</span>
+<span id="cb101-23"><a href="CCAPM.html#cb101-23" tabindex="-1"></a>gamma <span class="ot">&lt;-</span> <span class="dv">5</span></span>
+<span id="cb101-24"><a href="CCAPM.html#cb101-24" tabindex="-1"></a>C1 <span class="ot">&lt;-</span> W <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">+</span> R) <span class="sc">/</span> ((<span class="dv">1</span><span class="sc">/</span>delta <span class="sc">*</span> <span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span><span class="sc">+</span>R))<span class="sc">^</span>(<span class="sc">-</span><span class="dv">1</span><span class="sc">/</span>gamma) <span class="sc">+</span> (<span class="dv">1</span><span class="sc">+</span>R))</span>
+<span id="cb101-25"><a href="CCAPM.html#cb101-25" tabindex="-1"></a>C2 <span class="ot">&lt;-</span> (W <span class="sc">-</span> C1) <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">+</span> R)</span>
+<span id="cb101-26"><a href="CCAPM.html#cb101-26" tabindex="-1"></a><span class="fu">points</span>(<span class="fu">c</span>(C1,C2),<span class="at">pch=</span><span class="dv">15</span>,<span class="at">col=</span><span class="st">&quot;darkgrey&quot;</span>,<span class="at">cex=</span><span class="fl">1.3</span>)</span>
+<span id="cb101-27"><a href="CCAPM.html#cb101-27" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">c</span>(C1,C2),<span class="at">col=</span><span class="st">&quot;darkgrey&quot;</span>,<span class="at">lwd=</span><span class="dv">2</span>)</span>
+<span id="cb101-28"><a href="CCAPM.html#cb101-28" tabindex="-1"></a>gamma <span class="ot">&lt;-</span> <span class="dv">50</span></span>
+<span id="cb101-29"><a href="CCAPM.html#cb101-29" tabindex="-1"></a>C1 <span class="ot">&lt;-</span> W <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">+</span> R) <span class="sc">/</span> ((<span class="dv">1</span><span class="sc">/</span>delta <span class="sc">*</span> <span class="dv">1</span><span class="sc">/</span>(<span class="dv">1</span><span class="sc">+</span>R))<span class="sc">^</span>(<span class="sc">-</span><span class="dv">1</span><span class="sc">/</span>gamma) <span class="sc">+</span> (<span class="dv">1</span><span class="sc">+</span>R))</span>
+<span id="cb101-30"><a href="CCAPM.html#cb101-30" tabindex="-1"></a>C2 <span class="ot">&lt;-</span> (W <span class="sc">-</span> C1) <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">+</span> R)</span>
+<span id="cb101-31"><a href="CCAPM.html#cb101-31" tabindex="-1"></a><span class="fu">points</span>(<span class="fu">c</span>(C1,C2),<span class="at">pch=</span><span class="dv">17</span>,<span class="at">col=</span><span class="st">&quot;grey&quot;</span>,<span class="at">cex=</span><span class="fl">1.3</span>)</span>
+<span id="cb101-32"><a href="CCAPM.html#cb101-32" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">c</span>(C1,C2),<span class="at">col=</span><span class="st">&quot;grey&quot;</span>,<span class="at">lwd=</span><span class="dv">2</span>)</span>
+<span id="cb101-33"><a href="CCAPM.html#cb101-33" tabindex="-1"></a></span>
+<span id="cb101-34"><a href="CCAPM.html#cb101-34" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">&quot;topleft&quot;</span>,</span>
+<span id="cb101-35"><a href="CCAPM.html#cb101-35" tabindex="-1"></a>       <span class="fu">c</span>(<span class="fu">expression</span>(<span class="fu">paste</span>(gamma,<span class="st">&quot; = 1.5&quot;</span>,<span class="st">&quot; (IES = 2/3)&quot;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>)),</span>
+<span id="cb101-36"><a href="CCAPM.html#cb101-36" tabindex="-1"></a>         <span class="fu">expression</span>(<span class="fu">paste</span>(gamma,<span class="st">&quot; = 5&quot;</span>,<span class="st">&quot; (IES = 1/5)&quot;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>)),</span>
+<span id="cb101-37"><a href="CCAPM.html#cb101-37" tabindex="-1"></a>         <span class="fu">expression</span>(<span class="fu">paste</span>(gamma,<span class="st">&quot; = 50&quot;</span>,<span class="st">&quot; (IES = 1/50)&quot;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>))</span>
+<span id="cb101-38"><a href="CCAPM.html#cb101-38" tabindex="-1"></a>       ),</span>
+<span id="cb101-39"><a href="CCAPM.html#cb101-39" tabindex="-1"></a>       <span class="at">pt.bg =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>,<span class="st">&quot;darkgrey&quot;</span>,<span class="st">&quot;grey&quot;</span>),</span>
+<span id="cb101-40"><a href="CCAPM.html#cb101-40" tabindex="-1"></a>       <span class="at">lty=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>), <span class="co"># gives the legend appropriate symbols (lines)</span></span>
+<span id="cb101-41"><a href="CCAPM.html#cb101-41" tabindex="-1"></a>       <span class="at">lwd=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>), <span class="co"># line width</span></span>
+<span id="cb101-42"><a href="CCAPM.html#cb101-42" tabindex="-1"></a>       <span class="at">pch=</span><span class="fu">c</span>(<span class="dv">19</span>,<span class="dv">15</span>,<span class="dv">17</span>),</span>
+<span id="cb101-43"><a href="CCAPM.html#cb101-43" tabindex="-1"></a>       <span class="at">pt.cex =</span> <span class="fl">1.3</span>,</span>
+<span id="cb101-44"><a href="CCAPM.html#cb101-44" tabindex="-1"></a>       <span class="at">col=</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>,<span class="st">&quot;darkgrey&quot;</span>,<span class="st">&quot;grey&quot;</span>), <span class="co"># gives the legend lines the correct color and width</span></span>
+<span id="cb101-45"><a href="CCAPM.html#cb101-45" tabindex="-1"></a>       <span class="at">seg.len =</span> <span class="dv">4</span></span>
+<span id="cb101-46"><a href="CCAPM.html#cb101-46" tabindex="-1"></a>)</span></code></pre></div>
+<p><img src="_main_files/figure-html/fig_IESsmooth-1.png" width="720" /></p>
+<p>The following code shows the time-varying conditional correlation between consumption and inflation.</p>
+</div>
+<div id="empirical-correlations-between-key-macro-financial-variables" class="section level2 hasAnchor" number="10.4">
+<h2><span class="header-section-number">10.4</span> Empirical correlations between key macro-financial variables<a href="CCAPM.html#empirical-correlations-between-key-macro-financial-variables" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>This example reports empirical correlations between key macro-financial variables.</p>
+<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb102-1"><a href="CCAPM.html#cb102-1" tabindex="-1"></a><span class="co"># Purpose: This example reports empirical correlations between key macro-financial variables</span></span>
+<span id="cb102-2"><a href="CCAPM.html#cb102-2" tabindex="-1"></a><span class="fu">library</span>(DTAM)</span>
+<span id="cb102-3"><a href="CCAPM.html#cb102-3" tabindex="-1"></a><span class="co"># Build consumption-growth and inflation series at a two-year horizon.</span></span>
+<span id="cb102-4"><a href="CCAPM.html#cb102-4" tabindex="-1"></a>vec_dates <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(Data_Macro_US_monthly<span class="sc">$</span>date)</span>
+<span id="cb102-5"><a href="CCAPM.html#cb102-5" tabindex="-1"></a>CONSO <span class="ot">&lt;-</span> Data_Macro_US_monthly<span class="sc">$</span>RCONS</span>
+<span id="cb102-6"><a href="CCAPM.html#cb102-6" tabindex="-1"></a>CPI   <span class="ot">&lt;-</span> Data_Macro_US_monthly<span class="sc">$</span>CPIAUCSL</span>
+<span id="cb102-7"><a href="CCAPM.html#cb102-7" tabindex="-1"></a></span>
+<span id="cb102-8"><a href="CCAPM.html#cb102-8" tabindex="-1"></a>h <span class="ot">&lt;-</span> <span class="dv">24</span></span>
+<span id="cb102-9"><a href="CCAPM.html#cb102-9" tabindex="-1"></a>T <span class="ot">&lt;-</span> <span class="fu">length</span>(CPI)</span>
+<span id="cb102-10"><a href="CCAPM.html#cb102-10" tabindex="-1"></a>conso     <span class="ot">&lt;-</span> <span class="dv">100</span><span class="sc">*</span>(<span class="dv">12</span><span class="sc">/</span>h)<span class="sc">*</span><span class="fu">log</span>(CONSO[(h<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span>T]<span class="sc">/</span>CONSO[<span class="dv">1</span><span class="sc">:</span>(T<span class="sc">-</span>h)])</span>
+<span id="cb102-11"><a href="CCAPM.html#cb102-11" tabindex="-1"></a>inflation <span class="ot">&lt;-</span> <span class="dv">100</span><span class="sc">*</span>(<span class="dv">12</span><span class="sc">/</span>h)<span class="sc">*</span><span class="fu">log</span>(CPI[(h<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span>T]<span class="sc">/</span>CPI[<span class="dv">1</span><span class="sc">:</span>(T<span class="sc">-</span>h)])</span>
+<span id="cb102-12"><a href="CCAPM.html#cb102-12" tabindex="-1"></a></span>
+<span id="cb102-13"><a href="CCAPM.html#cb102-13" tabindex="-1"></a><span class="co"># Compute rolling correlations.</span></span>
+<span id="cb102-14"><a href="CCAPM.html#cb102-14" tabindex="-1"></a>correla <span class="ot">&lt;-</span> <span class="cn">NaN</span><span class="sc">*</span>inflation</span>
+<span id="cb102-15"><a href="CCAPM.html#cb102-15" tabindex="-1"></a>rwindow <span class="ot">&lt;-</span> <span class="dv">12</span><span class="sc">*</span><span class="dv">7</span></span>
+<span id="cb102-16"><a href="CCAPM.html#cb102-16" tabindex="-1"></a><span class="cf">for</span>(t <span class="cf">in</span> (rwindow<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span>(T<span class="sc">-</span>h)){</span>
+<span id="cb102-17"><a href="CCAPM.html#cb102-17" tabindex="-1"></a>  correla[t] <span class="ot">&lt;-</span> <span class="fu">cor</span>(conso[(t<span class="sc">-</span>rwindow<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span>t],inflation[(t<span class="sc">-</span>rwindow<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span>t])</span>
+<span id="cb102-18"><a href="CCAPM.html#cb102-18" tabindex="-1"></a>}</span>
+<span id="cb102-19"><a href="CCAPM.html#cb102-19" tabindex="-1"></a></span>
+<span id="cb102-20"><a href="CCAPM.html#cb102-20" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">1</span>))</span>
+<span id="cb102-21"><a href="CCAPM.html#cb102-21" tabindex="-1"></a><span class="fu">par</span>(<span class="at">plt=</span><span class="fu">c</span>(<span class="fl">0.15</span>,<span class="fl">0.88</span>,<span class="fl">0.2</span>,<span class="fl">0.84</span>))</span>
+<span id="cb102-22"><a href="CCAPM.html#cb102-22" tabindex="-1"></a><span class="fu">layout</span>(<span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>)), <span class="at">heights=</span><span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>))</span>
+<span id="cb102-23"><a href="CCAPM.html#cb102-23" tabindex="-1"></a></span>
+<span id="cb102-24"><a href="CCAPM.html#cb102-24" tabindex="-1"></a><span class="co"># Plot consumption growth and inflation.</span></span>
+<span id="cb102-25"><a href="CCAPM.html#cb102-25" tabindex="-1"></a><span class="fu">plot</span>(vec_dates[(h<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span>T],conso,<span class="at">type=</span><span class="st">&#39;l&#39;</span>,</span>
+<span id="cb102-26"><a href="CCAPM.html#cb102-26" tabindex="-1"></a>     <span class="at">ylim=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">8</span>,<span class="dv">15</span>),<span class="at">col=</span><span class="st">&quot;black&quot;</span>,<span class="at">lty=</span><span class="dv">1</span>,<span class="at">lwd=</span><span class="dv">2</span>,<span class="at">cex.axis=</span>.<span class="dv">8</span>,<span class="at">cex=</span>.<span class="dv">8</span>,<span class="at">las=</span><span class="dv">1</span>,</span>
+<span id="cb102-27"><a href="CCAPM.html#cb102-27" tabindex="-1"></a>     <span class="at">ylab=</span><span class="st">&quot;in percent&quot;</span>,<span class="at">xlab=</span><span class="st">&quot;&quot;</span>,<span class="at">main=</span><span class="st">&quot;(a) Inflation and consumption growth&quot;</span>,<span class="at">cex.main=</span>.<span class="dv">9</span>)</span>
+<span id="cb102-28"><a href="CCAPM.html#cb102-28" tabindex="-1"></a><span class="fu">grid</span>()</span>
+<span id="cb102-29"><a href="CCAPM.html#cb102-29" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h=</span><span class="dv">0</span>,<span class="at">col=</span><span class="st">&quot;black&quot;</span>,<span class="at">lty=</span><span class="dv">3</span>)</span>
+<span id="cb102-30"><a href="CCAPM.html#cb102-30" tabindex="-1"></a><span class="fu">lines</span>(vec_dates[(h<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span>T],inflation,<span class="at">col=</span><span class="st">&quot;darkgrey&quot;</span>,<span class="at">lwd=</span><span class="dv">2</span>)</span>
+<span id="cb102-31"><a href="CCAPM.html#cb102-31" tabindex="-1"></a></span>
+<span id="cb102-32"><a href="CCAPM.html#cb102-32" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">&quot;bottomleft&quot;</span>,</span>
+<span id="cb102-33"><a href="CCAPM.html#cb102-33" tabindex="-1"></a>       <span class="fu">c</span>(<span class="st">&quot;Consumption growth&quot;</span>,<span class="st">&quot;Inflation rate&quot;</span>),</span>
+<span id="cb102-34"><a href="CCAPM.html#cb102-34" tabindex="-1"></a>       <span class="at">lty=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>), <span class="co"># gives the legend appropriate symbols (lines)</span></span>
+<span id="cb102-35"><a href="CCAPM.html#cb102-35" tabindex="-1"></a>       <span class="at">lwd=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>), <span class="co"># line width</span></span>
+<span id="cb102-36"><a href="CCAPM.html#cb102-36" tabindex="-1"></a>       <span class="at">col=</span><span class="fu">c</span>(<span class="st">&quot;black&quot;</span>,<span class="st">&quot;darkgrey&quot;</span>), <span class="co"># gives the legend lines the correct color and width</span></span>
+<span id="cb102-37"><a href="CCAPM.html#cb102-37" tabindex="-1"></a>       <span class="at">cex=</span>.<span class="dv">8</span><span class="co"># size of the text</span></span>
+<span id="cb102-38"><a href="CCAPM.html#cb102-38" tabindex="-1"></a>)</span>
+<span id="cb102-39"><a href="CCAPM.html#cb102-39" tabindex="-1"></a><span class="co"># Plot the rolling correlation together with term-premium estimates.</span></span>
+<span id="cb102-40"><a href="CCAPM.html#cb102-40" tabindex="-1"></a><span class="fu">plot</span>(vec_dates[(h<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span>T],<span class="dv">100</span><span class="sc">*</span>correla,<span class="at">col=</span><span class="st">&quot;black&quot;</span>,<span class="at">type=</span><span class="st">&quot;l&quot;</span>,</span>
+<span id="cb102-41"><a href="CCAPM.html#cb102-41" tabindex="-1"></a>     <span class="at">lwd=</span><span class="dv">3</span>,<span class="at">ylim=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">130</span>,<span class="dv">130</span>),<span class="at">lty=</span><span class="dv">2</span>,</span>
+<span id="cb102-42"><a href="CCAPM.html#cb102-42" tabindex="-1"></a>     <span class="at">ylab=</span><span class="st">&quot;Correlation, in percent&quot;</span>,<span class="at">xlab=</span><span class="st">&quot;&quot;</span>,<span class="at">cex.axis=</span>.<span class="dv">8</span>,<span class="at">cex=</span>.<span class="dv">8</span>,<span class="at">las=</span><span class="dv">1</span>,</span>
+<span id="cb102-43"><a href="CCAPM.html#cb102-43" tabindex="-1"></a>     <span class="at">main=</span><span class="st">&quot;(b) Correlation between consumption growth and inflation&quot;</span>,<span class="at">cex.main=</span>.<span class="dv">9</span>)</span>
+<span id="cb102-44"><a href="CCAPM.html#cb102-44" tabindex="-1"></a><span class="fu">grid</span>()</span>
+<span id="cb102-45"><a href="CCAPM.html#cb102-45" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h=</span><span class="dv">0</span>,<span class="at">col=</span><span class="st">&quot;black&quot;</span>,<span class="at">lty=</span><span class="dv">3</span>)</span>
+<span id="cb102-46"><a href="CCAPM.html#cb102-46" tabindex="-1"></a><span class="fu">text</span>(vec_dates[<span class="dv">330</span>],<span class="sc">-</span><span class="dv">15</span>,<span class="at">labels=</span><span class="st">&quot;Supply shocks prevail&quot;</span>,<span class="at">cex=</span>.<span class="dv">9</span>)</span>
+<span id="cb102-47"><a href="CCAPM.html#cb102-47" tabindex="-1"></a><span class="fu">text</span>(vec_dates[<span class="dv">330</span>],<span class="sc">+</span><span class="dv">15</span>,<span class="at">labels=</span><span class="st">&quot;Demand shocks prevail&quot;</span>,<span class="at">cex=</span>.<span class="dv">9</span>)</span>
+<span id="cb102-48"><a href="CCAPM.html#cb102-48" tabindex="-1"></a></span>
+<span id="cb102-49"><a href="CCAPM.html#cb102-49" tabindex="-1"></a>values.TP <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">450</span>,<span class="dv">450</span>,<span class="at">by=</span><span class="dv">150</span>)</span>
+<span id="cb102-50"><a href="CCAPM.html#cb102-50" tabindex="-1"></a>location.ticks <span class="ot">&lt;-</span> <span class="sc">-</span>values.TP<span class="sc">/</span><span class="fl">4.5</span></span>
+<span id="cb102-51"><a href="CCAPM.html#cb102-51" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">4</span>,<span class="at">at=</span><span class="sc">-</span>location.ticks,</span>
+<span id="cb102-52"><a href="CCAPM.html#cb102-52" tabindex="-1"></a>     <span class="at">labels =</span> <span class="fu">paste</span>(<span class="sc">-</span>values.TP,<span class="st">&quot;&quot;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>),</span>
+<span id="cb102-53"><a href="CCAPM.html#cb102-53" tabindex="-1"></a>     <span class="at">col=</span><span class="st">&quot;darkgrey&quot;</span>,<span class="at">col.axis=</span><span class="st">&quot;darkgrey&quot;</span>,<span class="at">las=</span><span class="dv">1</span>,<span class="at">cex.axis=</span>.<span class="dv">9</span>)</span>
+<span id="cb102-54"><a href="CCAPM.html#cb102-54" tabindex="-1"></a><span class="fu">mtext</span>(<span class="st">&quot;Term premium, in basis points&quot;</span>, <span class="at">side=</span><span class="dv">4</span>, <span class="at">line=</span><span class="dv">3</span>,<span class="at">col=</span><span class="st">&quot;darkgrey&quot;</span>)</span>
+<span id="cb102-55"><a href="CCAPM.html#cb102-55" tabindex="-1"></a></span>
+<span id="cb102-56"><a href="CCAPM.html#cb102-56" tabindex="-1"></a><span class="fu">lines</span>(ACMTermPremium<span class="sc">$</span>date,<span class="sc">-</span><span class="dv">100</span><span class="sc">/</span><span class="fl">4.5</span><span class="sc">*</span>ACMTermPremium<span class="sc">$</span>ACMTP10,</span>
+<span id="cb102-57"><a href="CCAPM.html#cb102-57" tabindex="-1"></a>      <span class="at">col=</span><span class="st">&quot;darkgrey&quot;</span>,<span class="at">lwd=</span><span class="dv">2</span>)</span>
+<span id="cb102-58"><a href="CCAPM.html#cb102-58" tabindex="-1"></a><span class="fu">lines</span>(Data_Macro_US_monthly<span class="sc">$</span>date,</span>
+<span id="cb102-59"><a href="CCAPM.html#cb102-59" tabindex="-1"></a>      <span class="sc">-</span><span class="dv">100</span><span class="sc">/</span><span class="fl">4.5</span><span class="sc">*</span>Data_Macro_US_monthly<span class="sc">$</span>THREEFYTP10,<span class="at">col=</span><span class="st">&quot;black&quot;</span>,<span class="at">lwd=</span><span class="dv">2</span>,<span class="at">lty=</span><span class="dv">1</span>)</span>
+<span id="cb102-60"><a href="CCAPM.html#cb102-60" tabindex="-1"></a></span>
+<span id="cb102-61"><a href="CCAPM.html#cb102-61" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">&quot;topleft&quot;</span>,</span>
+<span id="cb102-62"><a href="CCAPM.html#cb102-62" tabindex="-1"></a>       <span class="at">title=</span><span class="st">&quot;Term premiums (rhs)&quot;</span>,</span>
+<span id="cb102-63"><a href="CCAPM.html#cb102-63" tabindex="-1"></a>       <span class="fu">c</span>(<span class="st">&quot;ACM&quot;</span>,<span class="st">&quot;KW&quot;</span>),</span>
+<span id="cb102-64"><a href="CCAPM.html#cb102-64" tabindex="-1"></a>       <span class="at">lty=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>), <span class="co"># gives the legend appropriate symbols (lines)</span></span>
+<span id="cb102-65"><a href="CCAPM.html#cb102-65" tabindex="-1"></a>       <span class="at">lwd=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>), <span class="co"># line width</span></span>
+<span id="cb102-66"><a href="CCAPM.html#cb102-66" tabindex="-1"></a>       <span class="at">seg.len =</span> <span class="dv">3</span>,</span>
+<span id="cb102-67"><a href="CCAPM.html#cb102-67" tabindex="-1"></a>       <span class="at">col=</span><span class="fu">c</span>(<span class="st">&quot;darkgrey&quot;</span>,<span class="st">&quot;black&quot;</span>), <span class="co"># gives the legend lines the correct color and width</span></span>
+<span id="cb102-68"><a href="CCAPM.html#cb102-68" tabindex="-1"></a>       <span class="at">cex=</span>.<span class="dv">8</span><span class="co"># size of the text</span></span>
+<span id="cb102-69"><a href="CCAPM.html#cb102-69" tabindex="-1"></a>)</span>
+<span id="cb102-70"><a href="CCAPM.html#cb102-70" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">&quot;topright&quot;</span>,</span>
+<span id="cb102-71"><a href="CCAPM.html#cb102-71" tabindex="-1"></a>       <span class="fu">c</span>(<span class="st">&quot;Consumption-inflation correlation&quot;</span>),</span>
+<span id="cb102-72"><a href="CCAPM.html#cb102-72" tabindex="-1"></a>       <span class="at">lty=</span><span class="fu">c</span>(<span class="dv">2</span>), <span class="co"># gives the legend appropriate symbols (lines)</span></span>
+<span id="cb102-73"><a href="CCAPM.html#cb102-73" tabindex="-1"></a>       <span class="at">lwd=</span><span class="fu">c</span>(<span class="dv">3</span>), <span class="co"># line width</span></span>
+<span id="cb102-74"><a href="CCAPM.html#cb102-74" tabindex="-1"></a>       <span class="at">seg.len =</span> <span class="dv">3</span>,</span>
+<span id="cb102-75"><a href="CCAPM.html#cb102-75" tabindex="-1"></a>       <span class="at">col=</span><span class="fu">c</span>(<span class="st">&quot;black&quot;</span>), <span class="co"># gives the legend lines the correct color and width</span></span>
+<span id="cb102-76"><a href="CCAPM.html#cb102-76" tabindex="-1"></a>       <span class="at">cex=</span>.<span class="dv">8</span><span class="co"># size of the text</span></span>
+<span id="cb102-77"><a href="CCAPM.html#cb102-77" tabindex="-1"></a>)</span></code></pre></div>
+<p><img src="_main_files/figure-html/fig_fredCorrel-1.png" width="672" /></p>
+<p>The following code creates a figure that displays a simluated path for the short-term rate, and shows the term structure of interest rates at different point in times.</p>
+</div>
+<div id="term-structures-under-a-ccapm-based-pricing-kernel" class="section level2 hasAnchor" number="10.5">
+<h2><span class="header-section-number">10.5</span> Term structures under a CCAPM-based pricing kernel<a href="CCAPM.html#term-structures-under-a-ccapm-based-pricing-kernel" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>This example simulates term structures implied by a CCAPM-based pricing kernel.</p>
+<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb103-1"><a href="CCAPM.html#cb103-1" tabindex="-1"></a><span class="co"># Purpose: This example simulates term structures implied by a CCAPM-based pricing kernel</span></span>
+<span id="cb103-2"><a href="CCAPM.html#cb103-2" tabindex="-1"></a><span class="fu">library</span>(DTAM)</span>
+<span id="cb103-3"><a href="CCAPM.html#cb103-3" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb103-4"><a href="CCAPM.html#cb103-4" tabindex="-1"></a></span>
+<span id="cb103-5"><a href="CCAPM.html#cb103-5" tabindex="-1"></a>phi <span class="ot">&lt;-</span> <span class="fl">0.8</span></span>
+<span id="cb103-6"><a href="CCAPM.html#cb103-6" tabindex="-1"></a>mu <span class="ot">&lt;-</span> <span class="fl">0.005</span></span>
+<span id="cb103-7"><a href="CCAPM.html#cb103-7" tabindex="-1"></a>sigma.bar <span class="ot">&lt;-</span> .<span class="dv">01</span> <span class="co"># unconditional std dev of growth</span></span>
+<span id="cb103-8"><a href="CCAPM.html#cb103-8" tabindex="-1"></a>sigma2  <span class="ot">&lt;-</span> sigma.bar<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> phi<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb103-9"><a href="CCAPM.html#cb103-9" tabindex="-1"></a>sigma.c <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(sigma2)</span>
+<span id="cb103-10"><a href="CCAPM.html#cb103-10" tabindex="-1"></a>gamma   <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb103-11"><a href="CCAPM.html#cb103-11" tabindex="-1"></a>delta   <span class="ot">&lt;-</span> <span class="fl">0.99</span></span>
+<span id="cb103-12"><a href="CCAPM.html#cb103-12" tabindex="-1"></a><span class="co"># Determine specification of real short-term rate:</span></span>
+<span id="cb103-13"><a href="CCAPM.html#cb103-13" tabindex="-1"></a>eta<span class="fl">.0</span> <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">log</span>(delta) <span class="sc">+</span> mu <span class="sc">*</span> gamma <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> phi) <span class="sc">-</span> </span>
+<span id="cb103-14"><a href="CCAPM.html#cb103-14" tabindex="-1"></a>  gamma<span class="sc">^</span><span class="dv">2</span> <span class="sc">*</span> sigma.c<span class="sc">^</span><span class="dv">2</span> <span class="sc">/</span> <span class="dv">2</span></span>
+<span id="cb103-15"><a href="CCAPM.html#cb103-15" tabindex="-1"></a>eta<span class="fl">.1</span> <span class="ot">&lt;-</span> gamma <span class="sc">*</span> phi</span>
+<span id="cb103-16"><a href="CCAPM.html#cb103-16" tabindex="-1"></a><span class="co"># Specify the model:</span></span>
+<span id="cb103-17"><a href="CCAPM.html#cb103-17" tabindex="-1"></a>psi.parameterization <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb103-18"><a href="CCAPM.html#cb103-18" tabindex="-1"></a>  <span class="at">mu =</span> <span class="fu">matrix</span>(mu <span class="sc">*</span> (<span class="dv">1</span><span class="sc">-</span>phi)),</span>
+<span id="cb103-19"><a href="CCAPM.html#cb103-19" tabindex="-1"></a>  <span class="at">Phi =</span> <span class="fu">matrix</span>(phi),</span>
+<span id="cb103-20"><a href="CCAPM.html#cb103-20" tabindex="-1"></a>  <span class="at">Sigma =</span> <span class="fu">matrix</span>(sigma.c<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb103-21"><a href="CCAPM.html#cb103-21" tabindex="-1"></a><span class="co"># Use reverse-order multi-horizon LT to price ZC bonds:</span></span>
+<span id="cb103-22"><a href="CCAPM.html#cb103-22" tabindex="-1"></a>h <span class="ot">=</span> <span class="dv">10</span> <span class="co"># maximum maturity</span></span>
+<span id="cb103-23"><a href="CCAPM.html#cb103-23" tabindex="-1"></a>u2 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="sc">-</span>gamma)</span>
+<span id="cb103-24"><a href="CCAPM.html#cb103-24" tabindex="-1"></a>u1 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="sc">-</span>gamma)</span>
+<span id="cb103-25"><a href="CCAPM.html#cb103-25" tabindex="-1"></a>AB <span class="ot">&lt;-</span> <span class="fu">reverse_MHLT</span>(psi_GaussianVAR,u1,u2,<span class="at">H=</span>h,psi.parameterization)</span>
+<span id="cb103-26"><a href="CCAPM.html#cb103-26" tabindex="-1"></a>a.h <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">c</span>(AB<span class="sc">$</span>A)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">:</span>h)</span>
+<span id="cb103-27"><a href="CCAPM.html#cb103-27" tabindex="-1"></a>b.h <span class="ot">&lt;-</span> <span class="sc">-</span> <span class="fu">log</span>(delta) <span class="sc">+</span> <span class="sc">-</span><span class="fu">c</span>(AB<span class="sc">$</span>B)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">:</span>h)</span>
+<span id="cb103-28"><a href="CCAPM.html#cb103-28" tabindex="-1"></a><span class="co"># Under EH:</span></span>
+<span id="cb103-29"><a href="CCAPM.html#cb103-29" tabindex="-1"></a>u2 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="sc">-</span> eta<span class="fl">.1</span>)</span>
+<span id="cb103-30"><a href="CCAPM.html#cb103-30" tabindex="-1"></a>u1 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>)</span>
+<span id="cb103-31"><a href="CCAPM.html#cb103-31" tabindex="-1"></a>AB <span class="ot">&lt;-</span> <span class="fu">reverse_MHLT</span>(psi_GaussianVAR,u1,u2,<span class="at">H=</span>h,psi.parameterization)</span>
+<span id="cb103-32"><a href="CCAPM.html#cb103-32" tabindex="-1"></a>a.h.EH <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">c</span>(AB<span class="sc">$</span>A <span class="sc">-</span> eta<span class="fl">.1</span>)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">:</span>h)</span>
+<span id="cb103-33"><a href="CCAPM.html#cb103-33" tabindex="-1"></a>b.h.EH <span class="ot">&lt;-</span> eta<span class="fl">.0</span> <span class="sc">-</span> <span class="fu">c</span>(AB<span class="sc">$</span>B)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">:</span>h)</span>
+<span id="cb103-34"><a href="CCAPM.html#cb103-34" tabindex="-1"></a><span class="co"># Simulate growth:</span></span>
+<span id="cb103-35"><a href="CCAPM.html#cb103-35" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">mu=</span>mu<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>phi),</span>
+<span id="cb103-36"><a href="CCAPM.html#cb103-36" tabindex="-1"></a>              <span class="at">Phi=</span><span class="fu">as.matrix</span>(phi),</span>
+<span id="cb103-37"><a href="CCAPM.html#cb103-37" tabindex="-1"></a>              <span class="at">Sigma12=</span><span class="fu">as.matrix</span>(sigma.c))</span>
+<span id="cb103-38"><a href="CCAPM.html#cb103-38" tabindex="-1"></a>T <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb103-39"><a href="CCAPM.html#cb103-39" tabindex="-1"></a>x.sim <span class="ot">&lt;-</span> <span class="fu">simul_GaussianVAR</span>(model,<span class="at">nb.sim=</span>T)</span>
+<span id="cb103-40"><a href="CCAPM.html#cb103-40" tabindex="-1"></a>r.t   <span class="ot">&lt;-</span> (eta<span class="fl">.0</span> <span class="sc">+</span> eta<span class="fl">.1</span> <span class="sc">*</span> x.sim)</span>
+<span id="cb103-41"><a href="CCAPM.html#cb103-41" tabindex="-1"></a></span>
+<span id="cb103-42"><a href="CCAPM.html#cb103-42" tabindex="-1"></a><span class="co"># Prepare plots:</span></span>
+<span id="cb103-43"><a href="CCAPM.html#cb103-43" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))</span>
+<span id="cb103-44"><a href="CCAPM.html#cb103-44" tabindex="-1"></a><span class="fu">par</span>(<span class="at">plt=</span><span class="fu">c</span>(.<span class="dv">15</span>,.<span class="dv">98</span>,.<span class="dv">1</span>,.<span class="dv">95</span>))</span>
+<span id="cb103-45"><a href="CCAPM.html#cb103-45" tabindex="-1"></a></span>
+<span id="cb103-46"><a href="CCAPM.html#cb103-46" tabindex="-1"></a><span class="fu">plot</span>(<span class="dv">100</span><span class="sc">*</span>r.t,<span class="at">type=</span><span class="st">&quot;l&quot;</span>,<span class="at">xlab=</span><span class="st">&quot;&quot;</span>,<span class="at">ylab=</span><span class="st">&quot;interest rate, in percent&quot;</span>,</span>
+<span id="cb103-47"><a href="CCAPM.html#cb103-47" tabindex="-1"></a>     <span class="at">ylim=</span><span class="dv">100</span><span class="sc">*</span><span class="fu">c</span>(<span class="fu">min</span>(r.t),</span>
+<span id="cb103-48"><a href="CCAPM.html#cb103-48" tabindex="-1"></a>                <span class="fu">max</span>(r.t)<span class="sc">+</span>.<span class="dv">07</span>),<span class="at">las=</span><span class="dv">1</span>,</span>
+<span id="cb103-49"><a href="CCAPM.html#cb103-49" tabindex="-1"></a>     <span class="at">lwd=</span><span class="dv">2</span>,<span class="at">col=</span><span class="st">&quot;grey&quot;</span>)</span>
+<span id="cb103-50"><a href="CCAPM.html#cb103-50" tabindex="-1"></a><span class="fu">grid</span>()</span>
+<span id="cb103-51"><a href="CCAPM.html#cb103-51" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h=</span><span class="dv">0</span>,<span class="at">lty=</span><span class="dv">3</span>)</span>
+<span id="cb103-52"><a href="CCAPM.html#cb103-52" tabindex="-1"></a><span class="cf">for</span>(t <span class="cf">in</span> <span class="fu">seq</span>(<span class="dv">1</span>,T,<span class="at">by=</span><span class="dv">10</span>)){</span>
+<span id="cb103-53"><a href="CCAPM.html#cb103-53" tabindex="-1"></a>  <span class="fu">lines</span>(t<span class="sc">+</span>(<span class="dv">1</span><span class="sc">:</span>h)<span class="sc">-</span><span class="dv">1</span>,<span class="dv">100</span><span class="sc">*</span>(b.h    <span class="sc">+</span> a.h    <span class="sc">*</span> x.sim[t]),<span class="at">col=</span><span class="st">&quot;black&quot;</span>,<span class="at">lwd=</span><span class="dv">2</span>)</span>
+<span id="cb103-54"><a href="CCAPM.html#cb103-54" tabindex="-1"></a>  <span class="fu">lines</span>(t<span class="sc">+</span>(<span class="dv">1</span><span class="sc">:</span>h)<span class="sc">-</span><span class="dv">1</span>,<span class="dv">100</span><span class="sc">*</span>(b.h.EH <span class="sc">+</span> a.h.EH <span class="sc">*</span> x.sim[t]),<span class="at">col=</span><span class="st">&quot;black&quot;</span>,<span class="at">lwd=</span><span class="dv">2</span>,<span class="at">lty=</span><span class="dv">2</span>)}</span>
+<span id="cb103-55"><a href="CCAPM.html#cb103-55" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">&quot;topleft&quot;</span>,</span>
+<span id="cb103-56"><a href="CCAPM.html#cb103-56" tabindex="-1"></a>       <span class="fu">c</span>(<span class="st">&quot;Short-term rate&quot;</span>,<span class="st">&quot;Term structure of real yields&quot;</span>,</span>
+<span id="cb103-57"><a href="CCAPM.html#cb103-57" tabindex="-1"></a>         <span class="st">&quot;Term structure of real yields (without risk premiums)&quot;</span>),</span>
+<span id="cb103-58"><a href="CCAPM.html#cb103-58" tabindex="-1"></a>       <span class="at">lwd=</span><span class="fu">c</span>(<span class="dv">2</span>),<span class="at">lty=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">2</span>),<span class="at">col=</span><span class="fu">c</span>(<span class="st">&quot;grey&quot;</span>,<span class="st">&quot;black&quot;</span>,<span class="st">&quot;black&quot;</span>),<span class="at">seg.len =</span> <span class="dv">4</span>)</span></code></pre></div>
+<p><img src="_main_files/figure-html/fig_simulTS_CCAPM-1.png" width="768" /></p>
+<p>The following code produces a figure illustrating the real term premium.</p>
+</div>
+<div id="decomposes-the-real-term-premium-in-the-baseline-ccapm-setting" class="section level2 hasAnchor" number="10.6">
+<h2><span class="header-section-number">10.6</span> Decomposes the real term premium in the baseline CCAPM setting<a href="CCAPM.html#decomposes-the-real-term-premium-in-the-baseline-ccapm-setting" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>This example decomposes the real term premium in the baseline CCAPM setting.</p>
+<div class="sourceCode" id="cb104"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb104-1"><a href="CCAPM.html#cb104-1" tabindex="-1"></a><span class="co"># Purpose: This example decomposes the real term premium in the baseline CCAPM setting</span></span>
+<span id="cb104-2"><a href="CCAPM.html#cb104-2" tabindex="-1"></a><span class="fu">library</span>(DTAM)</span>
+<span id="cb104-3"><a href="CCAPM.html#cb104-3" tabindex="-1"></a></span>
+<span id="cb104-4"><a href="CCAPM.html#cb104-4" tabindex="-1"></a><span class="co"># Load and merge nominal, real, and survey data.</span></span>
+<span id="cb104-5"><a href="CCAPM.html#cb104-5" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;SPF&quot;</span>, <span class="at">package =</span> <span class="st">&quot;DTAM&quot;</span>)</span>
+<span id="cb104-6"><a href="CCAPM.html#cb104-6" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;Data_Macro_US_quarterly&quot;</span>, <span class="at">package =</span> <span class="st">&quot;DTAM&quot;</span>)</span>
+<span id="cb104-7"><a href="CCAPM.html#cb104-7" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;YC_LW&quot;</span>, <span class="at">package =</span> <span class="st">&quot;DTAM&quot;</span>)</span>
+<span id="cb104-8"><a href="CCAPM.html#cb104-8" tabindex="-1"></a></span>
+<span id="cb104-9"><a href="CCAPM.html#cb104-9" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">merge</span>(YC_LW,SPF,<span class="at">by=</span><span class="st">&quot;date&quot;</span>)</span>
+<span id="cb104-10"><a href="CCAPM.html#cb104-10" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">merge</span>(data,DAT_GSW,<span class="at">by=</span><span class="st">&quot;date&quot;</span>)</span>
+<span id="cb104-11"><a href="CCAPM.html#cb104-11" tabindex="-1"></a></span>
+<span id="cb104-12"><a href="CCAPM.html#cb104-12" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))</span>
+<span id="cb104-13"><a href="CCAPM.html#cb104-13" tabindex="-1"></a><span class="fu">par</span>(<span class="at">plt=</span><span class="fu">c</span>(.<span class="dv">2</span>,.<span class="dv">95</span>,.<span class="dv">1</span>,.<span class="dv">85</span>))</span>
+<span id="cb104-14"><a href="CCAPM.html#cb104-14" tabindex="-1"></a></span>
+<span id="cb104-15"><a href="CCAPM.html#cb104-15" tabindex="-1"></a><span class="co"># Plot the slope of the real yield curve.</span></span>
+<span id="cb104-16"><a href="CCAPM.html#cb104-16" tabindex="-1"></a>data_reduced <span class="ot">&lt;-</span> <span class="fu">subset</span>(data,<span class="at">select=</span><span class="fu">c</span>(date,TIPSY10,TIPSY02))</span>
+<span id="cb104-17"><a href="CCAPM.html#cb104-17" tabindex="-1"></a>data_reduced <span class="ot">&lt;-</span> data_reduced[<span class="fu">complete.cases</span>(data_reduced),]</span>
+<span id="cb104-18"><a href="CCAPM.html#cb104-18" tabindex="-1"></a><span class="fu">plot</span>(data_reduced<span class="sc">$</span>date,data_reduced<span class="sc">$</span>TIPSY10 <span class="sc">-</span> data_reduced<span class="sc">$</span>TIPSY02,<span class="at">type=</span><span class="st">&quot;l&quot;</span>,</span>
+<span id="cb104-19"><a href="CCAPM.html#cb104-19" tabindex="-1"></a>     <span class="at">lwd=</span><span class="dv">2</span>,<span class="at">las=</span><span class="dv">1</span>,<span class="at">ylab=</span><span class="st">&quot;in percent&quot;</span>,<span class="at">xlab=</span><span class="st">&quot;&quot;</span>,</span>
+<span id="cb104-20"><a href="CCAPM.html#cb104-20" tabindex="-1"></a>     <span class="at">main=</span><span class="st">&quot;(a) Slope of TIPS yield curve (2y-10y)&quot;</span>,<span class="at">cex.main=</span>.<span class="dv">9</span>)</span>
+<span id="cb104-21"><a href="CCAPM.html#cb104-21" tabindex="-1"></a><span class="fu">grid</span>()</span>
+<span id="cb104-22"><a href="CCAPM.html#cb104-22" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h=</span><span class="dv">0</span>,<span class="at">lty=</span><span class="dv">3</span>)</span>
+<span id="cb104-23"><a href="CCAPM.html#cb104-23" tabindex="-1"></a></span>
+<span id="cb104-24"><a href="CCAPM.html#cb104-24" tabindex="-1"></a><span class="co"># Computation of model-free real term premium:</span></span>
+<span id="cb104-25"><a href="CCAPM.html#cb104-25" tabindex="-1"></a>data_reduced <span class="ot">&lt;-</span> <span class="fu">subset</span>(data,<span class="at">select=</span><span class="fu">c</span>(date,TIPSY10,yld_10y,CPI10,BILL10))</span>
+<span id="cb104-26"><a href="CCAPM.html#cb104-26" tabindex="-1"></a>data_reduced <span class="ot">&lt;-</span> data_reduced[<span class="fu">complete.cases</span>(data_reduced),]</span>
+<span id="cb104-27"><a href="CCAPM.html#cb104-27" tabindex="-1"></a></span>
+<span id="cb104-28"><a href="CCAPM.html#cb104-28" tabindex="-1"></a>BEIR10 <span class="ot">&lt;-</span> data_reduced<span class="sc">$</span>yld_10y <span class="sc">-</span> data_reduced<span class="sc">$</span>TIPSY10</span>
+<span id="cb104-29"><a href="CCAPM.html#cb104-29" tabindex="-1"></a>IRP10  <span class="ot">&lt;-</span> BEIR10 <span class="sc">-</span> data_reduced<span class="sc">$</span>CPI10</span>
+<span id="cb104-30"><a href="CCAPM.html#cb104-30" tabindex="-1"></a>NTP10  <span class="ot">&lt;-</span> data_reduced<span class="sc">$</span>yld_10y <span class="sc">-</span> data_reduced<span class="sc">$</span>BILL10</span>
+<span id="cb104-31"><a href="CCAPM.html#cb104-31" tabindex="-1"></a>RTP10  <span class="ot">&lt;-</span> NTP10 <span class="sc">-</span> IRP10</span>
+<span id="cb104-32"><a href="CCAPM.html#cb104-32" tabindex="-1"></a><span class="fu">plot</span>(data_reduced<span class="sc">$</span>date,RTP10,<span class="at">type=</span><span class="st">&quot;b&quot;</span>,</span>
+<span id="cb104-33"><a href="CCAPM.html#cb104-33" tabindex="-1"></a>     <span class="at">lwd=</span><span class="dv">2</span>,<span class="at">las=</span><span class="dv">1</span>,<span class="at">ylab=</span><span class="st">&quot;in percent&quot;</span>,<span class="at">xlab=</span><span class="st">&quot;&quot;</span>,</span>
+<span id="cb104-34"><a href="CCAPM.html#cb104-34" tabindex="-1"></a>     <span class="at">main=</span><span class="st">&quot;(b) Survey-based 10y real term premium&quot;</span>,<span class="at">cex.main=</span>.<span class="dv">9</span>)</span>
+<span id="cb104-35"><a href="CCAPM.html#cb104-35" tabindex="-1"></a><span class="fu">grid</span>()</span>
+<span id="cb104-36"><a href="CCAPM.html#cb104-36" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h=</span><span class="dv">0</span>,<span class="at">lty=</span><span class="dv">3</span>)</span></code></pre></div>
+<p><img src="_main_files/figure-html/fig_RTP-1.png" width="768" /></p>
+<p>The following code produces a figure showing average real and inflation yield curves.</p>
+</div>
+<div id="model-implied-yield-curve-moments-with-ccapm-restrictions" class="section level2 hasAnchor" number="10.7">
+<h2><span class="header-section-number">10.7</span> Model-implied yield-curve moments with CCAPM restrictions<a href="CCAPM.html#model-implied-yield-curve-moments-with-ccapm-restrictions" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>This example compares model-implied yield-curve moments with CCAPM restrictions.</p>
+<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb105-1"><a href="CCAPM.html#cb105-1" tabindex="-1"></a><span class="co"># Purpose: This example compares model-implied yield-curve moments with CCAPM restrictions</span></span>
+<span id="cb105-2"><a href="CCAPM.html#cb105-2" tabindex="-1"></a><span class="fu">library</span>(DTAM)</span>
+<span id="cb105-3"><a href="CCAPM.html#cb105-3" tabindex="-1"></a></span>
+<span id="cb105-4"><a href="CCAPM.html#cb105-4" tabindex="-1"></a>values_sigma.pi.c <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="sc">-</span>.<span class="dv">03</span>)</span>
+<span id="cb105-5"><a href="CCAPM.html#cb105-5" tabindex="-1"></a>title_plot <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb105-6"><a href="CCAPM.html#cb105-6" tabindex="-1"></a>  <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;(a) &quot;</span>,sigma[pi<span class="sc">*</span><span class="st">&#39;,&#39;</span><span class="sc">*</span>c],<span class="st">&quot; = 0&quot;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>)),</span>
+<span id="cb105-7"><a href="CCAPM.html#cb105-7" tabindex="-1"></a>  <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;(a) &quot;</span>,sigma[pi<span class="sc">*</span><span class="st">&#39;,&#39;</span><span class="sc">*</span>c],<span class="st">&quot; = -0.03&quot;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>))</span>
+<span id="cb105-8"><a href="CCAPM.html#cb105-8" tabindex="-1"></a>)</span>
+<span id="cb105-9"><a href="CCAPM.html#cb105-9" tabindex="-1"></a></span>
+<span id="cb105-10"><a href="CCAPM.html#cb105-10" tabindex="-1"></a><span class="fu">par</span>(<span class="at">plt=</span><span class="fu">c</span>(.<span class="dv">2</span>,.<span class="dv">95</span>,.<span class="dv">25</span>,.<span class="dv">85</span>))</span>
+<span id="cb105-11"><a href="CCAPM.html#cb105-11" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))</span>
+<span id="cb105-12"><a href="CCAPM.html#cb105-12" tabindex="-1"></a></span>
+<span id="cb105-13"><a href="CCAPM.html#cb105-13" tabindex="-1"></a>pi_bar <span class="ot">&lt;-</span> .<span class="dv">02</span></span>
+<span id="cb105-14"><a href="CCAPM.html#cb105-14" tabindex="-1"></a>phi_pi <span class="ot">&lt;-</span> .<span class="dv">8</span></span>
+<span id="cb105-15"><a href="CCAPM.html#cb105-15" tabindex="-1"></a>sigma.pi   <span class="ot">&lt;-</span> .<span class="dv">01</span></span>
+<span id="cb105-16"><a href="CCAPM.html#cb105-16" tabindex="-1"></a></span>
+<span id="cb105-17"><a href="CCAPM.html#cb105-17" tabindex="-1"></a>count_plot <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb105-18"><a href="CCAPM.html#cb105-18" tabindex="-1"></a><span class="cf">for</span>(sigma.pi.c <span class="cf">in</span> values_sigma.pi.c){</span>
+<span id="cb105-19"><a href="CCAPM.html#cb105-19" tabindex="-1"></a>  count_plot <span class="ot">&lt;-</span> count_plot <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb105-20"><a href="CCAPM.html#cb105-20" tabindex="-1"></a>  <span class="co"># Determine specification of nominal short-term rate:</span></span>
+<span id="cb105-21"><a href="CCAPM.html#cb105-21" tabindex="-1"></a>  eta.<span class="fl">0.</span>i <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">log</span>(delta) <span class="sc">+</span> mu <span class="sc">*</span> gamma <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> phi) <span class="sc">+</span> pi_bar <span class="sc">*</span> </span>
+<span id="cb105-22"><a href="CCAPM.html#cb105-22" tabindex="-1"></a>    (<span class="dv">1</span> <span class="sc">-</span> phi_pi) <span class="sc">-</span> (gamma<span class="sc">*</span>sigma.c <span class="sc">+</span> sigma.pi.c)<span class="sc">^</span><span class="dv">2</span><span class="sc">/</span><span class="dv">2</span> <span class="sc">-</span> sigma.pi<span class="sc">^</span><span class="dv">2</span><span class="sc">/</span><span class="dv">2</span></span>
+<span id="cb105-23"><a href="CCAPM.html#cb105-23" tabindex="-1"></a>  eta.<span class="fl">1.</span>i <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(gamma <span class="sc">*</span> phi,phi_pi),<span class="dv">2</span>,<span class="dv">1</span>)</span>
+<span id="cb105-24"><a href="CCAPM.html#cb105-24" tabindex="-1"></a>  <span class="co"># Specify the model:</span></span>
+<span id="cb105-25"><a href="CCAPM.html#cb105-25" tabindex="-1"></a>  psi.parameterization <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb105-26"><a href="CCAPM.html#cb105-26" tabindex="-1"></a>    <span class="at">mu =</span> <span class="fu">matrix</span>(<span class="fu">c</span>(mu<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>phi),pi_bar<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>phi_pi)),<span class="dv">2</span>,<span class="dv">1</span>),</span>
+<span id="cb105-27"><a href="CCAPM.html#cb105-27" tabindex="-1"></a>    <span class="at">Phi =</span> <span class="fu">diag</span>(<span class="fu">c</span>(phi,phi_pi)),</span>
+<span id="cb105-28"><a href="CCAPM.html#cb105-28" tabindex="-1"></a>    <span class="at">Sigma =</span> <span class="fu">matrix</span>(<span class="fu">c</span>(sigma.c<span class="sc">^</span><span class="dv">2</span>,sigma.c<span class="sc">*</span>sigma.pi.c,sigma.c<span class="sc">*</span></span>
+<span id="cb105-29"><a href="CCAPM.html#cb105-29" tabindex="-1"></a>                       sigma.pi.c,sigma.pi<span class="sc">^</span><span class="dv">2</span><span class="sc">+</span>sigma.pi.c<span class="sc">^</span><span class="dv">2</span>),<span class="dv">2</span>,<span class="dv">2</span>))</span>
+<span id="cb105-30"><a href="CCAPM.html#cb105-30" tabindex="-1"></a>  <span class="co"># Use reverse-order multi-horizon LT to price ZC bonds:</span></span>
+<span id="cb105-31"><a href="CCAPM.html#cb105-31" tabindex="-1"></a>  u2 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="sc">-</span>gamma,<span class="sc">-</span><span class="dv">1</span>),<span class="dv">2</span>,<span class="dv">1</span>);u1 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="sc">-</span>gamma,<span class="sc">-</span><span class="dv">1</span>),<span class="dv">2</span>,<span class="dv">1</span>)</span>
+<span id="cb105-32"><a href="CCAPM.html#cb105-32" tabindex="-1"></a>  AB <span class="ot">&lt;-</span> <span class="fu">reverse_MHLT</span>(psi_GaussianVAR,u1,u2,<span class="at">H=</span>h,psi.parameterization)</span>
+<span id="cb105-33"><a href="CCAPM.html#cb105-33" tabindex="-1"></a>  a.h.i <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">matrix</span>(AB<span class="sc">$</span>A,<span class="dv">2</span>,h)<span class="sc">/</span><span class="fu">t</span>(<span class="fu">matrix</span>((<span class="dv">1</span><span class="sc">:</span>h),h,<span class="dv">2</span>))</span>
+<span id="cb105-34"><a href="CCAPM.html#cb105-34" tabindex="-1"></a>  b.h.i <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">log</span>(delta) <span class="sc">+</span> <span class="sc">-</span><span class="fu">c</span>(AB<span class="sc">$</span>B)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">:</span>h)</span>
+<span id="cb105-35"><a href="CCAPM.html#cb105-35" tabindex="-1"></a>  <span class="co"># Under EH:</span></span>
+<span id="cb105-36"><a href="CCAPM.html#cb105-36" tabindex="-1"></a>  u2 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="sc">-</span> eta.<span class="fl">1.</span>i);u1 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">1</span>)</span>
+<span id="cb105-37"><a href="CCAPM.html#cb105-37" tabindex="-1"></a>  AB <span class="ot">&lt;-</span> <span class="fu">reverse_MHLT</span>(psi_GaussianVAR,u1,u2,<span class="at">H=</span>h,psi.parameterization)</span>
+<span id="cb105-38"><a href="CCAPM.html#cb105-38" tabindex="-1"></a>  a.h.i.EH <span class="ot">&lt;-</span> <span class="sc">-</span>(<span class="fu">matrix</span>(AB<span class="sc">$</span>A,<span class="dv">2</span>,h)<span class="sc">-</span></span>
+<span id="cb105-39"><a href="CCAPM.html#cb105-39" tabindex="-1"></a>                  <span class="fu">matrix</span>(eta.<span class="fl">1.</span>i,<span class="dv">2</span>,h))<span class="sc">/</span><span class="fu">t</span>(<span class="fu">matrix</span>((<span class="dv">1</span><span class="sc">:</span>h),h,<span class="dv">2</span>))</span>
+<span id="cb105-40"><a href="CCAPM.html#cb105-40" tabindex="-1"></a>  b.h.i.EH <span class="ot">&lt;-</span> eta.<span class="fl">0.</span>i <span class="sc">-</span> <span class="fu">c</span>(AB<span class="sc">$</span>B)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">:</span>h)</span>
+<span id="cb105-41"><a href="CCAPM.html#cb105-41" tabindex="-1"></a>  <span class="co"># Average yield curves:</span></span>
+<span id="cb105-42"><a href="CCAPM.html#cb105-42" tabindex="-1"></a>  avg.i.h    <span class="ot">&lt;-</span> b.h.i    <span class="sc">+</span> <span class="fu">matrix</span>(<span class="fu">c</span>(mu,pi_bar),<span class="dv">1</span>,<span class="dv">2</span>) <span class="sc">%*%</span> a.h.i</span>
+<span id="cb105-43"><a href="CCAPM.html#cb105-43" tabindex="-1"></a>  avg.i.h.EH <span class="ot">&lt;-</span> b.h.i.EH <span class="sc">+</span> <span class="fu">matrix</span>(<span class="fu">c</span>(mu,pi_bar),<span class="dv">1</span>,<span class="dv">2</span>) <span class="sc">%*%</span> a.h.i.EH</span>
+<span id="cb105-44"><a href="CCAPM.html#cb105-44" tabindex="-1"></a>  </span>
+<span id="cb105-45"><a href="CCAPM.html#cb105-45" tabindex="-1"></a>  <span class="fu">plot</span>(<span class="dv">100</span><span class="sc">*</span><span class="fu">c</span>(avg.i.h),<span class="at">type=</span><span class="st">&quot;l&quot;</span>,<span class="at">lwd=</span><span class="dv">2</span>,<span class="at">col=</span><span class="st">&quot;darkgrey&quot;</span>,<span class="at">lty=</span><span class="dv">1</span>,</span>
+<span id="cb105-46"><a href="CCAPM.html#cb105-46" tabindex="-1"></a>       <span class="at">ylim=</span><span class="dv">100</span><span class="sc">*</span><span class="fu">c</span>(.<span class="dv">01</span>,<span class="fu">max</span>(avg.i.h)<span class="sc">+</span>.<span class="dv">01</span>),</span>
+<span id="cb105-47"><a href="CCAPM.html#cb105-47" tabindex="-1"></a>       <span class="at">main=</span>title_plot[count_plot],</span>
+<span id="cb105-48"><a href="CCAPM.html#cb105-48" tabindex="-1"></a>       <span class="at">xlab=</span><span class="st">&quot;maturity&quot;</span>,<span class="at">ylab=</span><span class="st">&quot;yield, in percent&quot;</span>,<span class="at">las=</span><span class="dv">1</span>);<span class="fu">grid</span>()</span>
+<span id="cb105-49"><a href="CCAPM.html#cb105-49" tabindex="-1"></a>  <span class="fu">lines</span>(<span class="dv">100</span><span class="sc">*</span><span class="fu">c</span>(avg.i.h.EH),<span class="at">type=</span><span class="st">&quot;l&quot;</span>,<span class="at">lwd=</span><span class="dv">2</span>,<span class="at">col=</span><span class="st">&quot;darkgrey&quot;</span>,<span class="at">lty=</span><span class="dv">2</span>)</span>
+<span id="cb105-50"><a href="CCAPM.html#cb105-50" tabindex="-1"></a>  <span class="fu">lines</span>(<span class="dv">100</span><span class="sc">*</span>(b.h<span class="sc">+</span>a.h<span class="sc">*</span>mu),<span class="at">lwd=</span><span class="dv">2</span>,<span class="at">col=</span><span class="st">&quot;black&quot;</span>)</span>
+<span id="cb105-51"><a href="CCAPM.html#cb105-51" tabindex="-1"></a>  <span class="fu">lines</span>(<span class="dv">100</span><span class="sc">*</span>(b.h.EH<span class="sc">+</span>a.h.EH<span class="sc">*</span>mu),<span class="at">lwd=</span><span class="dv">2</span>,<span class="at">col=</span><span class="st">&quot;black&quot;</span>,<span class="at">lty=</span><span class="dv">2</span>)</span>
+<span id="cb105-52"><a href="CCAPM.html#cb105-52" tabindex="-1"></a>  <span class="cf">if</span>(count_plot<span class="sc">==</span><span class="dv">1</span>){</span>
+<span id="cb105-53"><a href="CCAPM.html#cb105-53" tabindex="-1"></a>    <span class="fu">legend</span>(<span class="st">&quot;bottomleft&quot;</span>,<span class="at">title=</span><span class="st">&quot;Type of yield:&quot;</span>,</span>
+<span id="cb105-54"><a href="CCAPM.html#cb105-54" tabindex="-1"></a>           <span class="fu">c</span>(<span class="st">&quot;Nominal yields&quot;</span>,</span>
+<span id="cb105-55"><a href="CCAPM.html#cb105-55" tabindex="-1"></a>             <span class="st">&quot;Real yields&quot;</span>),</span>
+<span id="cb105-56"><a href="CCAPM.html#cb105-56" tabindex="-1"></a>           <span class="at">lwd=</span><span class="fu">c</span>(<span class="dv">2</span>),<span class="at">lty=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>),<span class="at">col=</span><span class="fu">c</span>(<span class="st">&quot;darkgrey&quot;</span>,<span class="st">&quot;black&quot;</span>),<span class="at">seg.len =</span> <span class="dv">3</span>)</span>
+<span id="cb105-57"><a href="CCAPM.html#cb105-57" tabindex="-1"></a>  }</span>
+<span id="cb105-58"><a href="CCAPM.html#cb105-58" tabindex="-1"></a>  <span class="cf">if</span>(count_plot<span class="sc">==</span><span class="dv">2</span>){</span>
+<span id="cb105-59"><a href="CCAPM.html#cb105-59" tabindex="-1"></a>    <span class="fu">legend</span>(<span class="st">&quot;bottomleft&quot;</span>,<span class="at">title=</span><span class="st">&quot;With or w/o term premiums:&quot;</span>,</span>
+<span id="cb105-60"><a href="CCAPM.html#cb105-60" tabindex="-1"></a>           <span class="fu">c</span>(<span class="st">&quot;with&quot;</span>,</span>
+<span id="cb105-61"><a href="CCAPM.html#cb105-61" tabindex="-1"></a>             <span class="st">&quot;without (i.e., under EH)&quot;</span>),</span>
+<span id="cb105-62"><a href="CCAPM.html#cb105-62" tabindex="-1"></a>           <span class="at">lwd=</span><span class="fu">c</span>(<span class="dv">2</span>),<span class="at">lty=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>),<span class="at">col=</span><span class="fu">c</span>(<span class="st">&quot;black&quot;</span>),<span class="at">seg.len =</span> <span class="dv">3</span>)</span>
+<span id="cb105-63"><a href="CCAPM.html#cb105-63" tabindex="-1"></a>  }</span>
+<span id="cb105-64"><a href="CCAPM.html#cb105-64" tabindex="-1"></a>}</span></code></pre></div>
+<p><img src="_main_files/figure-html/fig_TSMCCAPM-1.png" width="864" /></p>
+</div>
+<div id="separates-trend-and-cycle-contributions-to-the-real-term-premium" class="section level2 hasAnchor" number="10.8">
+<h2><span class="header-section-number">10.8</span> Separates trend and cycle contributions to the real term premium<a href="CCAPM.html#separates-trend-and-cycle-contributions-to-the-real-term-premium" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>This example separates trend and cycle contributions to the real term premium.</p>
+<div class="sourceCode" id="cb106"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb106-1"><a href="CCAPM.html#cb106-1" tabindex="-1"></a><span class="co"># Purpose: This example separates trend and cycle contributions to the real term premium</span></span>
+<span id="cb106-2"><a href="CCAPM.html#cb106-2" tabindex="-1"></a></span>
+<span id="cb106-3"><a href="CCAPM.html#cb106-3" tabindex="-1"></a>mu_g    <span class="ot">&lt;-</span> .<span class="dv">02</span></span>
+<span id="cb106-4"><a href="CCAPM.html#cb106-4" tabindex="-1"></a>rho_g   <span class="ot">&lt;-</span> .<span class="dv">9</span></span>
+<span id="cb106-5"><a href="CCAPM.html#cb106-5" tabindex="-1"></a>rho_z   <span class="ot">&lt;-</span> .<span class="dv">8</span></span>
+<span id="cb106-6"><a href="CCAPM.html#cb106-6" tabindex="-1"></a>sigma_g <span class="ot">&lt;-</span> .<span class="dv">002</span></span>
+<span id="cb106-7"><a href="CCAPM.html#cb106-7" tabindex="-1"></a>sigma_z <span class="ot">&lt;-</span> .<span class="dv">02</span></span>
+<span id="cb106-8"><a href="CCAPM.html#cb106-8" tabindex="-1"></a>delta   <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb106-9"><a href="CCAPM.html#cb106-9" tabindex="-1"></a>gamma   <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb106-10"><a href="CCAPM.html#cb106-10" tabindex="-1"></a></span>
+<span id="cb106-11"><a href="CCAPM.html#cb106-11" tabindex="-1"></a>h <span class="ot">&lt;-</span> <span class="dv">8</span></span>
+<span id="cb106-12"><a href="CCAPM.html#cb106-12" tabindex="-1"></a></span>
+<span id="cb106-13"><a href="CCAPM.html#cb106-13" tabindex="-1"></a><span class="co"># Specify the model:</span></span>
+<span id="cb106-14"><a href="CCAPM.html#cb106-14" tabindex="-1"></a>psi.parameterization <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb106-15"><a href="CCAPM.html#cb106-15" tabindex="-1"></a>  <span class="at">mu =</span> <span class="fu">matrix</span>(<span class="fu">c</span>(mu_g<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>rho_g),<span class="dv">0</span>,<span class="dv">0</span>),<span class="dv">3</span>,<span class="dv">1</span>),</span>
+<span id="cb106-16"><a href="CCAPM.html#cb106-16" tabindex="-1"></a>  <span class="at">Phi =</span> <span class="fu">matrix</span>(<span class="fu">c</span>(rho_g,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>,rho_z,<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>),<span class="dv">3</span>,<span class="dv">3</span>),</span>
+<span id="cb106-17"><a href="CCAPM.html#cb106-17" tabindex="-1"></a>  <span class="at">Sigma =</span> <span class="fu">diag</span>(<span class="fu">c</span>(sigma_g<span class="sc">^</span><span class="dv">2</span>,sigma_z<span class="sc">^</span><span class="dv">2</span>,<span class="dv">0</span>)))</span>
+<span id="cb106-18"><a href="CCAPM.html#cb106-18" tabindex="-1"></a></span>
+<span id="cb106-19"><a href="CCAPM.html#cb106-19" tabindex="-1"></a>all_sigma_g <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>,.<span class="dv">005</span>,.<span class="dv">01</span>)</span>
+<span id="cb106-20"><a href="CCAPM.html#cb106-20" tabindex="-1"></a>all_lty     <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>)</span>
+<span id="cb106-21"><a href="CCAPM.html#cb106-21" tabindex="-1"></a>all_col     <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>,<span class="st">&quot;black&quot;</span>,<span class="st">&quot;black&quot;</span>)</span>
+<span id="cb106-22"><a href="CCAPM.html#cb106-22" tabindex="-1"></a>names_legend <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">expression</span>(<span class="fu">paste</span>(sigma[g],<span class="st">&#39; = &#39;</span>,<span class="dv">0</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>)),</span>
+<span id="cb106-23"><a href="CCAPM.html#cb106-23" tabindex="-1"></a>                  <span class="fu">expression</span>(<span class="fu">paste</span>(sigma[g],<span class="st">&#39; = &#39;</span>,<span class="fl">0.005</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>)),</span>
+<span id="cb106-24"><a href="CCAPM.html#cb106-24" tabindex="-1"></a>                  <span class="fu">expression</span>(<span class="fu">paste</span>(sigma[g],<span class="st">&#39; = &#39;</span>,<span class="fl">0.01</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>)))</span>
+<span id="cb106-25"><a href="CCAPM.html#cb106-25" tabindex="-1"></a></span>
+<span id="cb106-26"><a href="CCAPM.html#cb106-26" tabindex="-1"></a><span class="fu">par</span>(<span class="at">plt=</span><span class="fu">c</span>(.<span class="dv">15</span>,.<span class="dv">95</span>,.<span class="dv">25</span>,.<span class="dv">95</span>))</span>
+<span id="cb106-27"><a href="CCAPM.html#cb106-27" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(all_sigma_g)){</span>
+<span id="cb106-28"><a href="CCAPM.html#cb106-28" tabindex="-1"></a>  </span>
+<span id="cb106-29"><a href="CCAPM.html#cb106-29" tabindex="-1"></a>  psi.parameterization<span class="sc">$</span>Sigma[<span class="dv">1</span>,<span class="dv">1</span>] <span class="ot">&lt;-</span> all_sigma_g[i]<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb106-30"><a href="CCAPM.html#cb106-30" tabindex="-1"></a></span>
+<span id="cb106-31"><a href="CCAPM.html#cb106-31" tabindex="-1"></a>  <span class="co"># Use reverse-order multi-horizon LT to price ZC bonds:</span></span>
+<span id="cb106-32"><a href="CCAPM.html#cb106-32" tabindex="-1"></a>  u1 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="sc">-</span>gamma,<span class="sc">-</span>gamma,gamma),<span class="dv">3</span>,<span class="dv">1</span>)</span>
+<span id="cb106-33"><a href="CCAPM.html#cb106-33" tabindex="-1"></a>  AB <span class="ot">&lt;-</span> <span class="fu">reverse_MHLT</span>(psi_GaussianVAR,u1,<span class="at">H=</span>h,</span>
+<span id="cb106-34"><a href="CCAPM.html#cb106-34" tabindex="-1"></a>                     <span class="at">psi.parameterization=</span>psi.parameterization)</span>
+<span id="cb106-35"><a href="CCAPM.html#cb106-35" tabindex="-1"></a>  a.h.r <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">matrix</span>(AB<span class="sc">$</span>A,<span class="dv">3</span>,h)<span class="sc">/</span><span class="fu">t</span>(<span class="fu">matrix</span>((<span class="dv">1</span><span class="sc">:</span>h),h,<span class="dv">3</span>))</span>
+<span id="cb106-36"><a href="CCAPM.html#cb106-36" tabindex="-1"></a>  b.h.r <span class="ot">&lt;-</span> <span class="sc">-</span> <span class="fu">log</span>(delta) <span class="sc">+</span> <span class="sc">-</span><span class="fu">c</span>(AB<span class="sc">$</span>B)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">:</span>h)</span>
+<span id="cb106-37"><a href="CCAPM.html#cb106-37" tabindex="-1"></a>  <span class="co"># Average yield curves:</span></span>
+<span id="cb106-38"><a href="CCAPM.html#cb106-38" tabindex="-1"></a>  yds    <span class="ot">&lt;-</span> <span class="dv">100</span> <span class="sc">*</span> (b.h.r    <span class="sc">+</span> <span class="fu">matrix</span>(<span class="fu">c</span>(mu_g,<span class="dv">0</span>,<span class="dv">0</span>),<span class="dv">1</span>,<span class="dv">3</span>) <span class="sc">%*%</span> a.h.r)</span>
+<span id="cb106-39"><a href="CCAPM.html#cb106-39" tabindex="-1"></a>  </span>
+<span id="cb106-40"><a href="CCAPM.html#cb106-40" tabindex="-1"></a>  <span class="cf">if</span>(i<span class="sc">==</span><span class="dv">1</span>){</span>
+<span id="cb106-41"><a href="CCAPM.html#cb106-41" tabindex="-1"></a>    <span class="fu">plot</span>(<span class="dv">1</span><span class="sc">:</span>h,yds,<span class="at">type=</span><span class="st">&quot;l&quot;</span>,<span class="at">col=</span>all_col[i],<span class="at">lty=</span>all_lty[i],<span class="at">lwd=</span><span class="dv">2</span>,</span>
+<span id="cb106-42"><a href="CCAPM.html#cb106-42" tabindex="-1"></a>         <span class="at">xlab=</span><span class="st">&quot;maturity&quot;</span>,<span class="at">ylab=</span><span class="st">&quot;real interest rate (in percent)&quot;</span>,<span class="at">las=</span><span class="dv">1</span>,</span>
+<span id="cb106-43"><a href="CCAPM.html#cb106-43" tabindex="-1"></a>         <span class="at">ylim=</span><span class="fu">c</span>(<span class="fl">3.6</span>,<span class="fl">4.1</span>))</span>
+<span id="cb106-44"><a href="CCAPM.html#cb106-44" tabindex="-1"></a>    <span class="fu">grid</span>()</span>
+<span id="cb106-45"><a href="CCAPM.html#cb106-45" tabindex="-1"></a>  }<span class="cf">else</span>{</span>
+<span id="cb106-46"><a href="CCAPM.html#cb106-46" tabindex="-1"></a>    <span class="fu">lines</span>(<span class="dv">1</span><span class="sc">:</span>h,yds,<span class="at">col=</span>all_col[i],<span class="at">lty=</span>all_lty[i],<span class="at">lwd=</span><span class="dv">2</span>)</span>
+<span id="cb106-47"><a href="CCAPM.html#cb106-47" tabindex="-1"></a>  }</span>
+<span id="cb106-48"><a href="CCAPM.html#cb106-48" tabindex="-1"></a>}</span>
+<span id="cb106-49"><a href="CCAPM.html#cb106-49" tabindex="-1"></a></span>
+<span id="cb106-50"><a href="CCAPM.html#cb106-50" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h=</span><span class="dv">0</span>,<span class="at">col=</span><span class="st">&quot;grey&quot;</span>,<span class="at">lty=</span><span class="dv">3</span>)</span>
+<span id="cb106-51"><a href="CCAPM.html#cb106-51" tabindex="-1"></a></span>
+<span id="cb106-52"><a href="CCAPM.html#cb106-52" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">&quot;bottomleft&quot;</span>,</span>
+<span id="cb106-53"><a href="CCAPM.html#cb106-53" tabindex="-1"></a>       names_legend,</span>
+<span id="cb106-54"><a href="CCAPM.html#cb106-54" tabindex="-1"></a>       <span class="at">lty=</span>all_lty, <span class="co"># gives the legend appropriate symbols (lines)       </span></span>
+<span id="cb106-55"><a href="CCAPM.html#cb106-55" tabindex="-1"></a>       <span class="at">lwd=</span><span class="dv">2</span>, <span class="co"># line width</span></span>
+<span id="cb106-56"><a href="CCAPM.html#cb106-56" tabindex="-1"></a>       <span class="at">col=</span>all_col, <span class="co"># gives the legend lines the correct color and width</span></span>
+<span id="cb106-57"><a href="CCAPM.html#cb106-57" tabindex="-1"></a>       <span class="at">bg=</span><span class="st">&quot;white&quot;</span>,</span>
+<span id="cb106-58"><a href="CCAPM.html#cb106-58" tabindex="-1"></a>       <span class="at">seg.len =</span> <span class="dv">4</span></span>
+<span id="cb106-59"><a href="CCAPM.html#cb106-59" tabindex="-1"></a>)</span></code></pre></div>
+<p><img src="_main_files/figure-html/fig_RTP_TrendCycle-1.png" width="864" /></p>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="CreditLiquidity.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="recursive.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+  "sharing": {
+    "github": false,
+    "facebook": true,
+    "twitter": true,
+    "linkedin": false,
+    "weibo": false,
+    "instapaper": false,
+    "vk": false,
+    "whatsapp": false,
+    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+  },
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": "https://github.com/USERNAME/REPO/edit/BRANCH/09-CCAPM.Rmd",
+    "text": "Edit"
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": ["_main.pdf", "_main.epub"],
+  "search": {
+    "engine": "fuse",
+    "options": null
+  },
+  "toc": {
+    "collapse": "subsection"
+  }
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
