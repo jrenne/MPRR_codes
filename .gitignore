@@ -9,7 +9,7 @@ private_data/
 # Bookdown/LaTeX intermediate files
 _book/
 _bookdown_files/
-_main*
+/_main*
 *.aux
 *.bbl
 *.blg
