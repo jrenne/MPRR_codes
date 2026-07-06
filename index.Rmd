@@ -13,7 +13,7 @@ link-citations: yes
 github-repo: rstudio/bookdown-demo
 ---
 
-# About
+# About {-}
 
 This Bookdown project gathers the R code used to reproduce the tables, figures, and numerical illustrations of *Asset Pricing with Discrete-Time Affine Processes*.
 
