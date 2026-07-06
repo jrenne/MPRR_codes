@@ -1,199 +1,5 @@
 # Stylized facts and a first simple model {#Stylized}
 
-## Several standard yield objects can be derived from a single discount curve
-
-This example shows how several standard yield objects can be derived from a single discount curve.
-
-```{r fig_conventions, fig.width=7, fig.height=4.5}
-# Purpose: This example shows how several standard yield objects can be derived from a single
-# discount curve
-
-# Nelson-Siegel-Svensson primitives and derived yield curves.
-nss_yield <- function(h, theta) {
-  b0 <- theta["beta0"]; b1 <- theta["beta1"]; b2 <- theta["beta2"]; b3 <- theta["beta3"]
-  l1 <- theta["lambda1"]; l2 <- theta["lambda2"]
-  
-  x1 <- (1 - exp(-l1 * h)) / (l1 * h)
-  x2 <- x1 - exp(-l1 * h)
-  x3 <- (1 - exp(-l2 * h)) / (l2 * h) - exp(-l2 * h)
-  
-  b0 + b1 * x1 + b2 * x2 + b3 * x3
-}
-
-disc <- function(h, theta) exp(-h * nss_yield(h, theta))
-
-# Curves derived from the discount function.
-zc_yield <- function(h, theta) nss_yield(h, theta)
-
-# simple forward rate between h and h+dh under continuous compounding
-fwd_rate <- function(h, dh, theta) {
-  -(log(disc(h + dh, theta)) - log(disc(h, theta))) / dh
-}
-
-# Par yield for maturity h with p coupons per year (cashflows at i/p)
-par_yield <- function(h, theta, p) {
-  n <- round(h * p)              # number of coupon periods
-  times <- (1:n) / p
-  df <- disc(times, theta)
-  dfT <- disc(h, theta)
-  p * (1 - dfT) / sum(df)
-}
-
-# Swap rate: same as par yield when fixed leg schedule matches
-swap_rate <- function(h, theta, p) {
-  par_yield(h, theta, p)
-}
-
-# YTM of a coupon bond priced off the same discount curve
-ytm_from_price <- function(price, c, h, p) {
-  n <- round(h * p)
-  times <- (1:n) / p
-  
-  f <- function(y) {
-    dfy <- exp(-y * times)
-    sum((c / p) * dfy) + exp(-y * h) - price
-  }
-  uniroot(f, c(-0.05, 0.30))$root
-}
-
-coupon_bond_price <- function(c, h, theta, p) {
-  n <- round(h * p)
-  times <- (1:n) / p
-  sum((c / p) * disc(times, theta)) + disc(h, theta)
-}
-
-# Choose parameters and maturity grids.
-
-theta <- c(
-  beta0 = 0.03, beta1 = -0.015, beta2 = 0.02, beta3 = -0.005,
-  lambda1 = 1.2, lambda2 = 3.5
-)
-
-p <- 2  # number of payments per period -- 2 = semiannual payments
-
-Hmax <- 20
-
-# Dense grid for ZC + forward (exists for all maturities)
-h_dense <- seq(0.25, Hmax, by = 0.25)
-
-# Payment-date grid for par/swap (must have h*p integer)
-h_pay <- seq(1/p, Hmax, by = 1/p)
-
-# Compute the implied curves.
-y_zc  <- sapply(h_dense, zc_yield, theta = theta)
-y_fwd <- sapply(h_dense, fwd_rate,  dh = 1/12, theta = theta)  # 1-month fwd
-
-y_par  <- sapply(h_pay, par_yield,  theta = theta, p = p)
-y_swap <- sapply(h_pay, swap_rate, theta = theta, p = p)
-
-# Coupon-bond yields for two different coupon levels.
-
-mats <- seq(1,Hmax,by=1)
-coupons <- rep(.1,length(mats))
-ytm_pts <- mapply(function(h, cpn) {
-  pr <- coupon_bond_price(cpn, h, theta, p)
-  ytm_from_price(pr, cpn, h, p)
-}, mats, coupons)
-
-mats2 <- seq(1,Hmax,by=1)
-coupons2 <- rep(0.01,length(mats2))
-ytm_pts2 <- mapply(function(h, cpn) {
-  pr <- coupon_bond_price(cpn, h, theta, p)
-  ytm_from_price(pr, cpn, h, p)
-}, mats2, coupons2)
-
-
-
-# Plot the resulting term-structure objects together.
-
-par(plt=c(.14,.98,.18,.97))
-
-plot(h_dense, 100*y_zc, type = "l", lwd = 2,las=1,
-     ylim = 100 * c(.025, .034),
-     xlab = "Maturity h (in years)", ylab = "Annualized %",
-     main = "Multiple yield curves from one discount curve")
-grid()
-
-lines(h_dense, 100*y_fwd, lwd = 3, lty = 3)
-lines(h_pay,  100*y_par,  lwd = 2, lty = 2)
-# lines(h_pay,  y_swap, lwd = 2, lty = 4)
-
-points(mats,  100*ytm_pts,  pch = 16, cex = 0.8) 
-points(mats2, 100*ytm_pts2, pch = 15, cex = 0.8,col="darkgrey") 
-
-legend("bottomright",
-       legend = c("Zero-coupon yield", "Forward (1m)",
-                  "Par yield", "Coupon-bond YTM (cpn = 10%)",
-                  "Coupon-bond YTM (cpn = 1%)"),
-       col=c(rep("black",4),"darkgrey"),
-       lty = c(1, 3, 2, NA, NA),
-       lwd = c(2, 3, 2, NA, NA),
-       pch = c(NA, NA, NA, 16, 15), bty = "n")
-
-
-```
-
-
-## Clean and dirty prices
-
-This example illustrates the distinction between clean and dirty prices for a coupon bond.
-
-```{r fig_clean_dirty_prices, fig.width=7, fig.height=3.8}
-# Purpose: This example illustrates the distinction between clean and dirty prices for a coupon
-# bond.
-
-# Bond and discount-curve assumptions.
-r_flat <- 0.03
-coupon_rate <- 0.04
-coupon_freq <- 2
-coupon_period <- 1 / coupon_freq
-coupon_payment <- coupon_rate / coupon_freq
-maturity <- 5
-
-# Monthly settlement dates over the life of the bond.
-settlement_grid <- seq(0, maturity - 1 / 12, by = 1 / 12)
-coupon_dates <- seq(coupon_period, maturity, by = coupon_period)
-
-dirty_price <- clean_price <- accrued_interest <- numeric(length(settlement_grid))
-
-for (i in seq_along(settlement_grid)) {
-  s <- settlement_grid[i]
-  remaining_dates <- coupon_dates[coupon_dates > s]
-  cash_flows <- rep(coupon_payment, length(remaining_dates))
-  cash_flows[remaining_dates == maturity] <- cash_flows[remaining_dates == maturity] + 1
-  
-  dirty_price[i] <- sum(cash_flows * exp(-r_flat * (remaining_dates - s)))
-  
-  previous_coupon <- ifelse(any(coupon_dates <= s), max(coupon_dates[coupon_dates <= s]), 0)
-  next_coupon <- min(coupon_dates[coupon_dates > s])
-  accrued_interest[i] <- coupon_payment * (s - previous_coupon) / (next_coupon - previous_coupon)
-  clean_price[i] <- dirty_price[i] - accrued_interest[i]
-}
-
-# Plot clean and dirty prices.
-op <- par(mar = c(4.1, 4.1, 0.8, 0.8), las = 1, cex.axis = 1.05)
-ylim <- range(c(dirty_price, clean_price))
-
-plot(
-  settlement_grid, dirty_price,
-  type = "l", lwd = 2, col = "black",
-  xlab = "time since issuance (years)", ylab = "price",
-  ylim = ylim
-)
-grid()
-abline(v = coupon_dates[coupon_dates < maturity], col = "grey85", lty = 3)
-lines(settlement_grid, clean_price, col = "grey55", lwd = 2, lty = 2)
-legend(
-  "bottomleft",
-  legend = c("dirty price", "clean price"),
-  col = c("black", "grey55"),
-  lty = c(1, 2), lwd = 2, bty = "n",
-  cex = 1
-)
-par(op)
-```
-
-
 ## A few observed US yield curves with different shapes
 
 This example plots a few observed US yield curves with different shapes.
@@ -329,26 +135,26 @@ theme_baseR <- function() {
                                         linetype = 3),
       panel.grid.minor.y = element_line(color = "grey60", linewidth = 0.2,
                                         linetype = 3),
-      
+
       # Optionally add vertical grid lines (comment out if not wanted)
       panel.grid.major.x = element_line(color = "grey60", linewidth = 0.3,
                                         linetype = 3),
       panel.grid.minor.x = element_line(color = "grey60", linewidth = 0.3,
                                         linetype = 3),
-      
+
       # Axis ticks more prominent
       axis.ticks = element_line(linewidth = 0.6),
-      
+
       # Keep axis lines (theme_classic already does this)
       panel.grid = element_line(),
-      
+
       # --- Facet labels bold, no box ---
       strip.text = element_text(face = "bold", size = 14),
       strip.background = element_blank(),
-      
+
       # --- Box around the whole plotting panel ---
       panel.border = element_rect(color = "black", fill = NA, linewidth = 0.6),
-      
+
       # Optional: small margin like base R
       plot.margin = margin(10, 10, 10, 10)
     )
@@ -356,16 +162,16 @@ theme_baseR <- function() {
 
 library(ggplot2)
 ggplot(YC_LW_tibb %>%
-         filter(maturity %in% c("3m", paste0(c(1,3,5,7,10,15,20,30), "y"))), 
-       aes(x = date, y = value, col = maturity)) + 
-  geom_line(alpha = 1, lwd = .5) +  
-  theme_baseR() + 
+         filter(maturity %in% c("3m", paste0(c(1,3,5,7,10,15,20,30), "y"))),
+       aes(x = date, y = value, col = maturity)) +
+  geom_line(alpha = 1, lwd = .5) +
+  theme_baseR() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 13),
         axis.text.y = element_text(size = 14),
         axis.title.y = element_text(size = 14),
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 14)
-  ) + 
+  ) +
   scale_color_grey(start = 0.2, end = 0.8) +
   labs(y = "Annualized %", x = "")
 
@@ -383,8 +189,8 @@ library(ggplot2)
 # Build yield-level and yield-change samples for two maturities.
 YC_to_plot <- YC_LW_tibb %>%
   filter(maturity %in% c("6m", "10y")) %>%
-  group_by(maturity) %>% 
-  arrange(date) %>% 
+  group_by(maturity) %>%
+  arrange(date) %>%
   mutate(d_value = value - dplyr::lag(value)) %>%
   pivot_longer(cols = 3:4) %>%
   rename(FD = name) %>%
@@ -392,15 +198,15 @@ YC_to_plot <- YC_LW_tibb %>%
                      labels = c("(a) Yield level", "(b) Differenced yield")))
 
 # Plot the two kernel-density comparisons.
-ggplot(YC_to_plot, 
+ggplot(YC_to_plot,
        aes(x = value, group = maturity, col = maturity, bg = maturity))  +
-  geom_density(alpha = .4, lwd = 1) +  
-  theme_baseR() + 
+  geom_density(alpha = .4, lwd = 1) +
+  theme_baseR() +
   facet_wrap(.~  FD, scales = "free",
-             labeller = labeller(.multi_line = FALSE)) + 
-  labs(x = "Yield, in annualized %") + 
+             labeller = labeller(.multi_line = FALSE)) +
+  labs(x = "Yield, in annualized %") +
   scale_color_manual(values = c("6m" = "grey60", "10y" = "black"))+
-  scale_fill_manual(values = c("6m" = "grey60", "10y" = "black")) + 
+  scale_fill_manual(values = c("6m" = "grey60", "10y" = "black")) +
   theme(legend.position = "bottom")
 
 
@@ -416,7 +222,7 @@ This example summarizes how average yields and yield volatilities vary with matu
 ```{r yield moments,  fig.width = 8, fig.height = 4, warning = F, message = F}
 # Purpose: This example summarizes how average yields and yield volatilities vary with maturity
 # Compute average yields and volatilities maturity by maturity.
-YC_moments <- YC_LW_tibb %>% 
+YC_moments <- YC_LW_tibb %>%
   filter(if_all(everything(), ~ !is.nan(.x))) %>%
   pivot_wider(names_from = maturity) %>%
   drop_na() %>%
@@ -425,7 +231,7 @@ YC_moments <- YC_LW_tibb %>%
   mutate(maturity_nb = if_else(str_detect(maturity, "y"),
                                12 * as.numeric(str_remove(maturity, "y")),
                                as.numeric(str_remove(maturity, "m")))) %>%
-  mutate(maturity = factor(maturity, 
+  mutate(maturity = factor(maturity,
                            levels = c(paste0(c(1,3,6,9),"m"),
                                       paste0(1:30,"y")))) %>%
   group_by(maturity_nb) %>%
@@ -439,8 +245,8 @@ ggplot(YC_moments %>% pivot_longer(2:3),
        aes(x = maturity_nb/12, y = value, group = name)) +
   geom_line() +
   geom_point()+
-  facet_grid(~ name, scales = "free") + 
-  theme_baseR() + 
+  facet_grid(~ name, scales = "free") +
+  theme_baseR() +
   labs(y = "Yield, in annualized %", x = "Maturity, in years")
 
 ```
@@ -457,74 +263,74 @@ library(ggplot2)
 # Build the US yield-curve panel around the lower-bound period.
 p_US_ZLB <- ggplot(YC_LW_tibb %>%
                      filter(maturity %in% c("3m", paste0(c(1,3,5,7,10,15,20,30), "y")),
-                            date > "Jun 2007", date <= "Jun 2022"), 
-                   aes(x = date, y = value, col = maturity)) + 
-  geom_line(alpha = 1, lwd = .5) +  
-  theme_baseR() + 
+                            date > "Jun 2007", date <= "Jun 2022"),
+                   aes(x = date, y = value, col = maturity)) +
+  geom_line(alpha = 1, lwd = .5) +
+  theme_baseR() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 12),
         plot.title = element_text(
           hjust = 0.5,
           size = 13,
-          face = "bold")) + 
+          face = "bold")) +
   scale_color_grey(start = 0.2, end = 0.8) +
-  labs(y = "Annualized %", x = "", title = "(a) US Treasury Curve") + 
-  geom_hline(aes(yintercept = 0), col = "black") + 
+  labs(y = "Annualized %", x = "", title = "(a) US Treasury Curve") +
+  geom_hline(aes(yintercept = 0), col = "black") +
   geom_vline(xintercept = as.yearmon(c("Sep 2008", "Mar 2020")),
-             lty = 5, lwd = 1, col = "black") + 
+             lty = 5, lwd = 1, col = "black") +
   annotate(
     "text",
     x = as.yearmon("Nov 2008"), y = 5,
-    label = "Lehman failure", size = 3,                       
-    fontface = "italic", color = "black", hjust = 0, vjust = 0            
-  ) + 
+    label = "Lehman failure", size = 3,
+    fontface = "italic", color = "black", hjust = 0, vjust = 0
+  ) +
   annotate(
     "text",
     x = as.yearmon("Apr 2020"), y = 5,
-    label = " COVID", size = 3,                       
-    fontface = "italic", color = "black", hjust = 0, vjust = 0            
+    label = " COVID", size = 3,
+    fontface = "italic", color = "black", hjust = 0, vjust = 0
   )
 
 # Add the same zero and crisis markers to the euro-area panel.
 # Build the euro-area panel on the same sample.
 p_EUR_ZLB <- ggplot(
-  YC_Euro %>% 
+  YC_Euro %>%
     mutate(yearmon = as.yearmon(date)) %>%
     group_by(yearmon) %>%
-    slice_tail(n=1) %>% 
+    slice_tail(n=1) %>%
     ungroup() %>%
-    relocate(yearmon, .before = date) %>% 
+    relocate(yearmon, .before = date) %>%
     dplyr::select(-date) %>%
     pivot_longer(Y1:Y10) %>%
-    rename(maturity = name, date = yearmon) %>% 
+    rename(maturity = name, date = yearmon) %>%
     mutate(maturity = factor(paste0(parse_number(maturity),"y"),
                              levels = paste0(1:10,"y"))) %>%
     filter(maturity %in% c(paste0(c(1,3,5,7,10),"y")),
            date > "Jun 2007", date <= "Jun 2022"),
-  aes(x = date, y = value, col = maturity)) + 
-  geom_line(alpha = 1, lwd = .5) +  
-  theme_baseR() + 
+  aes(x = date, y = value, col = maturity)) +
+  geom_line(alpha = 1, lwd = .5) +
+  theme_baseR() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 12),
         plot.title = element_text(
           hjust = 0.5,
           size = 13,
           face = "bold"
-        )) + 
+        )) +
   scale_color_grey(start = 0.2, end = 0.8) +
-  labs(y = "Annualized %", x = "", title = "(b) Euro Area curve") + 
-  geom_hline(aes(yintercept = 0), col = "black") + 
+  labs(y = "Annualized %", x = "", title = "(b) Euro Area curve") +
+  geom_hline(aes(yintercept = 0), col = "black") +
   geom_vline(xintercept = as.yearmon(c("Sep 2008", "Mar 2020")),
-             lty = 5, lwd = 1, col = "black") + 
+             lty = 5, lwd = 1, col = "black") +
   annotate(
     "text",
     x = as.yearmon("Nov 2008"), y = 4.5,
-    label = "Lehman failure", size = 3,                       
-    fontface = "italic", color = "black", hjust = 0, vjust = 0            
-  ) + 
+    label = "Lehman failure", size = 3,
+    fontface = "italic", color = "black", hjust = 0, vjust = 0
+  ) +
   annotate(
     "text",
     x = as.yearmon("Apr 2020"), y = 4.5,
-    label = " COVID", size = 3,                       
-    fontface = "italic", color = "black", hjust = 0, vjust = 0            
+    label = " COVID", size = 3,
+    fontface = "italic", color = "black", hjust = 0, vjust = 0
   )
 
 library(patchwork)
@@ -552,10 +358,10 @@ YC_vol <- YC_LW_tibb %>%
 
 # Plot the volatility proxy across selected maturities.
 ggplot(YC_vol %>% filter(maturity %in% c(paste0(c(1,3,5,7,10), "y"))),
-       aes(x = date, y = vol_proxy, col = maturity, group = maturity)) + 
-  geom_line(alpha = 1, lwd = .5) +  
-  theme_baseR() + 
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
+       aes(x = date, y = vol_proxy, col = maturity, group = maturity)) +
+  geom_line(alpha = 1, lwd = .5) +
+  theme_baseR() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   scale_color_grey(start = 0.2, end = 0.8) +
   labs(y = "Annualized %", x = "")
 
@@ -685,7 +491,7 @@ paste(rows_tex, collapse = "\n"),
 \\end{tabularx}
 
 \\vspace{0.3em}
-\\parbox{1.0\\textwidth}{\\footnotesize\\textit{Notes}: 
+\\parbox{1.0\\textwidth}{\\footnotesize\\textit{Notes}:
 The table reports autocorrelations (ACF) and partial autocorrelations (PACF)
 of monthly zero-coupon yields at selected maturities.
 $\\mathrm{ACF}(1)$ and $\\mathrm{ACF}(12)$ correspond to lags of 1 and 12 months, respectively.
@@ -764,7 +570,7 @@ for(k in holding_periods){# expressed in months
   # Match each holding period with the corresponding short rate.
   detect_k <- which(str_detect(names(YC_LW),paste(k,"m",sep="")))
   r_t_k <- matrix(YC_LW[,detect_k],ncol=1) %*% matrix(1,1,nb_longterm)
-  
+
   r_tplusk_h <- NaN*r_t_h
   r_tplusk_h[1:(dim(r_t_h)[1]-k),] <- r_t_h[(k+1):dim(r_t_h)[1],]
   # Approximate the maturity h-k yield after the holding period.
@@ -772,18 +578,18 @@ for(k in holding_periods){# expressed in months
   r_tplusk_hminusk <- (1-w)*r_tplusk_h[,1:(nb_longterm-1)] +
     w*r_tplusk_h[,2:nb_longterm] # exploits that we have all years
   r_tplusk_hminusk <- cbind(r_tplusk_hminusk,r_tplusk_h[,dim(r_tplusk_h)[2]])
-  
+
   # Express maturities and holding periods in the same units.
   M <- matrixH*12/k * r_t_h - (matrixH*12/k - 1) * r_tplusk_hminusk - r_t_k
   xsr[,,count_k] <- M
-  
+
   # Run the Campbell-Shiller regression maturity by maturity.
   dep_var   <- r_tplusk_hminusk - r_t_h
   indep_var <- k/(matrixH*12 - k)*(r_t_h - r_t_k)
-  
+
   dep_var   <- dep_var[indic_frst_date:indic_last_date,]
   indep_var <- indep_var[indic_frst_date:indic_last_date,]
-  
+
   for(h in 1:nb_longterm){
     y   <- c(dep_var[,h])
     x   <- c(indep_var[,h])
@@ -887,7 +693,7 @@ xsr_tibb <- xsr_tibb %>%
 
 
 # Compute summary statistics XSR
-summary_stats_XSR <- xsr_tibb %>% 
+summary_stats_XSR <- xsr_tibb %>%
   filter(if_all(everything(), ~ !is.nan(.x))) %>%
   filter(if_all(everything(), ~ !is.na(.x))) %>%
   group_by(maturity, `holding period`) %>%
@@ -903,12 +709,12 @@ ggplot(summary_stats_XSR %>% pivot_longer(cols = 3:5) %>%
                               labels = c("(a) Average", " (b) Volatility","(c) Sharpe Ratio"))) %>%
          filter(parse_number(as.character(maturity))<=30),
        aes(x = parse_number(as.character(maturity)), y = value,
-           col = `holding period`, group = `holding period`)) + 
-  geom_line() + 
-  geom_point() + 
-  facet_wrap(~ name, scales="free") + 
-  theme_baseR() + 
-  theme(legend.position = "bottom") + 
+           col = `holding period`, group = `holding period`)) +
+  geom_line() +
+  geom_point() +
+  facet_wrap(~ name, scales="free") +
+  theme_baseR() +
+  theme(legend.position = "bottom") +
   scale_color_grey(start = 0.2, end = 0.8) +
   labs(y = "percent return", x = "maturity, in years")
 
@@ -938,7 +744,7 @@ par(mfrow=c(1,2))
 par(plt=c(.2,.95,.2,.8))
 dates_plot_xsr <- xsr_tibb %>%
   filter(`holding period`=="6 months") %>%
-  pivot_wider(names_from = maturity) %>% 
+  pivot_wider(names_from = maturity) %>%
   dplyr::select(date) %>% c() %>% unlist()
 
 maturities <- c(1:30)
@@ -1094,12 +900,12 @@ This example compares two widely used term-premium estimates across maturities.
 # Purpose: This example compares two widely used term-premium estimates across maturities
 # Merge macro data with ACM and Kim-Wright term-premium estimates.
 Macro_data <- Data_Macro_US_monthly %>%
-  mutate(date = as.yearmon(date)) 
+  mutate(date = as.yearmon(date))
 
 
 
-TP_to_plot <- ACMTermPremium %>% 
-  mutate(date = as.yearmon(as.Date(DATE, format = "%d-%m-%Y"))) %>% 
+TP_to_plot <- ACMTermPremium %>%
+  mutate(date = as.yearmon(as.Date(DATE, format = "%d-%m-%Y"))) %>%
   dplyr::select(-DATE)
 
 # Combine the two term-premium data sources.
@@ -1118,17 +924,17 @@ total_TP_to_plot_KWACM <- total_TP_to_plot_KWACM %>%
 
 # Plot observed yields and term-premium estimates for selected maturities.
 ggplot(total_TP_to_plot_KWACM %>%
-         filter(maturity %in% c(1,5,10), 
+         filter(maturity %in% c(1,5,10),
                 date >= "Jan 1990") %>%
          mutate(maturity = factor(
            paste0(maturity, "-year maturity"),
-           levels = paste0(c(1,5,10), "-year maturity"))), 
-       aes(x = date, y = value, col = model, linetype = model)) + 
-  geom_line() + 
-  facet_wrap(~ maturity) + 
-  theme_baseR() + 
+           levels = paste0(c(1,5,10), "-year maturity"))),
+       aes(x = date, y = value, col = model, linetype = model)) +
+  geom_line() +
+  facet_wrap(~ maturity) +
+  theme_baseR() +
   scale_color_manual(values = c("grey65", "black", "black")) +
-  scale_linetype_manual(values = c(1,1,2)) + 
+  scale_linetype_manual(values = c(1,1,2)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, size  = 13),
         axis.text.y = element_text(size  = 13),
         strip.text.x  = element_text(size = 16),
@@ -1156,15 +962,15 @@ GSW_Data_tibb <- DAT_GSW %>% as_tibble() %>%
          `bond type` =  str_extract(name, "[A-Za-z]+")) %>%
   mutate(`bond type` = if_else(`bond type`=="SVENY", "Nominal", "TIPS")) %>%
   dplyr::select(-name) %>%
-  relocate(value, .after = `bond type`) 
+  relocate(value, .after = `bond type`)
 
 # Add breakeven-inflation rates and put all series in long form.
 GSW_Data_tibb <- GSW_Data_tibb %>%
   arrange(date, maturity, `bond type`) %>%
-  group_by(date, maturity) %>% 
+  group_by(date, maturity) %>%
   mutate(BEI = value - dplyr::lead(value)) %>%
   ungroup() %>% pivot_longer(cols = c(value, BEI),
-                             names_to = "bond_type_new", 
+                             names_to = "bond_type_new",
                              values_to = "value") %>%
   mutate(`bond type` = if_else(bond_type_new =="BEI", "BEI", `bond type`)) %>%
   dplyr::select(-bond_type_new) %>%
@@ -1180,21 +986,21 @@ ggplot(GSW_Data_tibb %>%
            "(b) Breakeven Inflation Rate",
            "(a) Inflation-Indexed Treasuries (TIPS)"
          ),
-                maturity = factor(maturity, labels = paste0(c(2,3,5,7,10,15,20),"y"))), 
-       aes(x = date, y = value, col = maturity, group = maturity)) + 
-  geom_hline(yintercept = 0)+ 
-  geom_line(alpha = 1, lwd = .5) +  
-  theme_baseR() + 
+                maturity = factor(maturity, labels = paste0(c(2,3,5,7,10,15,20),"y"))),
+       aes(x = date, y = value, col = maturity, group = maturity)) +
+  geom_hline(yintercept = 0)+
+  geom_line(alpha = 1, lwd = .5) +
+  theme_baseR() +
   facet_grid(~`bond type`) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 13),
         axis.text.y = element_text(size = 13),
         strip.text = element_text(size = 16),
         legend.text = element_text(size = 14),
         legend.title = element_text(size = 15),
-        legend.position = "bottom") + 
+        legend.position = "bottom") +
   guides(color = guide_legend(nrow = 1))+
   scale_color_grey(start = 0.2, end = 0.8) +
-  labs(y = "Annualized %", x = "") 
+  labs(y = "Annualized %", x = "")
 
 
 ```
@@ -1210,13 +1016,13 @@ library(ggtext)
 # Merge survey forecasts with market-implied forward rates.
 SPF <- SPF %>% mutate(date = as.yearmon(date))
 
-survey_plot <- YC_LW_FULL %>% 
+survey_plot <- YC_LW_FULL %>%
   mutate(date = as.yearmon(date)) %>%
   mutate(`3m_in_12m` = 1/3 * (15 * yld_15m - 12 * yld_12m)) %>%
   left_join(SPF)
 
 data_legend <- tibble(
-  x = as.yearmon("Jan 2000"), 
+  x = as.yearmon("Jan 2000"),
   y = NA,
   shape = c(0,3,1),
   linetype = c(1,0,0),
@@ -1226,32 +1032,32 @@ data_legend <- tibble(
 
 # Plot forward rates, survey forecasts, and their wedge.
 p <- ggplot(survey_plot %>%
-              filter(date >= "Jan 1980"), aes(x=date)) + 
-  geom_line(aes(y = `3m_in_12m`)) + 
-  geom_point(aes(y = BILL1), col = "grey70") + 
-  geom_point(aes(y = `3m_in_12m` - BILL1), col = "black", pch = 3) + 
+              filter(date >= "Jan 1980"), aes(x=date)) +
+  geom_line(aes(y = `3m_in_12m`)) +
+  geom_point(aes(y = BILL1), col = "grey70") +
+  geom_point(aes(y = `3m_in_12m` - BILL1), col = "black", pch = 3) +
   theme_baseR() +
-  labs(x = "", y = "Annualized %", title = "(a) 3m in 12m forward") + 
+  labs(x = "", y = "Annualized %", title = "(a) 3m in 12m forward") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         strip.text = element_text(size = 11),
         plot.title = element_text(hjust = .5, face="bold"))
 
 q <- ggplot(survey_plot %>%
-              filter(date >= "Jan 1980"), aes(x=date)) + 
-  geom_line(aes(y = yld_120m)) + 
-  geom_point(aes(y = BILL10), col = "grey70") + 
+              filter(date >= "Jan 1980"), aes(x=date)) +
+  geom_line(aes(y = yld_120m)) +
+  geom_point(aes(y = BILL10), col = "grey70") +
   geom_point(aes(y = yld_120m - BILL10), col = "black", pch = 3)+
   theme_baseR() +
-  labs(x = "", y = "Annualized %", title = "(b) 10 year yield") + 
+  labs(x = "", y = "Annualized %", title = "(b) 10 year yield") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         strip.text = element_text(size = 11),
-        plot.title = element_text(hjust = .5, face="bold")) + 
-  geom_line(data = data_legend, aes(x=x, y=y, colour = name, linetype= name, fill = name)) + 
+        plot.title = element_text(hjust = .5, face="bold")) +
+  geom_line(data = data_legend, aes(x=x, y=y, colour = name, linetype= name, fill = name)) +
   geom_point(data = data_legend, aes(x=x, y=y, shape = name, color = name, fill = name)) +
-  scale_color_manual(values = c("black", "black", "grey70")) + 
+  scale_color_manual(values = c("black", "black", "grey70")) +
   scale_fill_manual(values = c("black", "black", "grey70")) +
-  scale_shape_manual(values = c(NA,3,16)) + 
-  scale_linetype_manual(values=  c(1, NA,NA)) + 
+  scale_shape_manual(values = c(NA,3,16)) +
+  scale_linetype_manual(values=  c(1, NA,NA)) +
   theme(legend.title = element_blank(),
         legend.position = "inside",
         legend.position.inside = c(.8,.8),
@@ -1269,33 +1075,33 @@ inflation_survey_plots <- inflation_survey_plots %>%
   mutate(SPF_2_proxy = 9/10 * CPI1 + 1/10 * CPI10)
 
 # Plot breakeven inflation, survey inflation, and their wedge.
-p <- ggplot(inflation_survey_plots, aes(x=date)) + 
-  geom_line(aes(y = BEI_2)) + 
-  geom_point(aes(y = SPF_2_proxy), col = "grey70") + 
-  geom_point(aes(y = BEI_2 - SPF_2_proxy), col = "black", pch = 3) + 
+p <- ggplot(inflation_survey_plots, aes(x=date)) +
+  geom_line(aes(y = BEI_2)) +
+  geom_point(aes(y = SPF_2_proxy), col = "grey70") +
+  geom_point(aes(y = BEI_2 - SPF_2_proxy), col = "black", pch = 3) +
   theme_baseR() +
-  labs(x = "", y = "Annualized %", title = "(a) 2-year BEI") + 
-  geom_hline(yintercept = 0, lty = 3)+ 
+  labs(x = "", y = "Annualized %", title = "(a) 2-year BEI") +
+  geom_hline(yintercept = 0, lty = 3)+
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         strip.text = element_text(size = 11),
         plot.title = element_text(hjust = .5, face="bold"))+
-  geom_line(data = data_legend, aes(x=x, y=y, colour = name, linetype= name, fill = name)) + 
+  geom_line(data = data_legend, aes(x=x, y=y, colour = name, linetype= name, fill = name)) +
   geom_point(data = data_legend, aes(x=x, y=y, shape = name, color = name, fill = name)) +
-  scale_color_manual(values = c("black", "black", "grey70")) + 
+  scale_color_manual(values = c("black", "black", "grey70")) +
   scale_fill_manual(values = c("black", "black", "grey70")) +
-  scale_shape_manual(values = c(NA,3,16)) + 
-  scale_linetype_manual(values=  c(1, NA,NA)) + 
+  scale_shape_manual(values = c(NA,3,16)) +
+  scale_linetype_manual(values=  c(1, NA,NA)) +
   theme(legend.title = element_blank(),
         legend.position = "inside",
         legend.position.inside = c(0.8,.2))
 
-q <- ggplot(inflation_survey_plots, aes(x=date)) + 
-  geom_line(aes(y = BEI_10 )) + 
-  geom_point(aes(y = CPI10), col = "grey70") + 
+q <- ggplot(inflation_survey_plots, aes(x=date)) +
+  geom_line(aes(y = BEI_10 )) +
+  geom_point(aes(y = CPI10), col = "grey70") +
   geom_point(aes(y = BEI_10 - CPI10), col = "black", pch = 3)+
   theme_baseR() +
-  labs(x = "", y = "Annualized %", title = "(b) Ten-year BEI") + 
-  geom_hline(yintercept = 0, lty = 3)+ 
+  labs(x = "", y = "Annualized %", title = "(b) Ten-year BEI") +
+  geom_hline(yintercept = 0, lty = 3)+
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         strip.text = element_text(size = 11),
         plot.title = element_text(hjust = .5, face="bold"),
@@ -1319,7 +1125,7 @@ r_bar   <- .03
 rho     <- .9
 sigma   <- sqrt(1-rho^2) * 0.01
 lambda0 <- - 0.01/sigma^2 * (1 - rho)
-lambda1 <- (.97 - rho)/sigma^2 
+lambda1 <- (.97 - rho)/sigma^2
 
 model <- list(r_bar = r_bar,
               rho = rho,
@@ -1336,10 +1142,10 @@ make_ab <- function(model,H){
   a <- 0
   b <- 0
   for(i in 1:H){
-    b <- b + a*((1-model$rho)*model$r_bar + model$lambda0 * model$sigma^2) + 
+    b <- b + a*((1-model$rho)*model$r_bar + model$lambda0 * model$sigma^2) +
       a^2*model$sigma^2/2
     a <- a*(model$rho + model$lambda1 * model$sigma^2) - 1
-    
+
     all_a <- c(all_a,a)
     all_b <- c(all_b,b)
   }
@@ -1486,7 +1292,7 @@ parameters <- expand.grid(
   lambda1 = 0
 )
 
-parameters <- parameters %>% 
+parameters <- parameters %>%
   mutate(omega = sqrt(1 - phi^2) * 0.01)
 
 
@@ -1494,44 +1300,44 @@ H <- 100
 
 # Compute nominal, real, and breakeven curves for one configuration.
 make_ab <- function(model,H){
-  
+
   all_a_nom <- NULL
   all_b_nom <- NULL
   a_nom     <- 0
   b_nom     <- 0
-  
+
   all_a_real <- NULL
   all_b_real <- NULL
   a_real     <- c(0,0)
   b_real     <- 0
-  
+
   for(i in 1:H){
-    b_nom <- b_nom + a_nom * ((1 - model$rho) * model$r_bar + model$lambda0 * model$sigma^2) + 
+    b_nom <- b_nom + a_nom * ((1 - model$rho) * model$r_bar + model$lambda0 * model$sigma^2) +
       a_nom^2 * model$sigma^2/2
     a_nom <- a_nom * (model$rho + model$lambda1 * model$sigma^2) - 1
-    
+
     all_a_nom <- c(all_a_nom, a_nom)
     all_b_nom <- c(all_b_nom, b_nom)
-    
+
     b_real <- b_real + a_real[1] * (1 - model$rho) * model$r_bar +
-      (a_real[2] + 1) * model$pi_bar * (1 - model$phi) + 
+      (a_real[2] + 1) * model$pi_bar * (1 - model$phi) +
       a_real[1]^2 * model$sigma^2/2 + (a_real[2] + 1)^2 * model$omega^2/2
     a_real <- c(
       a_real[1] * model$rho - 1,
       (a_real[2] + 1) * model$phi
-    ) 
-    
+    )
+
     all_a_real <- cbind(all_a_real, a_real)
     all_b_real <- c(all_b_real, b_real)
   }
-  
+
   # Construct yield curves
   nominal_YC  <- - 1/c(1:H) * (all_b_nom + all_a_nom * model$current_r)
-  real_YC     <- - 1/c(1:H) * (all_b_real + 
+  real_YC     <- - 1/c(1:H) * (all_b_real +
                                  c(t(all_a_real) %*% c(model$current_r,
                                                        model$current_pi)))
-  
-  
+
+
   return(list(all_a_nom  = all_a_nom,
               all_b_nom  = all_b_nom,
               all_a_real = all_a_real,
@@ -1555,14 +1361,14 @@ loadings <- parameters %>%
 # Reshape curves and build facet labels.
 yield_curves <- loadings %>% unnest() %>%
   mutate(element = names(models)) %>%
-  relocate(element, .before = r_bar) %>% 
+  relocate(element, .before = r_bar) %>%
   dplyr::select(case, element, models) %>%
   separate(col = case,
            into = c("case_phi", "case_current"),
            sep = ",\\s*",                      # split at the first comma
            extra = "merge")                    # keep the remaining commas)
 
-YC_example_to_plot <- yield_curves %>% 
+YC_example_to_plot <- yield_curves %>%
   filter(element %in% c("nominal_YC", "real_YC", "BEI")) %>%
   mutate(x_axis = map(models, seq_along)) %>%
   unnest(c(models, x_axis)) %>%
@@ -1586,24 +1392,24 @@ YC_example_to_plot <- yield_curves %>%
 # Plot nominal, real, and breakeven curves across configurations.
 ggplot(YC_example_to_plot,
        aes(x = x_axis, y = models, col = element,
-           linetype = label_phi)) + 
-  geom_line() + 
-  geom_point(data  = 
-               YC_example_to_plot %>% 
-               group_by(label_math, label_phi, element) %>% 
+           linetype = label_phi)) +
+  geom_line() +
+  geom_point(data  =
+               YC_example_to_plot %>%
+               group_by(label_math, label_phi, element) %>%
                slice(seq(0, n(), 25)) %>%
                ungroup(),
              aes(x = x_axis, y = models, col = element, shape = element))+
   facet_wrap(. ~ label_math, scales = "free",
-             labeller = label_parsed) + 
-  labs(x = "maturity", y = "", col = "Curve", linetype = "") + 
-  theme_baseR() + 
+             labeller = label_parsed) +
+  labs(x = "maturity", y = "", col = "Curve", linetype = "") +
+  theme_baseR() +
   scale_color_manual(values = c("grey70", "grey50","black"),
-                     labels = function(x)  sub("_.*", "", x)) + 
+                     labels = function(x)  sub("_.*", "", x)) +
   scale_shape_discrete(name = "Curve")+
   scale_linetype_discrete(labels = function(x) parse(text = x) ) +
   theme(legend.position = "bottom",
-        legend.title = element_blank()) + 
+        legend.title = element_blank()) +
   guides(
     color = guide_legend(override.aes = list(shape = c(16,17,15))),
     shape = "none"   # hide separate shape legend
@@ -1642,48 +1448,48 @@ H <- 200
 
 # Compute nominal and real affine loadings for this calibration.
 make_ab <- function(model,H){
-  
+
   all_a_nom <- NULL
   all_b_nom <- NULL
   a_nom     <- 0
   b_nom     <- 0
-  
+
   all_a_real <- NULL
   all_b_real <- NULL
   a_real     <- c(0,0)
   b_real     <- 0
-  
+
   for(i in 1:H){
-    b_nom <- b_nom + a_nom * ((1 - model$rho) * model$r_bar + model$lambda0_n * model$sigma^2) + 
+    b_nom <- b_nom + a_nom * ((1 - model$rho) * model$r_bar + model$lambda0_n * model$sigma^2) +
       a_nom^2 * model$sigma^2/2
     a_nom <- a_nom * (model$rho + model$lambda1_n * model$sigma^2) - 1
-    
+
     all_a_nom <- c(all_a_nom, a_nom)
     all_b_nom <- c(all_b_nom, b_nom)
-    
+
     b_real <- b_real +
       a_real[1] * ((1 - model$rho) * model$r_bar +
                      model$lambda0_n * model$sigma^2) +
-      (a_real[2] + 1) *( model$pi_bar * (1 - model$phi) + model$omega^2 * model$lambda0_r) + 
+      (a_real[2] + 1) *( model$pi_bar * (1 - model$phi) + model$omega^2 * model$lambda0_r) +
       a_real[1]^2 * model$sigma^2/2 + (a_real[2] + 1)^2 * model$omega^2/2
-    
+
     a_real <- c(
       a_real[1] * (model$rho + model$sigma^2 * model$lambda1_n) - 1 +
         (a_real[2] + 1) * model$omega^2 * model$lambda1_r[1],
-      (a_real[2] + 1) * (model$phi + model$omega^2 * model$lambda1_r[2]) 
-    ) 
-    
+      (a_real[2] + 1) * (model$phi + model$omega^2 * model$lambda1_r[2])
+    )
+
     all_a_real <- cbind(all_a_real, a_real)
     all_b_real <- c(all_b_real, b_real)
   }
-  
+
   # Construct yield curves
   nominal_YC  <- - 1/c(1:H) * (all_b_nom + all_a_nom * model$current_r)
-  real_YC     <- - 1/c(1:H) * (all_b_real + 
+  real_YC     <- - 1/c(1:H) * (all_b_real +
                                  c(t(all_a_real) %*% c(model$current_r,
                                                        model$current_pi)))
-  
-  
+
+
   return(list(all_a_nom  = all_a_nom,
               all_b_nom  = all_b_nom,
               all_a_real = all_a_real,
@@ -1697,10 +1503,10 @@ example_curves <- make_ab(parameters, H)
 
 # Recompute curves under the expectations hypothesis.
 parameters_EH <- parameters
-parameters_EH$lambda0_n <- 0 
-parameters_EH$lambda1_n <- 0 
-parameters_EH$lambda0_r <- 0 
-parameters_EH$lambda1_r <- c(0,0) 
+parameters_EH$lambda0_n <- 0
+parameters_EH$lambda1_n <- 0
+parameters_EH$lambda0_r <- 0
+parameters_EH$lambda1_r <- c(0,0)
 
 example_curves_EH <- make_ab(parameters_EH, H)
 
@@ -1744,11 +1550,11 @@ ggplot(examples_total,
        aes(x = maturity, y = value, col = premium,
            group = premium, linetype = premium))+
   geom_ribbon(aes(ymin = ci_low, ymax = ci_high), alpha = 0.2, fill = "grey40", col = NA)+
-  geom_line(lwd = 1.25) + 
-  facet_grid(~type) + 
-  scale_color_manual(values = c("black", "grey60")) + 
-  theme_baseR() + 
-  labs(y = "") + 
+  geom_line(lwd = 1.25) +
+  facet_grid(~type) +
+  scale_color_manual(values = c("black", "grey60")) +
+  theme_baseR() +
+  labs(y = "") +
   theme(legend.title = element_blank(),
         legend.direction = "vertical",
         legend.position = c(0.2, 0.09),
@@ -1790,26 +1596,26 @@ for(i in 2:length_sim){
     parameters_sim$rho * (rt_sim[i-1] - parameters_sim$r_bar) + eps[i]
   pit_sim[i] <- parameters_sim$pi_bar +
     parameters_sim$phi * (pit_sim[i-1] - parameters_sim$pi_bar) + eta[i]
-  
+
 }
 
 chosen_mat <- 50
 # Compute nominal, real, breakeven, and premium series at one maturity.
-nom_YC_sim      <- -1/chosen_mat * (example_curves_sim$all_b_nom[chosen_mat] + 
+nom_YC_sim      <- -1/chosen_mat * (example_curves_sim$all_b_nom[chosen_mat] +
                                       example_curves_sim$all_a_nom[chosen_mat] * rt_sim)
-nom_YC_EH_sim   <- -1/chosen_mat * (example_curves_sim_EH$all_b_nom[chosen_mat] + 
+nom_YC_EH_sim   <- -1/chosen_mat * (example_curves_sim_EH$all_b_nom[chosen_mat] +
                                       example_curves_sim_EH$all_a_nom[chosen_mat] * rt_sim)
-TIPS_sim        <- -1/chosen_mat * c((example_curves_sim$all_b_real[chosen_mat] + 
-                                        cbind(rt_sim, pit_sim) %*% 
+TIPS_sim        <- -1/chosen_mat * c((example_curves_sim$all_b_real[chosen_mat] +
+                                        cbind(rt_sim, pit_sim) %*%
                                         c(example_curves_sim$all_a_real[,chosen_mat])))
-TIPS_EH_sim     <- -1/chosen_mat * c((example_curves_sim_EH$all_b_real[chosen_mat] + 
-                                        cbind(rt_sim, pit_sim) %*% 
+TIPS_EH_sim     <- -1/chosen_mat * c((example_curves_sim_EH$all_b_real[chosen_mat] +
+                                        cbind(rt_sim, pit_sim) %*%
                                         c(example_curves_sim_EH$all_a_real[,chosen_mat])))
 
 sim_to_plot <- tibble(x = 1:length_sim,
                       "short-rate" = rt_sim,
                       "inflation rate" = pit_sim,
-                      "ex post real rate" = rt_sim - pit_sim, 
+                      "ex post real rate" = rt_sim - pit_sim,
                       "nominal curve" = nom_YC_sim,
                       "nominal EH" = nom_YC_EH_sim,
                       "TIPS curve" = TIPS_sim,
@@ -1978,109 +1784,4 @@ decomp_check_table
 
 max(abs(nom_EH_check - nom_YC_EH_sim))
 range(real_short_sim - (real_short_delta0 + state_sim %*% real_short_delta1))
-```
-
-
-## Treasury issuance and outstanding debt by maturity
-
-This example documents the maturity composition of Treasury issuance and the stock of debt outstanding.
-
-```{r SIFMA, fig.width = 10, fig.height = 5}
-# Purpose: This example documents the maturity composition of Treasury issuance and the stock of
-# debt outstanding
-library(readxl)
-# Load and reshape Treasury issuance data.
-ta_us_treasury_sifma <- read_excel("data/ta-us-treasury-sifma.xlsx", sheet = "Issuance", skip = 5)
-ta_us_treasury_sifma <- ta_us_treasury_sifma %>% 
-  as_tibble() %>%
-  dplyr::select(-...5, -...9, -...13)
-
-names(ta_us_treasury_sifma) <- 
-  c("date", "Bills_Gross Issuance", "Bills_Gross Retirement", "Bills_net",
-    "Notes_Gross Issuance", "Notes_Gross Retirement", "Notes_net",
-    "Bonds_Gross Issuance", "Bonds_Gross Retirement", "Bonds_net",
-    "Total_Gross Issuance", "Total_Gross Retirement", "Total_net"
-  )
-
-ta_us_treasury_sifma <- ta_us_treasury_sifma %>%
-  mutate(date = as.yearmon(as.Date(date))) %>%
-  pivot_longer(cols = 2:13)
-
-ta_us_treasury_sifma <- ta_us_treasury_sifma %>%
-  mutate(type = str_extract(name, "^[^_]+"),
-         variable = str_replace(name, "^[^_]*_", ""),
-         year = year(date)) 
-
-# Load and reshape the outstanding-debt data.
-ta_us_treasury_sifma_OS <- read_excel(
-  "data/ta-us-treasury-sifma.xlsx",
-  sheet = "Outstanding",
-  skip = 3
-)
-ta_us_treasury_sifma_OS <- (ta_us_treasury_sifma_OS[1:25,]) %>%
-  mutate(TIPS = as.numeric(str_replace(TIPS, "-", "NA")),
-         FRN = as.numeric(str_replace(FRN, "-", "NA"))) %>%
-  rename(year = ...1)
-
-ta_us_treasury_sifma_OS <- ta_us_treasury_sifma_OS %>%
-  mutate(variable = "outstanding") %>%
-  pivot_longer(cols = 2:7) %>%
-  rename(type = name)
-
-
-# Plot net issuance by instrument type.
-p <- ggplot(ta_us_treasury_sifma %>%
-              filter(variable == "net", type != "Total") %>%
-              group_by(type) %>% 
-              mutate(y = rollmean(value,k=12, align = "right", fill = NA),
-                     type = factor(type, levels = c("Bonds", "Notes", "Bills"))) , 
-            aes(x = date, y = y, col = type, group = type, fill = type)) + 
-  geom_area() + 
-  theme_baseR() + 
-  labs(x = "", y = "USD Billions", title = "(a) Net issuance") + 
-  scale_color_manual(values = rev(c("black", "grey60", "grey80"))) + 
-  scale_fill_manual(values = rev(c("black", "grey60", "grey80"))) + 
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
-        strip.text = element_text(size = 11),
-        plot.title = element_text(hjust = .5, face="bold"),
-        legend.position = "bottom", 
-        legend.title = element_blank()
-  )
-
-ta_us_treasury_sifma_OS <- ta_us_treasury_sifma_OS %>%
-  mutate(date = as.Date(paste0(year,"-01-01")))
-
-# Plot outstanding amounts and composition.
-q <- ggplot() +
-  geom_area(data = ta_us_treasury_sifma_OS %>% filter(type != "Total") %>%
-              mutate(type = factor(type, levels = rev(c("TIPS","FRN","Bonds",  "Bills", "Notes")))),
-            aes(x = date, y = value, col = type, group = type, fill = type),
-            position = "fill", alpha = .6
-  ) +
-  geom_line(data = ta_us_treasury_sifma_OS %>% filter(type == "Total") %>%
-              mutate(type = "Total (right axis)"), 
-            aes(x = date, y = value/max(value), col = type, group = type, fill = type),
-            lwd = 2)+
-  theme_baseR() + 
-  scale_y_continuous(
-    name = "Share",      # left axis
-    sec.axis = sec_axis(
-      ~ . * 20973.13,
-      name = "Total amount"
-    )
-  ) + 
-  scale_color_manual(values = c( "grey90", "grey70", "grey50", "grey30","black", "black"))+
-  scale_fill_manual(values = c( "grey90", "grey70", "grey50", "grey30","black", "black")) + 
-  labs(x = "", title = "(b) Outstanding amounts") + 
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
-        strip.text = element_text(size = 11),
-        plot.title = element_text(hjust = .5, face="bold"),
-        legend.position = "bottom", 
-        legend.title = element_blank(),
-        legend.box = "horizontal"
-  ) +
-  guides(color = guide_legend(nrow = 1))
-
-p + q
-
 ```
