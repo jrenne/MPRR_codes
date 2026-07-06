@@ -340,3 +340,54 @@ check_table <- data.frame(
 check_table[, -1] <- round(check_table[, -1], 2)
 check_table
 ```
+
+## Jensen adjustment in the log-inflation component
+
+The log-moment inflation component,
+\(h^{-1}\log E_t[\exp(\pi_{t,t+h})]\), coincides with expected average
+inflation plus a Jensen term, \((2h)^{-1}\mathrm{Var}(\pi_{t,t+h})\), when
+cumulative log inflation is conditionally Gaussian. The following calculation
+uses the U.S. CPI series in `DTAM` to give a simple historical order of magnitude
+for this term at a five-year horizon. It is only a historical benchmark, not an
+estimate of the corresponding conditional physical or risk-neutral variance.
+
+```{r tbl_GATSM_log_inflation_jensen}
+# Purpose: Estimate the empirical order of magnitude of the Jensen term in the
+# five-year log-inflation component using U.S. CPI data from DTAM.
+data("Data_Macro_US_monthly", package = "DTAM")
+
+h_months <- 60
+h_years <- 5
+cpi_us <- Data_Macro_US_monthly$CPIAUCSL
+dates_us <- Data_Macro_US_monthly$date
+
+pi_5y <- log(
+  cpi_us[(h_months + 1):length(cpi_us)] /
+    cpi_us[1:(length(cpi_us) - h_months)]
+)
+pi_5y_dates <- dates_us[(h_months + 1):length(dates_us)]
+
+jensen_summary <- function(start_date = NULL) {
+  keep <- is.finite(pi_5y)
+  if (!is.null(start_date)) {
+    keep <- keep & pi_5y_dates >= as.Date(start_date)
+  }
+  jensen_bps <- 10000 * 0.5 * var(pi_5y[keep]) / h_years
+  data.frame(
+    sample_start = min(pi_5y_dates[keep]),
+    sample_end = max(pi_5y_dates[keep]),
+    observations = sum(keep),
+    sd_average_inflation = 100 * sd(pi_5y[keep] / h_years),
+    jensen_term_bps = jensen_bps
+  )
+}
+
+jensen_table <- rbind(
+  `Full sample` = jensen_summary(),
+  `Since 1990` = jensen_summary("1990-01-01")
+)
+
+jensen_table$sd_average_inflation <- round(jensen_table$sd_average_inflation, 2)
+jensen_table$jensen_term_bps <- round(jensen_table$jensen_term_bps, 1)
+jensen_table
+```

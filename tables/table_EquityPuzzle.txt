@@ -1,4 +1,4 @@
-Country&Sample&$R_f$&$\overline{er}$&$\sigma(er)$&$\sigma(\Delta c)$&$\rho(\Delta c,er)$&$SR$&$RRA1$&$RRA2$\\
+Country&Sample&$\widetilde{R}_f$&$\overline{er}$&$\sigma(er)$&$\sigma(\Delta c)$&$\rho(\Delta c,er)$&$SR$&$RRA1$&$RRA2$\\
 \hline
 &\multicolumn{9}{l}{\textbf{A. Sample: 1950-2019}}\\
 \hline

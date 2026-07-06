@@ -585,9 +585,9 @@ Y_t <- matrix(data$infl[(k+1):TT],ncol=1)
 vec_dates <- data$date[(k+1):TT]
 
 make_StateSpace <- function(param){
-  a     <- param[1]
+  c     <- exp(param[3])
   b     <- param[2]
-  c     <- param[3]
+  a     <- -5 + b^2/(4*c) - exp(param[1])
   alpha <- param[4]
   beta  <- param[5]
   rho   <- exp(param[6])/(1+exp(param[6]))
@@ -605,12 +605,12 @@ make_StateSpace <- function(param){
 
 rho <- .8
 stdv_tau <- 1/sqrt(1-rho^2)
-a <- .5*mean(Y_t)
 b <- sd(Y_t)/stdv_tau
-c <- 0.1
+c <- 0.03
+a <- -5 + b^2/(4*c) - 0.5
 alpha <- .3*sd(Y_t)
 beta <- 0.1
-param <- c(a,b,c,alpha,beta,log(rho/(1-rho)))
+param <- c(log(-5 + b^2/(4*c) - a),b,log(c),alpha,beta,log(rho/(1-rho)))
 
 loglik_QKF <- function(param,Y_t=Y_t){
   QStateSpace <- make_StateSpace(param)
@@ -630,7 +630,7 @@ if(indic_reestim){
                           Y_t = Y_t,
                           method=method,
                           control=list(trace=TRUE,
-                                       maxit=ifelse(method=="Nelder-Mead",200,10),
+                                       maxit=ifelse(method=="Nelder-Mead",300,30),
                                        kkt = FALSE))
       print(paste("--- Log-lik (",method,"): ",round(res.optim$value,2)," ---",sep=""))
       param  <- c(as.matrix(res.optim)[1:length(param)])
@@ -672,7 +672,8 @@ lines(vec_dates,fitted,col="black",lty=3,lwd=2)
 
 
 plot(vec_dates,Y_t,col="white",xlab="",ylab="",las=1,
-     main=expression(paste("(b) ",tau[t]," and ",tau[t]^2,sep="")))
+     ylim=range(c(resQKF$r[,1],resQKF$r[,3]),finite=TRUE),
+     main=expression(paste("(b) Estimates of ",tau[t]," and ",tau[t]^2,sep="")))
 grid()
 stdv_b_x_tau  <- sqrt(resQKF$Sigma_tt %*% (vec_b_x_tau %x% vec_b_x_tau))
 stdv_c_x_tau2 <- sqrt(resQKF$Sigma_tt %*% (vec_c_x_tau2 %x% vec_c_x_tau2))
@@ -688,8 +689,8 @@ stdv_c_x_tau2 <- sqrt(resQKF$Sigma_tt %*% (vec_c_x_tau2 %x% vec_c_x_tau2))
 # polygon(c(vec_dates,rev(vec_dates)),c(lower_bound,rev(upper_bound)),
 #         border = NA, col="#33333344")
 
-lines(vec_dates,b_x_tau,col="black",lwd=2)
-lines(vec_dates,c_x_tau2,col="black",lwd=2,lty=3)
+lines(vec_dates,resQKF$r[,1],col="black",lwd=2)
+lines(vec_dates,resQKF$r[,3],col="black",lwd=2,lty=3)
 legend("topleft",
        legend=c(expression(tau[t]),
                 expression(tau[t]^2)),

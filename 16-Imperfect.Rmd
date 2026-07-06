@@ -1,4 +1,4 @@
-# Imperfect information and rational expectations {#YieldCurveData}
+# Imperfect information and rational expectations {#ImperfectInfoRE}
 
 <!-- ```{r ECB1, eval=FALSE} -->
 <!-- library(ecb) -->

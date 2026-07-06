@@ -1,4 +1,4 @@
-# Non-linear models of the term structure of interest rates {#NonLinear}
+# Shadow-rate framework and extensions {#ShadowRate}
 
 
 ## Shadow-rate and unconstrained Gaussian term structures in the simple Wu-Xia setting
@@ -1319,4 +1319,3 @@ SCC_simul <- model$Ct*time_step_yrs/(model$gamma-1)*
 print(cbind(res_SCC$SCC,SCC_simul))
 
 ```
-

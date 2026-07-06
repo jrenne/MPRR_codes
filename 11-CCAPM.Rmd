@@ -207,7 +207,7 @@ format.nb <- 2
 
 # Build LaTeX table
 latex.table <- paste0(
-  "Country&Sample&$R_f$&$\\overline{er}$&$\\sigma(er)$",
+  "Country&Sample&$\\widetilde{R}_f$&$\\overline{er}$&$\\sigma(er)$",
   "&$\\sigma(\\Delta c)$&$\\rho(\\Delta c,er)$&$SR$",
   "&$RRA1$&$RRA2$\\\\"
 )

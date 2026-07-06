@@ -1,0 +1,3 @@
+# Term structure of interest rates: definitions, instruments, and yield-curve conventions {#IntroTSM}
+
+This chapter is mainly definitional and does not have dedicated replication code.
