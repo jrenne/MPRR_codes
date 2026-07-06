@@ -23,8 +23,6 @@ The aim of this material is twofold. First, it documents how the main figures an
 
 To run the examples, users should first install the companion package `DTAM`. The package can be installed either from the local source folder or from GitHub, for instance with `devtools::install_github("jrenne/DTAM")`, and then loaded in the usual way with `library(DTAM)`. Most chapters assume that `DTAM` is already available in the R session before the code chunks are executed.
 
-In several cases, the same objects also appear in the Overleaf project used to typeset the book. In this Bookdown version, the focus is on transparent and reproducible code, with one chapter per block of applications.
-
 ```{r include=FALSE}
 knitr::opts_chunk$set(
   warning = FALSE,
