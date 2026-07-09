@@ -1,7 +1,4 @@
-thm:FastPricingVAR
-thm:FastRSpricing
 eq:PDz
-thm:FastRSpricing2
 affine
 a-simple-gaussian-ar1-generates-nonlinear-transforms-such-as-squared-states
 standard-arg-and-arg0-processes

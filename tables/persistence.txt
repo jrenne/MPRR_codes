@@ -24,7 +24,7 @@ Maturity
 \end{tabularx}
 
 \vspace{0.3em}
-\parbox{1.0\textwidth}{\footnotesize\textit{Notes}: 
+\parbox{1.0\textwidth}{\footnotesize\textit{Notes}:
 The table reports autocorrelations (ACF) and partial autocorrelations (PACF)
 of monthly zero-coupon yields at selected maturities.
 $\mathrm{ACF}(1)$ and $\mathrm{ACF}(12)$ correspond to lags of 1 and 12 months, respectively.

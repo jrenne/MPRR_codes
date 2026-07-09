@@ -20,10 +20,10 @@
   <meta name="twitter:description" content="This website gathers the code used to replicate the tables and figures of the book." />
   
 
-<meta name="author" content="Alain Monfort, Fulvio Pegoraro, Jean-Paul Renne, and Guillaume Roussellet" />
+<meta name="author" content="Jean-Paul Renne, Alain Monfort, Fulvio Pegoraro, and Guillaume Roussellet" />
 
 
-<meta name="date" content="2026-07-06" />
+<meta name="date" content="2026-07-09" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -352,11 +352,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb7-5"><a href="IntroTSM.html#cb7-5" tabindex="-1"></a>nss_yield <span class="ot">&lt;-</span> <span class="cf">function</span>(h, theta) {</span>
 <span id="cb7-6"><a href="IntroTSM.html#cb7-6" tabindex="-1"></a>  b0 <span class="ot">&lt;-</span> theta[<span class="st">&quot;beta0&quot;</span>]; b1 <span class="ot">&lt;-</span> theta[<span class="st">&quot;beta1&quot;</span>]; b2 <span class="ot">&lt;-</span> theta[<span class="st">&quot;beta2&quot;</span>]; b3 <span class="ot">&lt;-</span> theta[<span class="st">&quot;beta3&quot;</span>]</span>
 <span id="cb7-7"><a href="IntroTSM.html#cb7-7" tabindex="-1"></a>  l1 <span class="ot">&lt;-</span> theta[<span class="st">&quot;lambda1&quot;</span>]; l2 <span class="ot">&lt;-</span> theta[<span class="st">&quot;lambda2&quot;</span>]</span>
-<span id="cb7-8"><a href="IntroTSM.html#cb7-8" tabindex="-1"></a>  </span>
+<span id="cb7-8"><a href="IntroTSM.html#cb7-8" tabindex="-1"></a></span>
 <span id="cb7-9"><a href="IntroTSM.html#cb7-9" tabindex="-1"></a>  x1 <span class="ot">&lt;-</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="fu">exp</span>(<span class="sc">-</span>l1 <span class="sc">*</span> h)) <span class="sc">/</span> (l1 <span class="sc">*</span> h)</span>
 <span id="cb7-10"><a href="IntroTSM.html#cb7-10" tabindex="-1"></a>  x2 <span class="ot">&lt;-</span> x1 <span class="sc">-</span> <span class="fu">exp</span>(<span class="sc">-</span>l1 <span class="sc">*</span> h)</span>
 <span id="cb7-11"><a href="IntroTSM.html#cb7-11" tabindex="-1"></a>  x3 <span class="ot">&lt;-</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="fu">exp</span>(<span class="sc">-</span>l2 <span class="sc">*</span> h)) <span class="sc">/</span> (l2 <span class="sc">*</span> h) <span class="sc">-</span> <span class="fu">exp</span>(<span class="sc">-</span>l2 <span class="sc">*</span> h)</span>
-<span id="cb7-12"><a href="IntroTSM.html#cb7-12" tabindex="-1"></a>  </span>
+<span id="cb7-12"><a href="IntroTSM.html#cb7-12" tabindex="-1"></a></span>
 <span id="cb7-13"><a href="IntroTSM.html#cb7-13" tabindex="-1"></a>  b0 <span class="sc">+</span> b1 <span class="sc">*</span> x1 <span class="sc">+</span> b2 <span class="sc">*</span> x2 <span class="sc">+</span> b3 <span class="sc">*</span> x3</span>
 <span id="cb7-14"><a href="IntroTSM.html#cb7-14" tabindex="-1"></a>}</span>
 <span id="cb7-15"><a href="IntroTSM.html#cb7-15" tabindex="-1"></a></span>
@@ -388,7 +388,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb7-41"><a href="IntroTSM.html#cb7-41" tabindex="-1"></a>ytm_from_price <span class="ot">&lt;-</span> <span class="cf">function</span>(price, c, h, p) {</span>
 <span id="cb7-42"><a href="IntroTSM.html#cb7-42" tabindex="-1"></a>  n <span class="ot">&lt;-</span> <span class="fu">round</span>(h <span class="sc">*</span> p)</span>
 <span id="cb7-43"><a href="IntroTSM.html#cb7-43" tabindex="-1"></a>  times <span class="ot">&lt;-</span> (<span class="dv">1</span><span class="sc">:</span>n) <span class="sc">/</span> p</span>
-<span id="cb7-44"><a href="IntroTSM.html#cb7-44" tabindex="-1"></a>  </span>
+<span id="cb7-44"><a href="IntroTSM.html#cb7-44" tabindex="-1"></a></span>
 <span id="cb7-45"><a href="IntroTSM.html#cb7-45" tabindex="-1"></a>  f <span class="ot">&lt;-</span> <span class="cf">function</span>(y) {</span>
 <span id="cb7-46"><a href="IntroTSM.html#cb7-46" tabindex="-1"></a>    dfy <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="sc">-</span>y <span class="sc">*</span> times)</span>
 <span id="cb7-47"><a href="IntroTSM.html#cb7-47" tabindex="-1"></a>    <span class="fu">sum</span>((c <span class="sc">/</span> p) <span class="sc">*</span> dfy) <span class="sc">+</span> <span class="fu">exp</span>(<span class="sc">-</span>y <span class="sc">*</span> h) <span class="sc">-</span> price</span>
@@ -458,8 +458,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb7-111"><a href="IntroTSM.html#cb7-111" tabindex="-1"></a><span class="fu">lines</span>(h_pay,  <span class="dv">100</span><span class="sc">*</span>y_par,  <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
 <span id="cb7-112"><a href="IntroTSM.html#cb7-112" tabindex="-1"></a><span class="co"># lines(h_pay,  y_swap, lwd = 2, lty = 4)</span></span>
 <span id="cb7-113"><a href="IntroTSM.html#cb7-113" tabindex="-1"></a></span>
-<span id="cb7-114"><a href="IntroTSM.html#cb7-114" tabindex="-1"></a><span class="fu">points</span>(mats,  <span class="dv">100</span><span class="sc">*</span>ytm_pts,  <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.8</span>) </span>
-<span id="cb7-115"><a href="IntroTSM.html#cb7-115" tabindex="-1"></a><span class="fu">points</span>(mats2, <span class="dv">100</span><span class="sc">*</span>ytm_pts2, <span class="at">pch =</span> <span class="dv">15</span>, <span class="at">cex =</span> <span class="fl">0.8</span>,<span class="at">col=</span><span class="st">&quot;darkgrey&quot;</span>) </span>
+<span id="cb7-114"><a href="IntroTSM.html#cb7-114" tabindex="-1"></a><span class="fu">points</span>(mats,  <span class="dv">100</span><span class="sc">*</span>ytm_pts,  <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.8</span>)</span>
+<span id="cb7-115"><a href="IntroTSM.html#cb7-115" tabindex="-1"></a><span class="fu">points</span>(mats2, <span class="dv">100</span><span class="sc">*</span>ytm_pts2, <span class="at">pch =</span> <span class="dv">15</span>, <span class="at">cex =</span> <span class="fl">0.8</span>,<span class="at">col=</span><span class="st">&quot;darkgrey&quot;</span>)</span>
 <span id="cb7-116"><a href="IntroTSM.html#cb7-116" tabindex="-1"></a></span>
 <span id="cb7-117"><a href="IntroTSM.html#cb7-117" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">&quot;bottomright&quot;</span>,</span>
 <span id="cb7-118"><a href="IntroTSM.html#cb7-118" tabindex="-1"></a>       <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">&quot;Zero-coupon yield&quot;</span>, <span class="st">&quot;Forward (1m)&quot;</span>,</span>
@@ -496,9 +496,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb8-20"><a href="IntroTSM.html#cb8-20" tabindex="-1"></a>  remaining_dates <span class="ot">&lt;-</span> coupon_dates[coupon_dates <span class="sc">&gt;</span> s]</span>
 <span id="cb8-21"><a href="IntroTSM.html#cb8-21" tabindex="-1"></a>  cash_flows <span class="ot">&lt;-</span> <span class="fu">rep</span>(coupon_payment, <span class="fu">length</span>(remaining_dates))</span>
 <span id="cb8-22"><a href="IntroTSM.html#cb8-22" tabindex="-1"></a>  cash_flows[remaining_dates <span class="sc">==</span> maturity] <span class="ot">&lt;-</span> cash_flows[remaining_dates <span class="sc">==</span> maturity] <span class="sc">+</span> <span class="dv">1</span></span>
-<span id="cb8-23"><a href="IntroTSM.html#cb8-23" tabindex="-1"></a>  </span>
+<span id="cb8-23"><a href="IntroTSM.html#cb8-23" tabindex="-1"></a></span>
 <span id="cb8-24"><a href="IntroTSM.html#cb8-24" tabindex="-1"></a>  dirty_price[i] <span class="ot">&lt;-</span> <span class="fu">sum</span>(cash_flows <span class="sc">*</span> <span class="fu">exp</span>(<span class="sc">-</span>r_flat <span class="sc">*</span> (remaining_dates <span class="sc">-</span> s)))</span>
-<span id="cb8-25"><a href="IntroTSM.html#cb8-25" tabindex="-1"></a>  </span>
+<span id="cb8-25"><a href="IntroTSM.html#cb8-25" tabindex="-1"></a></span>
 <span id="cb8-26"><a href="IntroTSM.html#cb8-26" tabindex="-1"></a>  previous_coupon <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">any</span>(coupon_dates <span class="sc">&lt;=</span> s), <span class="fu">max</span>(coupon_dates[coupon_dates <span class="sc">&lt;=</span> s]), <span class="dv">0</span>)</span>
 <span id="cb8-27"><a href="IntroTSM.html#cb8-27" tabindex="-1"></a>  next_coupon <span class="ot">&lt;-</span> <span class="fu">min</span>(coupon_dates[coupon_dates <span class="sc">&gt;</span> s])</span>
 <span id="cb8-28"><a href="IntroTSM.html#cb8-28" tabindex="-1"></a>  accrued_interest[i] <span class="ot">&lt;-</span> coupon_payment <span class="sc">*</span> (s <span class="sc">-</span> previous_coupon) <span class="sc">/</span> (next_coupon <span class="sc">-</span> previous_coupon)</span>
@@ -560,11 +560,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb10-27"><a href="IntroTSM.html#cb10-27" tabindex="-1"></a></span>
 <span id="cb10-28"><a href="IntroTSM.html#cb10-28" tabindex="-1"></a><span class="co"># Load and reshape Treasury issuance data.</span></span>
 <span id="cb10-29"><a href="IntroTSM.html#cb10-29" tabindex="-1"></a>ta_us_treasury_sifma <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">&quot;data/ta-us-treasury-sifma.xlsx&quot;</span>, <span class="at">sheet =</span> <span class="st">&quot;Issuance&quot;</span>, <span class="at">skip =</span> <span class="dv">5</span>)</span>
-<span id="cb10-30"><a href="IntroTSM.html#cb10-30" tabindex="-1"></a>ta_us_treasury_sifma <span class="ot">&lt;-</span> ta_us_treasury_sifma <span class="sc">%&gt;%</span> </span>
+<span id="cb10-30"><a href="IntroTSM.html#cb10-30" tabindex="-1"></a>ta_us_treasury_sifma <span class="ot">&lt;-</span> ta_us_treasury_sifma <span class="sc">%&gt;%</span></span>
 <span id="cb10-31"><a href="IntroTSM.html#cb10-31" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb10-32"><a href="IntroTSM.html#cb10-32" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>...<span class="dv">5</span>, <span class="sc">-</span>...<span class="dv">9</span>, <span class="sc">-</span>...<span class="dv">13</span>)</span>
 <span id="cb10-33"><a href="IntroTSM.html#cb10-33" tabindex="-1"></a></span>
-<span id="cb10-34"><a href="IntroTSM.html#cb10-34" tabindex="-1"></a><span class="fu">names</span>(ta_us_treasury_sifma) <span class="ot">&lt;-</span> </span>
+<span id="cb10-34"><a href="IntroTSM.html#cb10-34" tabindex="-1"></a><span class="fu">names</span>(ta_us_treasury_sifma) <span class="ot">&lt;-</span></span>
 <span id="cb10-35"><a href="IntroTSM.html#cb10-35" tabindex="-1"></a>  <span class="fu">c</span>(<span class="st">&quot;date&quot;</span>, <span class="st">&quot;Bills_Gross Issuance&quot;</span>, <span class="st">&quot;Bills_Gross Retirement&quot;</span>, <span class="st">&quot;Bills_net&quot;</span>,</span>
 <span id="cb10-36"><a href="IntroTSM.html#cb10-36" tabindex="-1"></a>    <span class="st">&quot;Notes_Gross Issuance&quot;</span>, <span class="st">&quot;Notes_Gross Retirement&quot;</span>, <span class="st">&quot;Notes_net&quot;</span>,</span>
 <span id="cb10-37"><a href="IntroTSM.html#cb10-37" tabindex="-1"></a>    <span class="st">&quot;Bonds_Gross Issuance&quot;</span>, <span class="st">&quot;Bonds_Gross Retirement&quot;</span>, <span class="st">&quot;Bonds_net&quot;</span>,</span>
@@ -578,7 +578,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb10-45"><a href="IntroTSM.html#cb10-45" tabindex="-1"></a>ta_us_treasury_sifma <span class="ot">&lt;-</span> ta_us_treasury_sifma <span class="sc">%&gt;%</span></span>
 <span id="cb10-46"><a href="IntroTSM.html#cb10-46" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">type =</span> <span class="fu">str_extract</span>(name, <span class="st">&quot;^[^_]+&quot;</span>),</span>
 <span id="cb10-47"><a href="IntroTSM.html#cb10-47" tabindex="-1"></a>         <span class="at">variable =</span> <span class="fu">str_replace</span>(name, <span class="st">&quot;^[^_]*_&quot;</span>, <span class="st">&quot;&quot;</span>),</span>
-<span id="cb10-48"><a href="IntroTSM.html#cb10-48" tabindex="-1"></a>         <span class="at">year =</span> <span class="fu">year</span>(date)) </span>
+<span id="cb10-48"><a href="IntroTSM.html#cb10-48" tabindex="-1"></a>         <span class="at">year =</span> <span class="fu">year</span>(date))</span>
 <span id="cb10-49"><a href="IntroTSM.html#cb10-49" tabindex="-1"></a></span>
 <span id="cb10-50"><a href="IntroTSM.html#cb10-50" tabindex="-1"></a><span class="co"># Load and reshape the outstanding-debt data.</span></span>
 <span id="cb10-51"><a href="IntroTSM.html#cb10-51" tabindex="-1"></a>ta_us_treasury_sifma_OS <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(</span>
@@ -600,19 +600,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb10-67"><a href="IntroTSM.html#cb10-67" tabindex="-1"></a><span class="co"># Plot net issuance by instrument type.</span></span>
 <span id="cb10-68"><a href="IntroTSM.html#cb10-68" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(ta_us_treasury_sifma <span class="sc">%&gt;%</span></span>
 <span id="cb10-69"><a href="IntroTSM.html#cb10-69" tabindex="-1"></a>              <span class="fu">filter</span>(variable <span class="sc">==</span> <span class="st">&quot;net&quot;</span>, type <span class="sc">!=</span> <span class="st">&quot;Total&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb10-70"><a href="IntroTSM.html#cb10-70" tabindex="-1"></a>              <span class="fu">group_by</span>(type) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-70"><a href="IntroTSM.html#cb10-70" tabindex="-1"></a>              <span class="fu">group_by</span>(type) <span class="sc">%&gt;%</span></span>
 <span id="cb10-71"><a href="IntroTSM.html#cb10-71" tabindex="-1"></a>              <span class="fu">mutate</span>(<span class="at">y =</span> <span class="fu">rollmean</span>(value,<span class="at">k=</span><span class="dv">12</span>, <span class="at">align =</span> <span class="st">&quot;right&quot;</span>, <span class="at">fill =</span> <span class="cn">NA</span>),</span>
-<span id="cb10-72"><a href="IntroTSM.html#cb10-72" tabindex="-1"></a>                     <span class="at">type =</span> <span class="fu">factor</span>(type, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;Bonds&quot;</span>, <span class="st">&quot;Notes&quot;</span>, <span class="st">&quot;Bills&quot;</span>))) , </span>
-<span id="cb10-73"><a href="IntroTSM.html#cb10-73" tabindex="-1"></a>            <span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> y, <span class="at">col =</span> type, <span class="at">group =</span> type, <span class="at">fill =</span> type)) <span class="sc">+</span> </span>
-<span id="cb10-74"><a href="IntroTSM.html#cb10-74" tabindex="-1"></a>  <span class="fu">geom_area</span>() <span class="sc">+</span> </span>
-<span id="cb10-75"><a href="IntroTSM.html#cb10-75" tabindex="-1"></a>  <span class="fu">theme_baseR</span>() <span class="sc">+</span> </span>
-<span id="cb10-76"><a href="IntroTSM.html#cb10-76" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;&quot;</span>, <span class="at">y =</span> <span class="st">&quot;USD Billions&quot;</span>, <span class="at">title =</span> <span class="st">&quot;(a) Net issuance&quot;</span>) <span class="sc">+</span> </span>
-<span id="cb10-77"><a href="IntroTSM.html#cb10-77" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">rev</span>(<span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;grey60&quot;</span>, <span class="st">&quot;grey80&quot;</span>))) <span class="sc">+</span> </span>
-<span id="cb10-78"><a href="IntroTSM.html#cb10-78" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">rev</span>(<span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;grey60&quot;</span>, <span class="st">&quot;grey80&quot;</span>))) <span class="sc">+</span> </span>
+<span id="cb10-72"><a href="IntroTSM.html#cb10-72" tabindex="-1"></a>                     <span class="at">type =</span> <span class="fu">factor</span>(type, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;Bonds&quot;</span>, <span class="st">&quot;Notes&quot;</span>, <span class="st">&quot;Bills&quot;</span>))) ,</span>
+<span id="cb10-73"><a href="IntroTSM.html#cb10-73" tabindex="-1"></a>            <span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> y, <span class="at">col =</span> type, <span class="at">group =</span> type, <span class="at">fill =</span> type)) <span class="sc">+</span></span>
+<span id="cb10-74"><a href="IntroTSM.html#cb10-74" tabindex="-1"></a>  <span class="fu">geom_area</span>() <span class="sc">+</span></span>
+<span id="cb10-75"><a href="IntroTSM.html#cb10-75" tabindex="-1"></a>  <span class="fu">theme_baseR</span>() <span class="sc">+</span></span>
+<span id="cb10-76"><a href="IntroTSM.html#cb10-76" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;&quot;</span>, <span class="at">y =</span> <span class="st">&quot;USD Billions&quot;</span>, <span class="at">title =</span> <span class="st">&quot;(a) Net issuance&quot;</span>) <span class="sc">+</span></span>
+<span id="cb10-77"><a href="IntroTSM.html#cb10-77" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">rev</span>(<span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;grey60&quot;</span>, <span class="st">&quot;grey80&quot;</span>))) <span class="sc">+</span></span>
+<span id="cb10-78"><a href="IntroTSM.html#cb10-78" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">rev</span>(<span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;grey60&quot;</span>, <span class="st">&quot;grey80&quot;</span>))) <span class="sc">+</span></span>
 <span id="cb10-79"><a href="IntroTSM.html#cb10-79" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>),</span>
 <span id="cb10-80"><a href="IntroTSM.html#cb10-80" tabindex="-1"></a>        <span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">11</span>),</span>
 <span id="cb10-81"><a href="IntroTSM.html#cb10-81" tabindex="-1"></a>        <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> .<span class="dv">5</span>, <span class="at">face=</span><span class="st">&quot;bold&quot;</span>),</span>
-<span id="cb10-82"><a href="IntroTSM.html#cb10-82" tabindex="-1"></a>        <span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>, </span>
+<span id="cb10-82"><a href="IntroTSM.html#cb10-82" tabindex="-1"></a>        <span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>,</span>
 <span id="cb10-83"><a href="IntroTSM.html#cb10-83" tabindex="-1"></a>        <span class="at">legend.title =</span> <span class="fu">element_blank</span>()</span>
 <span id="cb10-84"><a href="IntroTSM.html#cb10-84" tabindex="-1"></a>  )</span>
 <span id="cb10-85"><a href="IntroTSM.html#cb10-85" tabindex="-1"></a></span>
@@ -627,24 +627,24 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb10-94"><a href="IntroTSM.html#cb10-94" tabindex="-1"></a>            <span class="at">position =</span> <span class="st">&quot;fill&quot;</span>, <span class="at">alpha =</span> .<span class="dv">6</span></span>
 <span id="cb10-95"><a href="IntroTSM.html#cb10-95" tabindex="-1"></a>  ) <span class="sc">+</span></span>
 <span id="cb10-96"><a href="IntroTSM.html#cb10-96" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> ta_us_treasury_sifma_OS <span class="sc">%&gt;%</span> <span class="fu">filter</span>(type <span class="sc">==</span> <span class="st">&quot;Total&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb10-97"><a href="IntroTSM.html#cb10-97" tabindex="-1"></a>              <span class="fu">mutate</span>(<span class="at">type =</span> <span class="st">&quot;Total (right axis)&quot;</span>), </span>
+<span id="cb10-97"><a href="IntroTSM.html#cb10-97" tabindex="-1"></a>              <span class="fu">mutate</span>(<span class="at">type =</span> <span class="st">&quot;Total (right axis)&quot;</span>),</span>
 <span id="cb10-98"><a href="IntroTSM.html#cb10-98" tabindex="-1"></a>            <span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> value<span class="sc">/</span><span class="fu">max</span>(value), <span class="at">col =</span> type, <span class="at">group =</span> type, <span class="at">fill =</span> type),</span>
 <span id="cb10-99"><a href="IntroTSM.html#cb10-99" tabindex="-1"></a>            <span class="at">lwd =</span> <span class="dv">2</span>)<span class="sc">+</span></span>
-<span id="cb10-100"><a href="IntroTSM.html#cb10-100" tabindex="-1"></a>  <span class="fu">theme_baseR</span>() <span class="sc">+</span> </span>
+<span id="cb10-100"><a href="IntroTSM.html#cb10-100" tabindex="-1"></a>  <span class="fu">theme_baseR</span>() <span class="sc">+</span></span>
 <span id="cb10-101"><a href="IntroTSM.html#cb10-101" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(</span>
 <span id="cb10-102"><a href="IntroTSM.html#cb10-102" tabindex="-1"></a>    <span class="at">name =</span> <span class="st">&quot;Share&quot;</span>,      <span class="co"># left axis</span></span>
 <span id="cb10-103"><a href="IntroTSM.html#cb10-103" tabindex="-1"></a>    <span class="at">sec.axis =</span> <span class="fu">sec_axis</span>(</span>
 <span id="cb10-104"><a href="IntroTSM.html#cb10-104" tabindex="-1"></a>      <span class="sc">~</span> . <span class="sc">*</span> <span class="fl">20973.13</span>,</span>
 <span id="cb10-105"><a href="IntroTSM.html#cb10-105" tabindex="-1"></a>      <span class="at">name =</span> <span class="st">&quot;Total amount&quot;</span></span>
 <span id="cb10-106"><a href="IntroTSM.html#cb10-106" tabindex="-1"></a>    )</span>
-<span id="cb10-107"><a href="IntroTSM.html#cb10-107" tabindex="-1"></a>  ) <span class="sc">+</span> </span>
+<span id="cb10-107"><a href="IntroTSM.html#cb10-107" tabindex="-1"></a>  ) <span class="sc">+</span></span>
 <span id="cb10-108"><a href="IntroTSM.html#cb10-108" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>( <span class="st">&quot;grey90&quot;</span>, <span class="st">&quot;grey70&quot;</span>, <span class="st">&quot;grey50&quot;</span>, <span class="st">&quot;grey30&quot;</span>,<span class="st">&quot;black&quot;</span>, <span class="st">&quot;black&quot;</span>))<span class="sc">+</span></span>
-<span id="cb10-109"><a href="IntroTSM.html#cb10-109" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>( <span class="st">&quot;grey90&quot;</span>, <span class="st">&quot;grey70&quot;</span>, <span class="st">&quot;grey50&quot;</span>, <span class="st">&quot;grey30&quot;</span>,<span class="st">&quot;black&quot;</span>, <span class="st">&quot;black&quot;</span>)) <span class="sc">+</span> </span>
-<span id="cb10-110"><a href="IntroTSM.html#cb10-110" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;&quot;</span>, <span class="at">title =</span> <span class="st">&quot;(b) Outstanding amounts&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb10-109"><a href="IntroTSM.html#cb10-109" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>( <span class="st">&quot;grey90&quot;</span>, <span class="st">&quot;grey70&quot;</span>, <span class="st">&quot;grey50&quot;</span>, <span class="st">&quot;grey30&quot;</span>,<span class="st">&quot;black&quot;</span>, <span class="st">&quot;black&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb10-110"><a href="IntroTSM.html#cb10-110" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;&quot;</span>, <span class="at">title =</span> <span class="st">&quot;(b) Outstanding amounts&quot;</span>) <span class="sc">+</span></span>
 <span id="cb10-111"><a href="IntroTSM.html#cb10-111" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>),</span>
 <span id="cb10-112"><a href="IntroTSM.html#cb10-112" tabindex="-1"></a>        <span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">11</span>),</span>
 <span id="cb10-113"><a href="IntroTSM.html#cb10-113" tabindex="-1"></a>        <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> .<span class="dv">5</span>, <span class="at">face=</span><span class="st">&quot;bold&quot;</span>),</span>
-<span id="cb10-114"><a href="IntroTSM.html#cb10-114" tabindex="-1"></a>        <span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>, </span>
+<span id="cb10-114"><a href="IntroTSM.html#cb10-114" tabindex="-1"></a>        <span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>,</span>
 <span id="cb10-115"><a href="IntroTSM.html#cb10-115" tabindex="-1"></a>        <span class="at">legend.title =</span> <span class="fu">element_blank</span>(),</span>
 <span id="cb10-116"><a href="IntroTSM.html#cb10-116" tabindex="-1"></a>        <span class="at">legend.box =</span> <span class="st">&quot;horizontal&quot;</span></span>
 <span id="cb10-117"><a href="IntroTSM.html#cb10-117" tabindex="-1"></a>  ) <span class="sc">+</span></span>

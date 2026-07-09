@@ -1,6 +1,6 @@
 --- 
 title: "Asset Pricing with Discrete-Time Affine processes"
-author: "Alain Monfort, Fulvio Pegoraro, Jean-Paul Renne, and Guillaume Roussellet"
+author: "Jean-Paul Renne, Alain Monfort, Fulvio Pegoraro, and Guillaume Roussellet"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 documentclass: book
