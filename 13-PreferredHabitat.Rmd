@@ -26,7 +26,7 @@ a.theta0 <- 289
 
 # Specif of short-rate:
 a1 <- matrix(c(1,rep(0,n-1)),ncol=1) # The first factor is r_t
-b1 <- r_bar/100 # minus mean of short-term rate
+b1 <- r_bar/100 # mean of the short-term rate
 
 # Specify factors' dynamics:
 mu    <- matrix(0,n,1)
@@ -53,7 +53,7 @@ par(plt=c(.2,.98,.25,.85))
 plot(2:H,
      las=1,
      Alpha[2:H,2],type="l",lwd=2,
-     xlab=expression(paste("maturity (",h,")",sep="")),ylab=expression(alpha[2*','*h]),
+     xlab=expression(paste("maturity (",h,")",sep="")),ylab=expression(alpha[h*','*2]),
      main=expression(paste("(a) w/o first maturity (",alpha[1*','*2],")",sep=""))
 )
 grid()
@@ -67,7 +67,7 @@ plot(1:H,
      las=1,
      Alpha[1:H,2],type="l",lwd=2,
      xlab=expression(paste("maturity (",h,")",sep="")),
-     ylab=expression(alpha[2*','*h]),
+     ylab=expression(alpha[h*','*2]),
      main=expression(paste("(b) w/ first maturity (",alpha[1*','*2],")",sep=""))
 )
 grid()
@@ -88,10 +88,10 @@ par(plt=c(.2,.98,.25,.85))
 for(i in 1:n){
   if(i==1){
     main = expression(paste("(a) Loading on short-term rate",sep=""))
-    ylab = expression(a[h*','*1])
+    ylab = expression(-a[h*','*1]/h)
   }else{
     main = expression(paste("(b) Loading on supply factor",sep=""))
-    ylab = expression(a[h*','*2])
+    ylab = expression(-a[h*','*2]/h)
   }
   plot(RES$a[,i],type="l",
        las=1,lwd=2,
@@ -174,10 +174,10 @@ b_h_1 <- matrix(rbind(0,matrix(b_h[1:(H-1)])),ncol=1)
 
 # Conditional variance of returns:
 cond_var <- ((a_h_1 %x% matrix(1,1,n)) * (matrix(1,1,n) %x% a_h_1)) %*% c(Sigma)
-# Average excess return:
+# Unconditional mean of the conditional continuously compounded excess return:
 avg_xs_returns <- b_h_1 - b_h - b1 + 0.5*cond_var
-# Average Sharpe ratio:
-SR <- avg_xs_returns/sqrt(cond_var)
+# Maturities with a non-degenerate one-period holding return:
+risky_maturities <- which(cond_var > .Machine$double.eps)
 
 # Compute unconditional standard deviation of excess return:--------------------
 # Compute matrix of variance of W_t = [w_t',w_{t-1}']':
@@ -190,39 +190,59 @@ a_h_1_a_h <- cbind(a_h_1,- a_h - matrix(1,H,1) %*% t(a1))
 cond_var_xs <- 
   ((a_h_1_a_h %x% matrix(1,1,2*n)) * (matrix(1,1,2*n) %x% a_h_1_a_h)) %*%
   c(Var_w_w_1)
-# Unconditional variance of Expected excess return:
+# Unconditional variance of the conditional expected excess return:
 aux <- a_h_1 %*% Phi - a_h - matrix(1,H,1) %*% t(a1)
-cond_var_Exs <- ((aux %x% matrix(1,1,n)) * (matrix(1,1,n) %x% aux)) %*% c(Sigma)
+var_expected_xs <-
+  ((aux %x% matrix(1,1,n)) * (matrix(1,1,n) %x% aux)) %*% c(Var_w)
 
-# Compute unconditional standard deviation of expected excess return:-----------
-# condi. variance of expected returns:
-lower_bound_xs <- avg_xs_returns - 1.64 * sqrt(cond_var_Exs)
-upper_bound_xs <- avg_xs_returns + 1.64 * sqrt(cond_var_Exs)
-lower_bound_SR <- SR - 1.64 * sqrt(cond_var_Exs)/sqrt(cond_var)
-upper_bound_SR <- SR + 1.64 * sqrt(cond_var_Exs)/sqrt(cond_var)
+# Central 90% stationary range of the conditional expected excess return:------
+q05_normal <- qnorm(.05)
+q95_normal <- qnorm(.95)
+lower_bound_xs <- avg_xs_returns + q05_normal * sqrt(var_expected_xs)
+upper_bound_xs <- avg_xs_returns + q95_normal * sqrt(var_expected_xs)
+
+# Exact conditional Sharpe ratio of the arithmetic holding return. If
+# x_{t,h}=log(E_t[G_{t+1,h}])-r_t and
+# v_h=Var_t(log(G_{t+1,h})), conditional lognormality gives
+# SR_{t,h}=(1-exp(-x_{t,h}))/sqrt(exp(v_h)-1). Its absolute value is the
+# asset-specific object bounded by the Hansen--Jagannathan maximum Sharpe ratio.
+# Because x_{t,h} is Gaussian under the stationary distribution, the
+# unconditional mean and quantiles can be computed analytically.
+SR <- lower_bound_SR <- upper_bound_SR <- rep(NA_real_,H)
+SR_denominator <- sqrt(exp(cond_var[risky_maturities])-1)
+SR[risky_maturities] <-
+  (1-exp(-avg_xs_returns[risky_maturities] +
+           0.5*var_expected_xs[risky_maturities]))/SR_denominator
+q05_xs <- avg_xs_returns[risky_maturities] +
+  q05_normal*sqrt(var_expected_xs[risky_maturities])
+q95_xs <- avg_xs_returns[risky_maturities] +
+  q95_normal*sqrt(var_expected_xs[risky_maturities])
+lower_bound_SR[risky_maturities] <- (1-exp(-q05_xs))/SR_denominator
+upper_bound_SR[risky_maturities] <- (1-exp(-q95_xs))/SR_denominator
 # ------------------------------------------------------------------------------
 
 par(mfrow=c(1,2))
 par(plt=c(.23,.98,.23,.85))
-plot(10000*avg_xs_returns,col="white",las=1,
+plot(100*avg_xs_returns,col="white",las=1,
      xlab=expression(paste("maturity (",h,")",sep="")),
-     ylab=expression(paste("Excess return, in basis points",sep="")),
-     ylim=c(0,700),
+     ylab=expression(paste("Excess return, in percentage points",sep="")),
+     ylim=range(100*c(lower_bound_xs,upper_bound_xs), finite=TRUE),
      main=expression(paste("(a) Expected excess return",sep="")))
 grid()
-polygon(c(1:H,H:1),10000*c(lower_bound_xs,rev(upper_bound_xs)),
+polygon(c(1:H,H:1),100*c(lower_bound_xs,rev(upper_bound_xs)),
         col="#CCCCCCBB",border = NaN)
-lines(10000*avg_xs_returns,lwd=2)
+lines(100*avg_xs_returns,lwd=2)
 
-plot(100*SR,col="white",las=1,
-     ylim=c(0,70),
+plot(risky_maturities,100*SR[risky_maturities],col="white",las=1,
+     ylim=range(100*c(lower_bound_SR,upper_bound_SR), finite=TRUE),
      xlab=expression(paste("maturity (",h,")",sep="")),
      ylab=expression(paste("Sharpe ratio, in percent",sep="")),
-     main=expression(paste("(b) Sharpe ratio",sep="")))
+     main=expression(paste("(b) Conditional Sharpe ratio",sep="")))
 grid()
-polygon(c(1:H,H:1),100*c(lower_bound_SR,rev(upper_bound_SR)),
+polygon(c(risky_maturities,rev(risky_maturities)),
+        100*c(lower_bound_SR[risky_maturities],rev(upper_bound_SR[risky_maturities])),
         col="#CCCCCCBB",border = NaN)
-lines(100*SR,lwd=2)
+lines(risky_maturities,100*SR[risky_maturities],lwd=2)
 
 # Compute average maximum Sharpe ratio
 k <- 20
@@ -298,10 +318,11 @@ rho_r  <- .8
 rho_pi <- .8
 sigma_r  <- .01 
 sigma_pi <- sigma_r
-gamma <- 0.1
+a_r   <- 0.1
 a_pi  <- 0.3
-Phi <- matrix(c(rho_r,-gamma,a_pi,rho_pi),2,2)
-Sigma_12 <- diag(c(.01,.01))
+Phi <- matrix(c(rho_r,-a_r,a_pi,rho_pi),2,2)
+Sigma_12 <- diag(c(sigma_r,sigma_pi))
+Sigma <- Sigma_12 %*% t(Sigma_12)
 
 H <- 20
 
@@ -332,7 +353,6 @@ avg_pi <- .02 # average inflation rate
 # plot(all_x[2,])
 
 mu <- matrix(0,2,1)
-Sigma <- Sigma_12 %*% t(Sigma_12)
 
 # Create matrices defining supply functions:
 Alpha      <- matrix(0,H,2)
@@ -594,12 +614,12 @@ rownames(all_results) <- c("$\\omega$",
                            "$\\sigma_k$",
                            "$\\alpha_{K,r}$",
                            "Share of stocks ($\\beta_K$)",
-                           "$\\mathbb{E}(R_{K,t,t+1}-r_t)$",
+                           "$\\mathbb{E}(R_{K,t,t+1}-R^f_{t,t+1})$",
                            "$\\sigma(R_{K,t,t+1})$",
                            "$\\mathbb{E}(SR_{K,t})$",
                            "$\\mathbb{E}(r_{t,10})$",
                            "$\\sigma(r_{t,10})$",
-                           "$\\mathbb{E}(R_{10,t,t+1}-r_t)$",
+                           "$\\mathbb{E}(R_{10,t,t+1}-R^f_{t,t+1})$",
                            "$\\sigma(R_{10,t,t+1})$",
                            "$\\mathbb{E}(SR_{10,t})$",
                            "$\\mathbb{C}or(R_{K,t,t+1},r_t)$",
@@ -631,7 +651,7 @@ for(i in 1:length(all_omega)){
   Ew    <- solve(diag(3) - Phi) %*% mu
   # Unconditional variance matrix of w_t:
   Var_w <- matrix(solve(diag(9) - Phi %x% Phi) %*% c(Sigma),3,3)
-  # Unconditional variance matrix of [w_t',w_{t-1}']':
+  # Unconditional variance matrix of [w_{t+1}',w_t']':
   Var_w_w_1 <- cbind(
     rbind(Var_w,Var_w %*% t(Phi)),
     rbind(Phi %*% Var_w,Var_w)
@@ -650,21 +670,35 @@ for(i in 1:length(all_omega)){
   
   RES <- solve_PH_TSM(model,max_iter = 200)
   
-  mu_ERK0 <- RES$C_K + RES$Theta_K %*% model$mu
-  mu_ERK1 <- RES$D_K + RES$Theta_K %*% model$Phi
-  avg_ERK <- mu_ERK0 + c(mu_ERK1 %*% Ew)
-  
-  # Average excess return:
-  all_results["$\\mathbb{E}(R_{K,t,t+1}-r_t)$",i] <- avg_ERK - b1
-  
-  # Compute unconditional variance of R_{K,t,t+1}:
+  # Exact stationary moments implied by the affine Gaussian approximation.
+  # R^f_{t,t+1}=exp(r_t)-1 is the arithmetic risk-free return.
+  mean_log_Rf <- model$b1 + c(t(model$a1) %*% Ew)
+  var_log_Rf <- c(t(model$a1) %*% Var_w %*% model$a1)
+  avg_gross_Rf <- exp(mean_log_Rf + 0.5*var_log_Rf)
+
+  # The package returns both the arithmetic-return intercept C_K used by the
+  # equilibrium approximation and C_K_log, the intercept of log(1+R_K).
+  mean_log_RK <- c(RES$C_K_log + RES$Theta_K %*% model$mu +
+                     (RES$D_K + RES$Theta_K %*% model$Phi) %*% Ew)
   loadings_RK <- matrix(c(RES$Theta_K,RES$D_K),ncol=1)
-  Var_RK <- t(loadings_RK) %*% Var_w_w_1 %*% loadings_RK
-  all_results["$\\sigma(R_{K,t,t+1})$",i] <- sqrt(Var_RK)
-  
-  # Average Sharpe ratio (for stocks):
-  SR <- (avg_ERK - b1)/sqrt(RES$Theta_K %*% Sigma %*% t(RES$Theta_K))
-  all_results["$\\mathbb{E}(SR_{K,t})$",i] <- SR
+  var_log_RK <- c(t(loadings_RK) %*% Var_w_w_1 %*% loadings_RK)
+  avg_gross_RK <- exp(mean_log_RK + 0.5*var_log_RK)
+  sd_RK <- sqrt((exp(var_log_RK)-1)*exp(2*mean_log_RK+var_log_RK))
+  all_results["$\\mathbb{E}(R_{K,t,t+1}-R^f_{t,t+1})$",i] <-
+    avg_gross_RK - avg_gross_Rf
+  all_results["$\\sigma(R_{K,t,t+1})$",i] <- sd_RK
+
+  # Mean of the exact conditional Sharpe ratio of the arithmetic stock return.
+  # If x_t=log(E_t[1+R_K])-r_t and v_K=Var_t(log(1+R_K)), then
+  # SR_t=(1-exp(-x_t))/sqrt(exp(v_K)-1). Here x_t is Gaussian, so its
+  # stationary mean can be evaluated analytically.
+  v_K <- c(RES$Theta_K %*% Sigma %*% t(RES$Theta_K))
+  loadings_xK <- RES$D_K + RES$Theta_K %*% model$Phi - t(model$a1)
+  mean_xK <- c(RES$C_K_log + RES$Theta_K %*% model$mu + 0.5*v_K - model$b1 +
+                 loadings_xK %*% Ew)
+  var_xK <- c(loadings_xK %*% Var_w %*% t(loadings_xK))
+  avg_SR_K <- (1-exp(-mean_xK+0.5*var_xK))/sqrt(exp(v_K)-1)
+  all_results["$\\mathbb{E}(SR_{K,t})$",i] <- avg_SR_K
   
   # Average 10-year yield:
   avg_r10 <- RES$b[10]
@@ -675,32 +709,50 @@ for(i in 1:length(all_omega)){
   sd_r10 <- sqrt(t(loadings_r10) %*% Var_w %*% loadings_r10)
   all_results["$\\sigma(r_{t,10})$",i] <- sd_r10
   
-  # SR of 10-year yield:
+  # Bond-return coefficients and conditional variance:
   a_h <- RES$A
   a_h_1 <- rbind(0,a_h[1:(H-1),])
   b_h <- RES$B
   b_h_1 <- matrix(rbind(0,matrix(b_h[1:(H-1)])),ncol=1)
-  # Conditional variance of returns:
   cond_var <- ((a_h_1 %x% matrix(1,1,3)) * (matrix(1,1,3) %x% a_h_1)) %*% c(Sigma)
-  avg_xs_returns <- b_h_1 - b_h - b1 + 0.5*cond_var # Average bond xs return
-  SR <- avg_xs_returns/sqrt(cond_var) # Average Sharpe ratio
-  all_results["$\\mathbb{E}(R_{10,t,t+1}-r_t)$",i] <- avg_xs_returns[10]
-  all_results["$\\mathbb{E}(SR_{10,t})$",i] <- SR[10]
-  
-  # Unconditional variance of bond returns:
+
+  # Exact unconditional arithmetic-return moments.
+  loadings_log_R <- a_h_1 %*% model$Phi - a_h
+  mean_log_R <- b_h_1 - b_h + a_h_1 %*% model$mu + loadings_log_R %*% Ew
   loadings_R10 <- matrix(c(a_h_1[10,],-a_h[10,]),ncol=1)
-  Var_R10 <- t(loadings_R10) %*% Var_w_w_1 %*% loadings_R10
-  all_results["$\\sigma(R_{10,t,t+1})$",i] <- sqrt(Var_R10)
+  var_log_R10 <- c(t(loadings_R10) %*% Var_w_w_1 %*% loadings_R10)
+  avg_gross_R10 <- exp(mean_log_R[10] + 0.5*var_log_R10)
+  sd_R10 <- sqrt((exp(var_log_R10)-1)*
+                   exp(2*mean_log_R[10]+var_log_R10))
+  all_results["$\\mathbb{E}(R_{10,t,t+1}-R^f_{t,t+1})$",i] <-
+    avg_gross_R10 - avg_gross_Rf
+  all_results["$\\sigma(R_{10,t,t+1})$",i] <- sd_R10
+
+  # Mean of the exact conditional arithmetic-return Sharpe ratio.
+  loadings_x_bond <- loadings_log_R - matrix(1,H,1) %*% t(model$a1)
+  mean_x_bond <- b_h_1 - b_h + a_h_1 %*% model$mu + 0.5*cond_var - model$b1 +
+    loadings_x_bond %*% Ew
+  var_x_bond <-
+    ((loadings_x_bond %x% matrix(1,1,3)) *
+       (matrix(1,1,3) %x% loadings_x_bond)) %*% c(Var_w)
+  avg_SR_bond <- rep(NA_real_,H)
+  risky_maturities <- which(cond_var > .Machine$double.eps)
+  avg_SR_bond[risky_maturities] <-
+    (1-exp(-mean_x_bond[risky_maturities]+0.5*var_x_bond[risky_maturities]))/
+    sqrt(exp(cond_var[risky_maturities])-1)
+  all_results["$\\mathbb{E}(SR_{10,t})$",i] <- avg_SR_bond[10]
   
   # Correlation between R_K and r_t:
   loadings_r <- matrix(c(0,0,0,1,0,0),ncol=1)
   sigma_r <- sqrt(Var_w[1])
-  Cov <- t(loadings_RK) %*% Var_w_w_1 %*% loadings_r
-  all_results["$\\mathbb{C}or(R_{K,t,t+1},r_t)$",i] <- Cov/sigma_r/sqrt(Var_RK)
+  Cov_log_RK_r <- c(t(loadings_RK) %*% Var_w_w_1 %*% loadings_r)
+  all_results["$\\mathbb{C}or(R_{K,t,t+1},r_t)$",i] <-
+    Cov_log_RK_r*avg_gross_RK/(sigma_r*sd_RK)
   
   # Correlation between R_10 and r_t:
-  Cov <- t(loadings_R10) %*% Var_w_w_1 %*% loadings_r
-  all_results["$\\mathbb{C}or(R_{10,t,t+1},r_t)$",i] <- Cov/sigma_r/sqrt(Var_R10)
+  Cov_log_R10_r <- c(t(loadings_R10) %*% Var_w_w_1 %*% loadings_r)
+  all_results["$\\mathbb{C}or(R_{10,t,t+1},r_t)$",i] <-
+    Cov_log_R10_r*avg_gross_R10/(sigma_r*sd_R10)
   
   # Correlation between E_t(R_{k,t+1}) and r_t:
   # loadings_r <- matrix(c(1,0,0),ncol=1)

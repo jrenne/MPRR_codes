@@ -18,11 +18,9 @@
 <!--     all_yields <- merge(all_yields,x_reduced,by="date") -->
 <!--   } -->
 <!-- } -->
-<!-- # save(all_yields,file="data/ECB_YC.Rdat") -->
 <!-- ``` -->
 
 <!-- ```{r ECB2, echo=FALSE} -->
-<!-- load("data/ECB_YC.Rdat") -->
 <!-- ``` -->
 
 ## Imperfect information

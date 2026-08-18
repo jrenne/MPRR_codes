@@ -192,7 +192,7 @@ for(h in rev(all_h)){
   mu1t <- res$all_b_bar_n[h] + s %*% t(model$Phi%^%h) %*% delta1
   sigma1 <- res$all_sigma_n[h] 
   ratio <- mu1t/sigma1
-  var_rt <- (mu1t^2 + sigma1^2)*pnorm(ratio) -
+  var_rt <- (mu1t^2 + sigma1^2)*pnorm(ratio) +
     mu1t*sigma1*dnorm(ratio) - sigma1^2*g(ratio)^2
   vol_rt <- 100*sqrt(var_rt)
   
@@ -253,7 +253,7 @@ Sigma <- Sigma12 %*% t(Sigma12)
 
 model <- list(mu = mu,Phi = Phi,
               Sigma12 = Sigma12,Sigma=Sigma,
-              n_w=3)
+              n_w=4)
 
 print(abs(eigen(Phi)$values))
 
@@ -806,13 +806,13 @@ plot(sim_s,type="l",las=1,col="white",xlab="",ylab="",
 grid()
 abline(h=0,col="grey")
 lines(sim_s,col="grey",lwd=2,lty=1)
-lines(3*sqrt(sim_z),col="black",lwd=1)
+lines(3*sqrt(sim_z),col="black",lwd=2)
 
 # Compute conditional variance of r_t:
 mu1t <- model$mu + model$phi * sim_s
 sigma1 <- sqrt(sim_z)
 ratio <- mu1t/sigma1
-var_rt <- (mu1t^2 + sigma1^2)*pnorm(ratio) -
+var_rt <- (mu1t^2 + sigma1^2)*pnorm(ratio) +
   mu1t*sigma1*dnorm(ratio) - sigma1^2*g(ratio)^2
 lines(3*sqrt(var_rt),lwd=2,lty=3,col="black")
 
@@ -822,7 +822,7 @@ legend("topleft",
          expression(paste(sqrt(Var(r[t]))," (x3)",sep=""))
        ),
        lty=c(1,1,3),
-       lwd=c(2,1,2),
+       lwd=c(2,2,2),
        pt.cex = 1,
        col= c("grey","black","black"),
        seg.len = 3)

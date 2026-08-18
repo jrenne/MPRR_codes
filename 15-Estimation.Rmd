@@ -453,7 +453,7 @@ for(maturity in c(2,10)){
 
 In this section, we take the same data and estimate a model with latent state vector, using the Kalman filter.
 
-In this example, we employ the results of Example \@ref(exm:nominalBth) in the context described by Christensen, Diebold, and Rudebusch (2009). Specifically, we consider a three factor model following a Gaussian VAR:
+In this example, we use the same data as in the preceding observed-state maximum-likelihood exercise, in the context described by Christensen, Diebold, and Rudebusch (2009). Specifically, we consider a three-factor model following a Gaussian VAR:
 $$
 w_t = \left[\begin{array}{c}X_{1,t}\\X_{2,t}\\X_{3,t}\end{array}\right] = 
 \left[\begin{array}{ccc}

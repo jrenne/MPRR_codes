@@ -1,3 +1,85 @@
 # No-arbitrage pricing and risk-neutral dynamics {#PricingRNdynamics}
 
-This chapter is mainly theoretical and does not have dedicated replication code.
+Most of this chapter is theoretical. The following example illustrates how a stochastic
+discount factor transforms physical probabilities into risk-neutral probabilities in a
+three-state economy.
+
+```{r fig_three_state_probabilities, fig.width=7, fig.height=4}
+# Purpose: Compare physical and risk-neutral probabilities implied by a simple SDF.
+
+states <- c("Normal", "Good", "Bad")
+physical_prob <- c(0.60, 0.25, 0.15)
+sdf <- c(0.90, 0.80, 1.60)
+
+# State prices, risk-free discount factor, and risk-neutral probabilities.
+state_price <- physical_prob * sdf
+risk_free_discount <- sum(state_price)
+short_rate <- -log(risk_free_discount)
+risk_neutral_prob <- state_price / risk_free_discount
+
+# Payoffs of the procyclical and insurance assets used in the book.
+payoff_procyclical <- c(100, 130, 50)
+payoff_insurance <- c(100, 70, 150)
+physical_expected_payoff <- c(
+  procyclical = sum(physical_prob * payoff_procyclical),
+  insurance = sum(physical_prob * payoff_insurance)
+)
+risk_neutral_expected_payoff <- c(
+  procyclical = sum(risk_neutral_prob * payoff_procyclical),
+  insurance = sum(risk_neutral_prob * payoff_insurance)
+)
+asset_price <- c(
+  procyclical = sum(state_price * payoff_procyclical),
+  insurance = sum(state_price * payoff_insurance)
+)
+
+# Report the quantities used in the text and verify the pricing identity.
+three_state_results <- data.frame(
+  state = states,
+  physical_prob = physical_prob,
+  sdf = sdf,
+  state_price = state_price,
+  risk_neutral_prob = risk_neutral_prob,
+  payoff_procyclical = payoff_procyclical,
+  payoff_insurance = payoff_insurance
+)
+print(three_state_results)
+stopifnot(
+  abs(sum(risk_neutral_prob) - 1) < 1e-12,
+  all(abs(physical_expected_payoff - 100) < 1e-12),
+  all(abs(asset_price - risk_free_discount * risk_neutral_expected_payoff) < 1e-12),
+  abs(asset_price["procyclical"] - 92) < 1e-12,
+  abs(asset_price["insurance"] - 104) < 1e-12
+)
+
+# Compare physical and risk-neutral probabilities.
+probabilities_to_plot <- 100 * rbind(
+  "Physical probability" = physical_prob,
+  "Risk-neutral probability" = risk_neutral_prob
+)
+
+par(mar = c(4.2, 4.3, 0.8, 0.8))
+bar_positions <- barplot(
+  probabilities_to_plot,
+  beside = TRUE,
+  names.arg = states,
+  col = c("lightgrey", "darkgrey"),
+  border = "black",
+  ylim = c(0, 70),
+  ylab = "Probability (percent)",
+  las = 1
+)
+text(
+  bar_positions,
+  probabilities_to_plot + 2.2,
+  labels = sprintf("%.1f", probabilities_to_plot),
+  cex = 0.85
+)
+legend(
+  "topright",
+  legend = rownames(probabilities_to_plot),
+  fill = c("lightgrey", "darkgrey"),
+  border = "black",
+  bty = "n"
+)
+```
