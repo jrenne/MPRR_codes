@@ -2,33 +2,60 @@
 
 ## Standard framework
 
-This example compares standard structural and reduced-form views of credit spreads.
-The empirical series combine two ingredients: a credit-spread component and a default-rate component. The credit spread is computed from the Moody's Seasoned Aaa and Baa corporate bond yields available on FRED (`DAAA` and `DBAA`), using annual averages and the difference `DBAA - DAAA`. The default component contains global corporate default counts and default rates from S&P Global Ratings' "Global corporate default summary" table, sourced by S&P Global Ratings to S&P Global Ratings Credit Research & Insights and S&P Global Market Intelligence's CreditPro. The 2024 update corresponds to S&P Global Ratings, "Default, Transition, and Recovery: 2024 Annual Global Corporate Default And Rating Transition Study" (March 27, 2025); the same global summary table is also reproduced in related regional S&P default-transition studies.^[The underlying observations are not distributed with DTAM or with the public version of this Rbookdown project. Readers wishing to reproduce them should consult the source pages for [DAAA](https://fred.stlouisfed.org/series/DAAA), [DBAA](https://fred.stlouisfed.org/series/DBAA), [FRED terms](https://fred.stlouisfed.org/legal/), and the relevant S&P Global Ratings corporate default-transition study, subject to the applicable permissions.]
+This example compares standard structural and reduced-form views of credit spreads. The empirical illustration combines a maturity-matched 20-year corporate credit spread with a rescaled business-loan loss indicator. The spread is the difference between the U.S. Treasury's 20-year High Quality Market (HQM) corporate spot rate and its 20-year Treasury Nominal Coupon-Issue (TNC) spot rate; the source workbooks and methodology are available from the [HQM](https://home.treasury.gov/data/treasury-coupon-issues-and-corporate-bond-yield-curve/corporate-bond-yield-curve) and [TNC](https://home.treasury.gov/data/treasury-coupon-issues-and-corporate-bond-yield-curves/treasury-coupon-issues) yield-curve pages. The credit-loss indicator uses the Federal Reserve Board's [business-loan charge-off rate](https://www.federalreserve.gov/releases/chargeoff/), rescaled so that its average expected loss corresponds to high-quality U.S. corporate bonds [@AmatoRemolona2003].^[We first average the quarterly charge-off rates within each calendar year and normalize the resulting series by its 1986--2024 mean. Amato and Remolona [-@AmatoRemolona2003, Table 1] report expected losses of 0.61, 2.70, and 7.32 basis points for AAA-, AA-, and A-rated bonds in their longest maturity bucket. We use their equal-weight average, 3.54 basis points, and map expected loss into the physical default intensity using the recovery rate assumed below. The companion workbook records the source observations and each transformation.]
 
 ```{r fig_standardCredit1, fig.width=5.5, fig.height=7}
 # Purpose: This example compares standard structural and reduced-form views of credit spreads
 library(DTAM)
 
-private_credit_file <- "private_data/Credit_spds.rda"
-precomputed_figure <- if (knitr::is_latex_output()) {
-  "_main_files/figure-latex/fig_standardCredit1-1.pdf"
-} else {
-  "_main_files/figure-latex/fig_standardCredit1-1.pdf"
+public_spread_file <- "data/Treasury_HQM_TNC_20Y.xlsx"
+credit_loss_file <- "data/FederalReserve_HQM_CreditLossProxy.xlsx"
+
+if (!file.exists(public_spread_file)) {
+  stop("Treasury spread data not found: ", public_spread_file, call. = FALSE)
+}
+if (!file.exists(credit_loss_file)) {
+  stop("Credit-loss indicator not found: ", credit_loss_file, call. = FALSE)
 }
 
-if (!file.exists(private_credit_file) && file.exists(precomputed_figure)) {
-  knitr::include_graphics(precomputed_figure)
-} else {
-  if (!file.exists(private_credit_file)) {
-    stop("Private credit-spread data not found: ", private_credit_file, call. = FALSE)
-  }
-  load(private_credit_file)
+spread_data <- readxl::read_excel(public_spread_file,
+                                  sheet = "Annual 20Y spread",
+                                  skip = 6)
+spread_data <- data.frame(
+  year = suppressWarnings(as.numeric(spread_data[[1]])),
+  HQM_yld = suppressWarnings(as.numeric(spread_data[[2]])),
+  TNC_yld = suppressWarnings(as.numeric(spread_data[[3]])),
+  HQM_TNC_spd = suppressWarnings(as.numeric(spread_data[[4]]))
+)
+spread_data <- subset(spread_data,
+                      year >= 1986 & year <= 2024 &
+                        complete.cases(spread_data))
+
+loss_data <- readxl::read_excel(credit_loss_file,
+                                sheet = "Annual calibrated",
+                                skip = 6)
+loss_data <- data.frame(
+  year = suppressWarnings(as.numeric(loss_data[[1]])),
+  chargeoff_rate = suppressWarnings(as.numeric(loss_data[[2]])),
+  expected_loss_bp = suppressWarnings(as.numeric(loss_data[[5]])),
+  default_intensity_pct = suppressWarnings(as.numeric(loss_data[[6]]))
+)
+loss_data <- subset(loss_data,
+                    year >= 1986 & year <= 2024 &
+                      complete.cases(loss_data))
+
+Credit_spds <- merge(spread_data, loss_data, by = "year", all = FALSE)
+stopifnot(nrow(Credit_spds) == 39,
+          !anyDuplicated(Credit_spds$year),
+          all(Credit_spds$HQM_TNC_spd > 0),
+          all(Credit_spds$default_intensity_pct >= 0))
 
 RR <- .6
-lambda       <- (0.5*Credit_spds$Investment.grade.default.rate + 0.5*Credit_spds$Default.rate)/100
-spd_BBB_AAA  <- Credit_spds$BBB_AAA_spd/100
+lambda       <- Credit_spds$default_intensity_pct/100
+spd_HQM_TNC  <- Credit_spds$HQM_TNC_spd/100
+stopifnot(max(abs(lambda*(1-RR) - Credit_spds$expected_loss_bp/10000)) < 1e-10)
 
-# Spread's maturity:
+# The observed spread and model bond both have a 20-year maturity.
 H <- 20
 
 make_models <- function(param){
@@ -86,25 +113,25 @@ loss4optim <- function(param){
   a_spd <- matrix(bond_prices$a[,e,H],ncol=1)
   
   # Compute x to have a perfect fit of spreads:
-  x <- (spd_BBB_AAA - b_spd - a_spd[2]*lambda)/a_spd[1]
+  x <- (spd_HQM_TNC - b_spd - a_spd[2]*lambda)/a_spd[1]
   
   # Moments:
   mean_Y <- compute_uncondmean_VARG(model)
   Var_Y  <- compute_uncondvar_VARG(model)
   
   # Penalize negative x values:
-  penalty_neg_x <- 10000000*sum(abs(x[x<0]))
+  penalty_neg_x <- 10000000000*sum(abs(x[x<0]))
   
   # Penalty for distance between empirical and model-implied means:
   penalty_mean_distance_lambda <- 1000000000*abs(mean_Y[2] - mean(lambda))
   
   # penalty for average spread:
   avg_spd <- b_spd + sum(a_spd*mean_Y)
-  penalty_mean_spd <- 1000000000*abs(avg_spd - mean(spd_BBB_AAA))
+  penalty_mean_spd <- 1000000000*abs(avg_spd - mean(spd_HQM_TNC))
   
   # penalty for stdv of spreads:
   stdv_spd <- sqrt(t(a_spd) %*% Var_Y %*% a_spd)
-  penalty_var_spd <- 10000*abs(stdv_spd - sd(spd_BBB_AAA))
+  penalty_var_spd <- 10000*abs(stdv_spd - sd(spd_HQM_TNC))
   
   # penalty for stdv of lambda:
   a_lambda <- matrix(c(0,1),ncol=1)
@@ -116,7 +143,7 @@ loss4optim <- function(param){
                      cbind(Var_Y%*%t(Phi_Y),Var_Y))
   
   # penalty for autocorrelation of lambda:
-  T <- length(spd_BBB_AAA)
+  T <- length(spd_HQM_TNC)
   Autocor_lambda <- cor(lambda[2:T],lambda[1:(T-1)])
   a1 <- rbind(a_lambda,0*a_lambda)
   a2 <- rbind(0*a_lambda,a_lambda)
@@ -125,7 +152,7 @@ loss4optim <- function(param){
   penalty_AC_lambda <- 1000*abs(AC_lambda_model - Autocor_lambda)
   
   # penalty for autocorrelation of spd:
-  Autocor_spd <- cor(spd_BBB_AAA[2:T],spd_BBB_AAA[1:(T-1)])
+  Autocor_spd <- cor(spd_HQM_TNC[2:T],spd_HQM_TNC[1:(T-1)])
   a1 <- rbind(a_spd,0*a_spd)
   a2 <- rbind(0*a_spd,a_spd)
   cov_spd_spd_1 <- t(a1) %*% Var_Y_Y_1 %*% a2
@@ -178,7 +205,7 @@ bond_prices <- compute_AB_classical(xi0=xi0, xi1=xi1,
 k <- 2 # k=1 is for the risk-free yield
 b_spd <- bond_prices$b[1,k,H]
 a_spd <- matrix(bond_prices$a[,k,H],ncol=1)
-x <- (spd_BBB_AAA - b_spd - a_spd[2]*lambda)/a_spd[1]
+x <- (spd_HQM_TNC - b_spd - a_spd[2]*lambda)/a_spd[1]
 Y <- cbind(x,lambda)
 
 # Calculate Physical probabilities of default:
@@ -208,26 +235,25 @@ PD_Q_H2 <- 1 - exp(surviv_proba_Q$B[1,e,H2] + Y %*% surviv_proba_Q$A[,e,H2])
 par(mfrow=c(3,1))
 par(plt=c(.1,.95,.2,.85))
 
-plot(Credit_spds$year,Credit_spds$Default.rate/100,
-     ylim=c(0,5),col="white",
+plot(Credit_spds$year,Credit_spds$default_intensity_pct,
+     ylim=c(0,1.2*max(c(Credit_spds$default_intensity_pct,
+                        Credit_spds$HQM_TNC_spd))),col="white",
      xlab="",ylab="in percent",las=1,
-     main=expression(paste("(a) Default rate and credit spread",sep="")))
+     main=expression(paste("(a) Default-intensity indicator and 20-year credit spread",sep="")))
 grid()
-lines(Credit_spds$year,Credit_spds$Default.rate,lwd=2,lty=2)
-lines(Credit_spds$year,Credit_spds$Investment.grade.default.rate,lwd=2,lty=1)
-lines(Credit_spds$year,Credit_spds$BBB_AAA_spd,col="dark grey",type="b",lwd=2)
+lines(Credit_spds$year,Credit_spds$default_intensity_pct,lwd=2,lty=2)
+lines(Credit_spds$year,Credit_spds$HQM_TNC_spd,col="dark grey",type="b",lwd=2)
 
 legend("topleft",
-       legend=c(expression(paste("Default rate (average)",sep="")),
-                expression(paste("Default rate (investment grade)",sep="")),
-                expression(paste("Credit spread",sep=""))),
-       lty=c(2,1,NaN),
-       pch=c(NaN,NaN,1),
-       col=c("black","black","dark grey"),
+       legend=c(expression(paste("Default-intensity indicator",sep="")),
+                expression(paste("20Y HQM-TNC spread",sep=""))),
+       lty=c(2,NaN),
+       pch=c(NaN,1),
+       col=c("black","dark grey"),
        lwd = 2,bty = "n",seg.len = 3)
 
 plot(Credit_spds$year,100*lambda,
-     ylim=c(0,3),col="white",
+     ylim=c(0,1.2*max(c(100*lambda,100*x))),col="white",
      xlab="",ylab="in percent",las=1,
      main=expression(paste("(b) Factors ",x[t]," and ",lambda[t],sep="")))
 grid()
@@ -241,7 +267,7 @@ legend("topleft",
        col=c("dark grey","black"),
        lwd = 2,bty = "n")
 
-plot(Credit_spds$year,Credit_spds$Default.rate/100,
+plot(Credit_spds$year,100*lambda,
      ylim=c(0,120*max(PD_Q_H2)),col="white",
      xlab="",ylab="in percent",las=1,
      main=expression(paste("(c) Physical and risk-neutral probabilities of default (PD)",sep="")))
@@ -259,9 +285,6 @@ legend("topleft",
        lty=c(1,3,1,3),
        col=c("black","black","dark grey","dark grey"),
        lwd = 2,bty = "n",seg.len = 3)
-
-}
-
 ```
 
 

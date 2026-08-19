@@ -197,6 +197,7 @@ par(op)
 ## Treasury issuance and outstanding debt by maturity
 
 This example documents the maturity composition of Treasury issuance and the stock of debt outstanding.
+The source workbook is available from [SIFMA's U.S. Fixed Income Securities Statistics page](https://www.sifma.org/research/statistics/us-fixed-income-securities-statistics). The workbook identifies the underlying sources for the series used here as the U.S. Department of the Treasury and the Bureau of the Fiscal Service.
 
 ```{r SIFMA, fig.width = 10, fig.height = 5}
 # Purpose: This example documents the maturity composition of Treasury issuance and the stock of
