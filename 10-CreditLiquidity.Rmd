@@ -4,7 +4,7 @@
 
 This example compares standard structural and reduced-form views of credit spreads. The empirical illustration combines a maturity-matched 20-year corporate credit spread with a rescaled business-loan loss indicator. The spread is the difference between the U.S. Treasury's 20-year High Quality Market (HQM) corporate spot rate and its 20-year Treasury Nominal Coupon-Issue (TNC) spot rate; the source workbooks and methodology are available from the [HQM](https://home.treasury.gov/data/treasury-coupon-issues-and-corporate-bond-yield-curve/corporate-bond-yield-curve) and [TNC](https://home.treasury.gov/data/treasury-coupon-issues-and-corporate-bond-yield-curves/treasury-coupon-issues) yield-curve pages. The credit-loss indicator uses the Federal Reserve Board's [business-loan charge-off rate](https://www.federalreserve.gov/releases/chargeoff/), rescaled so that its average expected loss corresponds to high-quality U.S. corporate bonds [@AmatoRemolona2003].^[We first average the quarterly charge-off rates within each calendar year and normalize the resulting series by its 1986--2024 mean. Amato and Remolona [-@AmatoRemolona2003, Table 1] report expected losses of 0.61, 2.70, and 7.32 basis points for AAA-, AA-, and A-rated bonds in their longest maturity bucket. We use their equal-weight average, 3.54 basis points, and map expected loss into the physical default intensity using the recovery rate assumed below. The companion workbook records the source observations and each transformation.]
 
-```{r fig_standardCredit1, fig.width=5.5, fig.height=7}
+```{r fig_standardCreditFedLoss, fig.width=5.5, fig.height=7}
 # Purpose: This example compares standard structural and reduced-form views of credit spreads
 library(DTAM)
 
