@@ -23,7 +23,7 @@
 <meta name="author" content="Jean-Paul Renne, Alain Monfort, Fulvio Pegoraro, and Guillaume Roussellet" />
 
 
-<meta name="date" content="2026-07-09" />
+<meta name="date" content="2026-08-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -122,6 +122,29 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <style type="text/css">
   
   div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
 </style>
 
 <link rel="stylesheet" href="style.css" type="text/css" />
@@ -350,105 +373,109 @@ variables on the first three principal components of the yield curve. The exerci
 is deliberately descriptive: low <span class="math inline">\(R^2\)</span> values do not, by themselves, reject a
 structural term-structure model, but they show why empirical work often introduces
 unspanned macroeconomic variables.</p>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="GATSM.html#cb53-1" tabindex="-1"></a><span class="co"># Purpose: This example checks how much macroeconomic variation is spanned by</span></span>
-<span id="cb53-2"><a href="GATSM.html#cb53-2" tabindex="-1"></a><span class="co"># the first three empirical yield-curve principal components in the U.S. and euro area.</span></span>
-<span id="cb53-3"><a href="GATSM.html#cb53-3" tabindex="-1"></a><span class="fu">library</span>(DTAM)</span>
-<span id="cb53-4"><a href="GATSM.html#cb53-4" tabindex="-1"></a></span>
-<span id="cb53-5"><a href="GATSM.html#cb53-5" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;YC_US&quot;</span>, <span class="at">package =</span> <span class="st">&quot;DTAM&quot;</span>)</span>
-<span id="cb53-6"><a href="GATSM.html#cb53-6" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;YC_Euro&quot;</span>, <span class="at">package =</span> <span class="st">&quot;DTAM&quot;</span>)</span>
-<span id="cb53-7"><a href="GATSM.html#cb53-7" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;Data_Macro_US_quarterly&quot;</span>, <span class="at">package =</span> <span class="st">&quot;DTAM&quot;</span>)</span>
-<span id="cb53-8"><a href="GATSM.html#cb53-8" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;Data_Macro_EA_quarterly&quot;</span>, <span class="at">package =</span> <span class="st">&quot;DTAM&quot;</span>)</span>
-<span id="cb53-9"><a href="GATSM.html#cb53-9" tabindex="-1"></a></span>
-<span id="cb53-10"><a href="GATSM.html#cb53-10" tabindex="-1"></a>quarter_id <span class="ot">&lt;-</span> <span class="cf">function</span>(d) {</span>
-<span id="cb53-11"><a href="GATSM.html#cb53-11" tabindex="-1"></a>  <span class="fu">paste0</span>(<span class="fu">format</span>(d, <span class="st">&quot;%Y&quot;</span>), <span class="st">&quot;Q&quot;</span>, ((<span class="fu">as.integer</span>(<span class="fu">format</span>(d, <span class="st">&quot;%m&quot;</span>)) <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">%/%</span> <span class="dv">3</span>) <span class="sc">+</span> <span class="dv">1</span>)</span>
-<span id="cb53-12"><a href="GATSM.html#cb53-12" tabindex="-1"></a>}</span>
-<span id="cb53-13"><a href="GATSM.html#cb53-13" tabindex="-1"></a></span>
-<span id="cb53-14"><a href="GATSM.html#cb53-14" tabindex="-1"></a>quarterly_average <span class="ot">&lt;-</span> <span class="cf">function</span>(x, yield_cols) {</span>
-<span id="cb53-15"><a href="GATSM.html#cb53-15" tabindex="-1"></a>  x<span class="sc">$</span>q <span class="ot">&lt;-</span> <span class="fu">quarter_id</span>(<span class="fu">as.Date</span>(x<span class="sc">$</span>date))</span>
-<span id="cb53-16"><a href="GATSM.html#cb53-16" tabindex="-1"></a>  out <span class="ot">&lt;-</span> <span class="fu">aggregate</span>(x[, yield_cols], <span class="fu">list</span>(<span class="at">q =</span> x<span class="sc">$</span>q), mean, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb53-17"><a href="GATSM.html#cb53-17" tabindex="-1"></a>  <span class="cf">for</span> (cc <span class="cf">in</span> yield_cols) {</span>
-<span id="cb53-18"><a href="GATSM.html#cb53-18" tabindex="-1"></a>    out[[cc]][<span class="sc">!</span><span class="fu">is.finite</span>(out[[cc]])] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb53-19"><a href="GATSM.html#cb53-19" tabindex="-1"></a>  }</span>
-<span id="cb53-20"><a href="GATSM.html#cb53-20" tabindex="-1"></a>  out</span>
-<span id="cb53-21"><a href="GATSM.html#cb53-21" tabindex="-1"></a>}</span>
-<span id="cb53-22"><a href="GATSM.html#cb53-22" tabindex="-1"></a></span>
-<span id="cb53-23"><a href="GATSM.html#cb53-23" tabindex="-1"></a>pc_regressions <span class="ot">&lt;-</span> <span class="cf">function</span>(yields, macro, yield_cols, macro_vars, area) {</span>
-<span id="cb53-24"><a href="GATSM.html#cb53-24" tabindex="-1"></a>  yq <span class="ot">&lt;-</span> <span class="fu">quarterly_average</span>(yields[, <span class="fu">c</span>(<span class="st">&quot;date&quot;</span>, yield_cols)], yield_cols)</span>
-<span id="cb53-25"><a href="GATSM.html#cb53-25" tabindex="-1"></a>  dat <span class="ot">&lt;-</span> <span class="fu">merge</span>(macro[, <span class="fu">c</span>(<span class="st">&quot;q&quot;</span>, macro_vars)], yq, <span class="at">by =</span> <span class="st">&quot;q&quot;</span>)</span>
-<span id="cb53-26"><a href="GATSM.html#cb53-26" tabindex="-1"></a>  dat <span class="ot">&lt;-</span> dat[<span class="fu">complete.cases</span>(dat[, <span class="fu">c</span>(macro_vars, yield_cols)]), ]</span>
-<span id="cb53-27"><a href="GATSM.html#cb53-27" tabindex="-1"></a>  pcs <span class="ot">&lt;-</span> <span class="fu">prcomp</span>(dat[, yield_cols], <span class="at">center =</span> <span class="cn">TRUE</span>, <span class="at">scale. =</span> <span class="cn">TRUE</span>)<span class="sc">$</span>x[, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, drop <span class="ot">=</span> <span class="cn">FALSE</span>]</span>
-<span id="cb53-28"><a href="GATSM.html#cb53-28" tabindex="-1"></a></span>
-<span id="cb53-29"><a href="GATSM.html#cb53-29" tabindex="-1"></a>  out <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
-<span id="cb53-30"><a href="GATSM.html#cb53-30" tabindex="-1"></a>  <span class="cf">for</span> (m <span class="cf">in</span> macro_vars) {</span>
-<span id="cb53-31"><a href="GATSM.html#cb53-31" tabindex="-1"></a>    <span class="cf">for</span> (k <span class="cf">in</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>)) {</span>
-<span id="cb53-32"><a href="GATSM.html#cb53-32" tabindex="-1"></a>      fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(dat[[m]] <span class="sc">~</span> pcs[, <span class="dv">1</span><span class="sc">:</span>k])</span>
-<span id="cb53-33"><a href="GATSM.html#cb53-33" tabindex="-1"></a>      out <span class="ot">&lt;-</span> <span class="fu">rbind</span>(out, <span class="fu">data.frame</span>(</span>
-<span id="cb53-34"><a href="GATSM.html#cb53-34" tabindex="-1"></a>        <span class="at">area =</span> area,</span>
-<span id="cb53-35"><a href="GATSM.html#cb53-35" tabindex="-1"></a>        <span class="at">variable =</span> m,</span>
-<span id="cb53-36"><a href="GATSM.html#cb53-36" tabindex="-1"></a>        <span class="at">pcs =</span> k,</span>
-<span id="cb53-37"><a href="GATSM.html#cb53-37" tabindex="-1"></a>        <span class="at">r2 =</span> <span class="fu">summary</span>(fit)<span class="sc">$</span>r.squared,</span>
-<span id="cb53-38"><a href="GATSM.html#cb53-38" tabindex="-1"></a>        <span class="at">n =</span> <span class="fu">nrow</span>(dat),</span>
-<span id="cb53-39"><a href="GATSM.html#cb53-39" tabindex="-1"></a>        <span class="at">start =</span> dat<span class="sc">$</span>q[<span class="dv">1</span>],</span>
-<span id="cb53-40"><a href="GATSM.html#cb53-40" tabindex="-1"></a>        <span class="at">end =</span> <span class="fu">tail</span>(dat<span class="sc">$</span>q, <span class="dv">1</span>)</span>
-<span id="cb53-41"><a href="GATSM.html#cb53-41" tabindex="-1"></a>      ))</span>
-<span id="cb53-42"><a href="GATSM.html#cb53-42" tabindex="-1"></a>    }</span>
-<span id="cb53-43"><a href="GATSM.html#cb53-43" tabindex="-1"></a>  }</span>
-<span id="cb53-44"><a href="GATSM.html#cb53-44" tabindex="-1"></a>  out</span>
-<span id="cb53-45"><a href="GATSM.html#cb53-45" tabindex="-1"></a>}</span>
-<span id="cb53-46"><a href="GATSM.html#cb53-46" tabindex="-1"></a></span>
-<span id="cb53-47"><a href="GATSM.html#cb53-47" tabindex="-1"></a>macro_us <span class="ot">&lt;-</span> Data_Macro_US_quarterly</span>
-<span id="cb53-48"><a href="GATSM.html#cb53-48" tabindex="-1"></a>macro_us<span class="sc">$</span>q <span class="ot">&lt;-</span> <span class="fu">quarter_id</span>(macro_us<span class="sc">$</span>date)</span>
-<span id="cb53-49"><a href="GATSM.html#cb53-49" tabindex="-1"></a>macro_us<span class="sc">$</span>inflation <span class="ot">&lt;-</span> <span class="dv">400</span> <span class="sc">*</span> macro_us<span class="sc">$</span>pi</span>
-<span id="cb53-50"><a href="GATSM.html#cb53-50" tabindex="-1"></a>macro_us<span class="sc">$</span>gdp_growth <span class="ot">&lt;-</span> <span class="dv">400</span> <span class="sc">*</span> macro_us<span class="sc">$</span>dy</span>
-<span id="cb53-51"><a href="GATSM.html#cb53-51" tabindex="-1"></a></span>
-<span id="cb53-52"><a href="GATSM.html#cb53-52" tabindex="-1"></a>us_yields <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb53-53"><a href="GATSM.html#cb53-53" tabindex="-1"></a>  <span class="st">&quot;DTB3&quot;</span>, <span class="st">&quot;DTB6&quot;</span>, <span class="st">&quot;THREEFY1&quot;</span>, <span class="st">&quot;THREEFY2&quot;</span>, <span class="st">&quot;THREEFY3&quot;</span>, <span class="st">&quot;THREEFY4&quot;</span>,</span>
-<span id="cb53-54"><a href="GATSM.html#cb53-54" tabindex="-1"></a>  <span class="st">&quot;THREEFY5&quot;</span>, <span class="st">&quot;THREEFY6&quot;</span>, <span class="st">&quot;THREEFY7&quot;</span>, <span class="st">&quot;THREEFY8&quot;</span>, <span class="st">&quot;THREEFY9&quot;</span>, <span class="st">&quot;THREEFY10&quot;</span></span>
-<span id="cb53-55"><a href="GATSM.html#cb53-55" tabindex="-1"></a>)</span>
-<span id="cb53-56"><a href="GATSM.html#cb53-56" tabindex="-1"></a></span>
-<span id="cb53-57"><a href="GATSM.html#cb53-57" tabindex="-1"></a>macro_ea <span class="ot">&lt;-</span> Data_Macro_EA_quarterly</span>
-<span id="cb53-58"><a href="GATSM.html#cb53-58" tabindex="-1"></a>macro_ea<span class="sc">$</span>inflation <span class="ot">&lt;-</span> <span class="dv">400</span> <span class="sc">*</span> macro_ea<span class="sc">$</span>pi</span>
-<span id="cb53-59"><a href="GATSM.html#cb53-59" tabindex="-1"></a>macro_ea<span class="sc">$</span>gdp_growth <span class="ot">&lt;-</span> <span class="dv">400</span> <span class="sc">*</span> macro_ea<span class="sc">$</span>dy</span>
-<span id="cb53-60"><a href="GATSM.html#cb53-60" tabindex="-1"></a></span>
-<span id="cb53-61"><a href="GATSM.html#cb53-61" tabindex="-1"></a>ea_yields <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;Y&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>)</span>
-<span id="cb53-62"><a href="GATSM.html#cb53-62" tabindex="-1"></a></span>
-<span id="cb53-63"><a href="GATSM.html#cb53-63" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
-<span id="cb53-64"><a href="GATSM.html#cb53-64" tabindex="-1"></a>  <span class="fu">pc_regressions</span>(YC_US, macro_us, us_yields,</span>
-<span id="cb53-65"><a href="GATSM.html#cb53-65" tabindex="-1"></a>                 <span class="fu">c</span>(<span class="st">&quot;inflation&quot;</span>, <span class="st">&quot;gdp_growth&quot;</span>), <span class="st">&quot;United States&quot;</span>),</span>
-<span id="cb53-66"><a href="GATSM.html#cb53-66" tabindex="-1"></a>  <span class="fu">pc_regressions</span>(YC_Euro, macro_ea, ea_yields,</span>
-<span id="cb53-67"><a href="GATSM.html#cb53-67" tabindex="-1"></a>                 <span class="fu">c</span>(<span class="st">&quot;inflation&quot;</span>, <span class="st">&quot;gdp_growth&quot;</span>), <span class="st">&quot;Euro area&quot;</span>)</span>
-<span id="cb53-68"><a href="GATSM.html#cb53-68" tabindex="-1"></a>)</span>
-<span id="cb53-69"><a href="GATSM.html#cb53-69" tabindex="-1"></a></span>
-<span id="cb53-70"><a href="GATSM.html#cb53-70" tabindex="-1"></a>results<span class="sc">$</span>variable_label <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(results<span class="sc">$</span>variable <span class="sc">==</span> <span class="st">&quot;inflation&quot;</span>, <span class="st">&quot;Inflation&quot;</span>, <span class="st">&quot;GDP growth&quot;</span>)</span>
-<span id="cb53-71"><a href="GATSM.html#cb53-71" tabindex="-1"></a>results<span class="sc">$</span>area_var <span class="ot">&lt;-</span> <span class="fu">paste</span>(results<span class="sc">$</span>area, results<span class="sc">$</span>variable_label, <span class="at">sep =</span> <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb53-72"><a href="GATSM.html#cb53-72" tabindex="-1"></a></span>
-<span id="cb53-73"><a href="GATSM.html#cb53-73" tabindex="-1"></a>plot_dat <span class="ot">&lt;-</span> <span class="fu">subset</span>(results, pcs <span class="sc">==</span> <span class="dv">3</span>)</span>
-<span id="cb53-74"><a href="GATSM.html#cb53-74" tabindex="-1"></a>plot_dat <span class="ot">&lt;-</span> plot_dat[<span class="fu">match</span>(</span>
-<span id="cb53-75"><a href="GATSM.html#cb53-75" tabindex="-1"></a>  <span class="fu">c</span>(<span class="st">&quot;United States</span><span class="sc">\n</span><span class="st">Inflation&quot;</span>, <span class="st">&quot;United States</span><span class="sc">\n</span><span class="st">GDP growth&quot;</span>,</span>
-<span id="cb53-76"><a href="GATSM.html#cb53-76" tabindex="-1"></a>    <span class="st">&quot;Euro area</span><span class="sc">\n</span><span class="st">Inflation&quot;</span>, <span class="st">&quot;Euro area</span><span class="sc">\n</span><span class="st">GDP growth&quot;</span>),</span>
-<span id="cb53-77"><a href="GATSM.html#cb53-77" tabindex="-1"></a>  plot_dat<span class="sc">$</span>area_var</span>
-<span id="cb53-78"><a href="GATSM.html#cb53-78" tabindex="-1"></a>), ]</span>
-<span id="cb53-79"><a href="GATSM.html#cb53-79" tabindex="-1"></a></span>
-<span id="cb53-80"><a href="GATSM.html#cb53-80" tabindex="-1"></a>op <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">4.8</span>, <span class="fl">4.5</span>, <span class="fl">1.2</span>, <span class="fl">0.8</span>), <span class="at">las =</span> <span class="dv">1</span>)</span>
-<span id="cb53-81"><a href="GATSM.html#cb53-81" tabindex="-1"></a>bp <span class="ot">&lt;-</span> <span class="fu">barplot</span>(</span>
-<span id="cb53-82"><a href="GATSM.html#cb53-82" tabindex="-1"></a>  <span class="dv">100</span> <span class="sc">*</span> plot_dat<span class="sc">$</span>r2,</span>
-<span id="cb53-83"><a href="GATSM.html#cb53-83" tabindex="-1"></a>  <span class="at">names.arg =</span> plot_dat<span class="sc">$</span>area_var,</span>
-<span id="cb53-84"><a href="GATSM.html#cb53-84" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;grey20&quot;</span>, <span class="st">&quot;grey65&quot;</span>, <span class="st">&quot;grey35&quot;</span>, <span class="st">&quot;grey75&quot;</span>),</span>
-<span id="cb53-85"><a href="GATSM.html#cb53-85" tabindex="-1"></a>  <span class="at">border =</span> <span class="cn">NA</span>,</span>
-<span id="cb53-86"><a href="GATSM.html#cb53-86" tabindex="-1"></a>  <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">20</span>),</span>
-<span id="cb53-87"><a href="GATSM.html#cb53-87" tabindex="-1"></a>  <span class="at">ylab =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;Regression &quot;</span>, R<span class="sc">^</span><span class="dv">2</span>, <span class="st">&quot; (%)&quot;</span>)),</span>
-<span id="cb53-88"><a href="GATSM.html#cb53-88" tabindex="-1"></a>  <span class="at">cex.names =</span> <span class="fl">0.82</span></span>
-<span id="cb53-89"><a href="GATSM.html#cb53-89" tabindex="-1"></a>)</span>
-<span id="cb53-90"><a href="GATSM.html#cb53-90" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">2</span>, <span class="at">las =</span> <span class="dv">1</span>)</span>
-<span id="cb53-91"><a href="GATSM.html#cb53-91" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">20</span>, <span class="dv">5</span>), <span class="at">col =</span> <span class="st">&quot;grey88&quot;</span>, <span class="at">lwd =</span> <span class="fl">0.7</span>)</span>
-<span id="cb53-92"><a href="GATSM.html#cb53-92" tabindex="-1"></a><span class="fu">box</span>(<span class="at">bty =</span> <span class="st">&quot;l&quot;</span>)</span>
-<span id="cb53-93"><a href="GATSM.html#cb53-93" tabindex="-1"></a><span class="fu">text</span>(bp, <span class="dv">100</span> <span class="sc">*</span> plot_dat<span class="sc">$</span>r2 <span class="sc">+</span> <span class="fl">1.1</span>, <span class="fu">sprintf</span>(<span class="st">&quot;%.1f&quot;</span>, <span class="dv">100</span> <span class="sc">*</span> plot_dat<span class="sc">$</span>r2), <span class="at">cex =</span> <span class="fl">0.86</span>)</span>
-<span id="cb53-94"><a href="GATSM.html#cb53-94" tabindex="-1"></a><span class="fu">mtext</span>(<span class="st">&quot;Macro variables regressed on the first three yield principal components&quot;</span>,</span>
-<span id="cb53-95"><a href="GATSM.html#cb53-95" tabindex="-1"></a>      <span class="at">side =</span> <span class="dv">3</span>, <span class="at">line =</span> <span class="fl">0.1</span>, <span class="at">cex =</span> <span class="fl">0.95</span>)</span></code></pre></div>
+<p>The euro-area real GDP, HICP, and unemployment series are drawn from the March
+2026 vintage of the Updated Area-Wide Model Database. Its construction and
+updating methodology are documented by <span class="citation">İpek and Kısacıkoğlu (<a href="#ref-ipekKisacikoglu2026">2026</a>)</span>; the current
+vintage is distributed through the EABCN Area-Wide Model data page.</p>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="GATSM.html#cb56-1" tabindex="-1"></a><span class="co"># Purpose: This example checks how much macroeconomic variation is spanned by</span></span>
+<span id="cb56-2"><a href="GATSM.html#cb56-2" tabindex="-1"></a><span class="co"># the first three empirical yield-curve principal components in the U.S. and euro area.</span></span>
+<span id="cb56-3"><a href="GATSM.html#cb56-3" tabindex="-1"></a><span class="fu">library</span>(DTAM)</span>
+<span id="cb56-4"><a href="GATSM.html#cb56-4" tabindex="-1"></a></span>
+<span id="cb56-5"><a href="GATSM.html#cb56-5" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;YC_US&quot;</span>, <span class="at">package =</span> <span class="st">&quot;DTAM&quot;</span>)</span>
+<span id="cb56-6"><a href="GATSM.html#cb56-6" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;YC_Euro&quot;</span>, <span class="at">package =</span> <span class="st">&quot;DTAM&quot;</span>)</span>
+<span id="cb56-7"><a href="GATSM.html#cb56-7" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;Data_Macro_US_quarterly&quot;</span>, <span class="at">package =</span> <span class="st">&quot;DTAM&quot;</span>)</span>
+<span id="cb56-8"><a href="GATSM.html#cb56-8" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;Data_Macro_EA_quarterly&quot;</span>, <span class="at">package =</span> <span class="st">&quot;DTAM&quot;</span>)</span>
+<span id="cb56-9"><a href="GATSM.html#cb56-9" tabindex="-1"></a></span>
+<span id="cb56-10"><a href="GATSM.html#cb56-10" tabindex="-1"></a>quarter_id <span class="ot">&lt;-</span> <span class="cf">function</span>(d) {</span>
+<span id="cb56-11"><a href="GATSM.html#cb56-11" tabindex="-1"></a>  <span class="fu">paste0</span>(<span class="fu">format</span>(d, <span class="st">&quot;%Y&quot;</span>), <span class="st">&quot;Q&quot;</span>, ((<span class="fu">as.integer</span>(<span class="fu">format</span>(d, <span class="st">&quot;%m&quot;</span>)) <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">%/%</span> <span class="dv">3</span>) <span class="sc">+</span> <span class="dv">1</span>)</span>
+<span id="cb56-12"><a href="GATSM.html#cb56-12" tabindex="-1"></a>}</span>
+<span id="cb56-13"><a href="GATSM.html#cb56-13" tabindex="-1"></a></span>
+<span id="cb56-14"><a href="GATSM.html#cb56-14" tabindex="-1"></a>quarterly_average <span class="ot">&lt;-</span> <span class="cf">function</span>(x, yield_cols) {</span>
+<span id="cb56-15"><a href="GATSM.html#cb56-15" tabindex="-1"></a>  x<span class="sc">$</span>q <span class="ot">&lt;-</span> <span class="fu">quarter_id</span>(<span class="fu">as.Date</span>(x<span class="sc">$</span>date))</span>
+<span id="cb56-16"><a href="GATSM.html#cb56-16" tabindex="-1"></a>  out <span class="ot">&lt;-</span> <span class="fu">aggregate</span>(x[, yield_cols], <span class="fu">list</span>(<span class="at">q =</span> x<span class="sc">$</span>q), mean, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb56-17"><a href="GATSM.html#cb56-17" tabindex="-1"></a>  <span class="cf">for</span> (cc <span class="cf">in</span> yield_cols) {</span>
+<span id="cb56-18"><a href="GATSM.html#cb56-18" tabindex="-1"></a>    out[[cc]][<span class="sc">!</span><span class="fu">is.finite</span>(out[[cc]])] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb56-19"><a href="GATSM.html#cb56-19" tabindex="-1"></a>  }</span>
+<span id="cb56-20"><a href="GATSM.html#cb56-20" tabindex="-1"></a>  out</span>
+<span id="cb56-21"><a href="GATSM.html#cb56-21" tabindex="-1"></a>}</span>
+<span id="cb56-22"><a href="GATSM.html#cb56-22" tabindex="-1"></a></span>
+<span id="cb56-23"><a href="GATSM.html#cb56-23" tabindex="-1"></a>pc_regressions <span class="ot">&lt;-</span> <span class="cf">function</span>(yields, macro, yield_cols, macro_vars, area) {</span>
+<span id="cb56-24"><a href="GATSM.html#cb56-24" tabindex="-1"></a>  yq <span class="ot">&lt;-</span> <span class="fu">quarterly_average</span>(yields[, <span class="fu">c</span>(<span class="st">&quot;date&quot;</span>, yield_cols)], yield_cols)</span>
+<span id="cb56-25"><a href="GATSM.html#cb56-25" tabindex="-1"></a>  dat <span class="ot">&lt;-</span> <span class="fu">merge</span>(macro[, <span class="fu">c</span>(<span class="st">&quot;q&quot;</span>, macro_vars)], yq, <span class="at">by =</span> <span class="st">&quot;q&quot;</span>)</span>
+<span id="cb56-26"><a href="GATSM.html#cb56-26" tabindex="-1"></a>  dat <span class="ot">&lt;-</span> dat[<span class="fu">complete.cases</span>(dat[, <span class="fu">c</span>(macro_vars, yield_cols)]), ]</span>
+<span id="cb56-27"><a href="GATSM.html#cb56-27" tabindex="-1"></a>  pcs <span class="ot">&lt;-</span> <span class="fu">prcomp</span>(dat[, yield_cols], <span class="at">center =</span> <span class="cn">TRUE</span>, <span class="at">scale. =</span> <span class="cn">TRUE</span>)<span class="sc">$</span>x[, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, drop <span class="ot">=</span> <span class="cn">FALSE</span>]</span>
+<span id="cb56-28"><a href="GATSM.html#cb56-28" tabindex="-1"></a></span>
+<span id="cb56-29"><a href="GATSM.html#cb56-29" tabindex="-1"></a>  out <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
+<span id="cb56-30"><a href="GATSM.html#cb56-30" tabindex="-1"></a>  <span class="cf">for</span> (m <span class="cf">in</span> macro_vars) {</span>
+<span id="cb56-31"><a href="GATSM.html#cb56-31" tabindex="-1"></a>    <span class="cf">for</span> (k <span class="cf">in</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>)) {</span>
+<span id="cb56-32"><a href="GATSM.html#cb56-32" tabindex="-1"></a>      fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(dat[[m]] <span class="sc">~</span> pcs[, <span class="dv">1</span><span class="sc">:</span>k])</span>
+<span id="cb56-33"><a href="GATSM.html#cb56-33" tabindex="-1"></a>      out <span class="ot">&lt;-</span> <span class="fu">rbind</span>(out, <span class="fu">data.frame</span>(</span>
+<span id="cb56-34"><a href="GATSM.html#cb56-34" tabindex="-1"></a>        <span class="at">area =</span> area,</span>
+<span id="cb56-35"><a href="GATSM.html#cb56-35" tabindex="-1"></a>        <span class="at">variable =</span> m,</span>
+<span id="cb56-36"><a href="GATSM.html#cb56-36" tabindex="-1"></a>        <span class="at">pcs =</span> k,</span>
+<span id="cb56-37"><a href="GATSM.html#cb56-37" tabindex="-1"></a>        <span class="at">r2 =</span> <span class="fu">summary</span>(fit)<span class="sc">$</span>r.squared,</span>
+<span id="cb56-38"><a href="GATSM.html#cb56-38" tabindex="-1"></a>        <span class="at">n =</span> <span class="fu">nrow</span>(dat),</span>
+<span id="cb56-39"><a href="GATSM.html#cb56-39" tabindex="-1"></a>        <span class="at">start =</span> dat<span class="sc">$</span>q[<span class="dv">1</span>],</span>
+<span id="cb56-40"><a href="GATSM.html#cb56-40" tabindex="-1"></a>        <span class="at">end =</span> <span class="fu">tail</span>(dat<span class="sc">$</span>q, <span class="dv">1</span>)</span>
+<span id="cb56-41"><a href="GATSM.html#cb56-41" tabindex="-1"></a>      ))</span>
+<span id="cb56-42"><a href="GATSM.html#cb56-42" tabindex="-1"></a>    }</span>
+<span id="cb56-43"><a href="GATSM.html#cb56-43" tabindex="-1"></a>  }</span>
+<span id="cb56-44"><a href="GATSM.html#cb56-44" tabindex="-1"></a>  out</span>
+<span id="cb56-45"><a href="GATSM.html#cb56-45" tabindex="-1"></a>}</span>
+<span id="cb56-46"><a href="GATSM.html#cb56-46" tabindex="-1"></a></span>
+<span id="cb56-47"><a href="GATSM.html#cb56-47" tabindex="-1"></a>macro_us <span class="ot">&lt;-</span> Data_Macro_US_quarterly</span>
+<span id="cb56-48"><a href="GATSM.html#cb56-48" tabindex="-1"></a>macro_us<span class="sc">$</span>q <span class="ot">&lt;-</span> <span class="fu">quarter_id</span>(macro_us<span class="sc">$</span>date)</span>
+<span id="cb56-49"><a href="GATSM.html#cb56-49" tabindex="-1"></a>macro_us<span class="sc">$</span>inflation <span class="ot">&lt;-</span> <span class="dv">400</span> <span class="sc">*</span> macro_us<span class="sc">$</span>pi</span>
+<span id="cb56-50"><a href="GATSM.html#cb56-50" tabindex="-1"></a>macro_us<span class="sc">$</span>gdp_growth <span class="ot">&lt;-</span> <span class="dv">400</span> <span class="sc">*</span> macro_us<span class="sc">$</span>dy</span>
+<span id="cb56-51"><a href="GATSM.html#cb56-51" tabindex="-1"></a></span>
+<span id="cb56-52"><a href="GATSM.html#cb56-52" tabindex="-1"></a>us_yields <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb56-53"><a href="GATSM.html#cb56-53" tabindex="-1"></a>  <span class="st">&quot;DTB3&quot;</span>, <span class="st">&quot;DTB6&quot;</span>, <span class="st">&quot;THREEFY1&quot;</span>, <span class="st">&quot;THREEFY2&quot;</span>, <span class="st">&quot;THREEFY3&quot;</span>, <span class="st">&quot;THREEFY4&quot;</span>,</span>
+<span id="cb56-54"><a href="GATSM.html#cb56-54" tabindex="-1"></a>  <span class="st">&quot;THREEFY5&quot;</span>, <span class="st">&quot;THREEFY6&quot;</span>, <span class="st">&quot;THREEFY7&quot;</span>, <span class="st">&quot;THREEFY8&quot;</span>, <span class="st">&quot;THREEFY9&quot;</span>, <span class="st">&quot;THREEFY10&quot;</span></span>
+<span id="cb56-55"><a href="GATSM.html#cb56-55" tabindex="-1"></a>)</span>
+<span id="cb56-56"><a href="GATSM.html#cb56-56" tabindex="-1"></a></span>
+<span id="cb56-57"><a href="GATSM.html#cb56-57" tabindex="-1"></a>macro_ea <span class="ot">&lt;-</span> Data_Macro_EA_quarterly</span>
+<span id="cb56-58"><a href="GATSM.html#cb56-58" tabindex="-1"></a>macro_ea<span class="sc">$</span>inflation <span class="ot">&lt;-</span> <span class="dv">400</span> <span class="sc">*</span> macro_ea<span class="sc">$</span>pi</span>
+<span id="cb56-59"><a href="GATSM.html#cb56-59" tabindex="-1"></a>macro_ea<span class="sc">$</span>gdp_growth <span class="ot">&lt;-</span> <span class="dv">400</span> <span class="sc">*</span> macro_ea<span class="sc">$</span>dy</span>
+<span id="cb56-60"><a href="GATSM.html#cb56-60" tabindex="-1"></a></span>
+<span id="cb56-61"><a href="GATSM.html#cb56-61" tabindex="-1"></a>ea_yields <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;Y&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>)</span>
+<span id="cb56-62"><a href="GATSM.html#cb56-62" tabindex="-1"></a></span>
+<span id="cb56-63"><a href="GATSM.html#cb56-63" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
+<span id="cb56-64"><a href="GATSM.html#cb56-64" tabindex="-1"></a>  <span class="fu">pc_regressions</span>(YC_US, macro_us, us_yields,</span>
+<span id="cb56-65"><a href="GATSM.html#cb56-65" tabindex="-1"></a>                 <span class="fu">c</span>(<span class="st">&quot;inflation&quot;</span>, <span class="st">&quot;gdp_growth&quot;</span>), <span class="st">&quot;United States&quot;</span>),</span>
+<span id="cb56-66"><a href="GATSM.html#cb56-66" tabindex="-1"></a>  <span class="fu">pc_regressions</span>(YC_Euro, macro_ea, ea_yields,</span>
+<span id="cb56-67"><a href="GATSM.html#cb56-67" tabindex="-1"></a>                 <span class="fu">c</span>(<span class="st">&quot;inflation&quot;</span>, <span class="st">&quot;gdp_growth&quot;</span>), <span class="st">&quot;Euro area&quot;</span>)</span>
+<span id="cb56-68"><a href="GATSM.html#cb56-68" tabindex="-1"></a>)</span>
+<span id="cb56-69"><a href="GATSM.html#cb56-69" tabindex="-1"></a></span>
+<span id="cb56-70"><a href="GATSM.html#cb56-70" tabindex="-1"></a>results<span class="sc">$</span>variable_label <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(results<span class="sc">$</span>variable <span class="sc">==</span> <span class="st">&quot;inflation&quot;</span>, <span class="st">&quot;Inflation&quot;</span>, <span class="st">&quot;GDP growth&quot;</span>)</span>
+<span id="cb56-71"><a href="GATSM.html#cb56-71" tabindex="-1"></a>results<span class="sc">$</span>area_var <span class="ot">&lt;-</span> <span class="fu">paste</span>(results<span class="sc">$</span>area, results<span class="sc">$</span>variable_label, <span class="at">sep =</span> <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb56-72"><a href="GATSM.html#cb56-72" tabindex="-1"></a></span>
+<span id="cb56-73"><a href="GATSM.html#cb56-73" tabindex="-1"></a>plot_dat <span class="ot">&lt;-</span> <span class="fu">subset</span>(results, pcs <span class="sc">==</span> <span class="dv">3</span>)</span>
+<span id="cb56-74"><a href="GATSM.html#cb56-74" tabindex="-1"></a>plot_dat <span class="ot">&lt;-</span> plot_dat[<span class="fu">match</span>(</span>
+<span id="cb56-75"><a href="GATSM.html#cb56-75" tabindex="-1"></a>  <span class="fu">c</span>(<span class="st">&quot;United States</span><span class="sc">\n</span><span class="st">Inflation&quot;</span>, <span class="st">&quot;United States</span><span class="sc">\n</span><span class="st">GDP growth&quot;</span>,</span>
+<span id="cb56-76"><a href="GATSM.html#cb56-76" tabindex="-1"></a>    <span class="st">&quot;Euro area</span><span class="sc">\n</span><span class="st">Inflation&quot;</span>, <span class="st">&quot;Euro area</span><span class="sc">\n</span><span class="st">GDP growth&quot;</span>),</span>
+<span id="cb56-77"><a href="GATSM.html#cb56-77" tabindex="-1"></a>  plot_dat<span class="sc">$</span>area_var</span>
+<span id="cb56-78"><a href="GATSM.html#cb56-78" tabindex="-1"></a>), ]</span>
+<span id="cb56-79"><a href="GATSM.html#cb56-79" tabindex="-1"></a></span>
+<span id="cb56-80"><a href="GATSM.html#cb56-80" tabindex="-1"></a>op <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">4.8</span>, <span class="fl">4.5</span>, <span class="fl">1.2</span>, <span class="fl">0.8</span>), <span class="at">las =</span> <span class="dv">1</span>)</span>
+<span id="cb56-81"><a href="GATSM.html#cb56-81" tabindex="-1"></a>bp <span class="ot">&lt;-</span> <span class="fu">barplot</span>(</span>
+<span id="cb56-82"><a href="GATSM.html#cb56-82" tabindex="-1"></a>  <span class="dv">100</span> <span class="sc">*</span> plot_dat<span class="sc">$</span>r2,</span>
+<span id="cb56-83"><a href="GATSM.html#cb56-83" tabindex="-1"></a>  <span class="at">names.arg =</span> plot_dat<span class="sc">$</span>area_var,</span>
+<span id="cb56-84"><a href="GATSM.html#cb56-84" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;grey20&quot;</span>, <span class="st">&quot;grey65&quot;</span>, <span class="st">&quot;grey35&quot;</span>, <span class="st">&quot;grey75&quot;</span>),</span>
+<span id="cb56-85"><a href="GATSM.html#cb56-85" tabindex="-1"></a>  <span class="at">border =</span> <span class="cn">NA</span>,</span>
+<span id="cb56-86"><a href="GATSM.html#cb56-86" tabindex="-1"></a>  <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">20</span>),</span>
+<span id="cb56-87"><a href="GATSM.html#cb56-87" tabindex="-1"></a>  <span class="at">ylab =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;Regression &quot;</span>, R<span class="sc">^</span><span class="dv">2</span>, <span class="st">&quot; (%)&quot;</span>)),</span>
+<span id="cb56-88"><a href="GATSM.html#cb56-88" tabindex="-1"></a>  <span class="at">cex.names =</span> <span class="fl">0.82</span></span>
+<span id="cb56-89"><a href="GATSM.html#cb56-89" tabindex="-1"></a>)</span>
+<span id="cb56-90"><a href="GATSM.html#cb56-90" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">2</span>, <span class="at">las =</span> <span class="dv">1</span>)</span>
+<span id="cb56-91"><a href="GATSM.html#cb56-91" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">20</span>, <span class="dv">5</span>), <span class="at">col =</span> <span class="st">&quot;grey88&quot;</span>, <span class="at">lwd =</span> <span class="fl">0.7</span>)</span>
+<span id="cb56-92"><a href="GATSM.html#cb56-92" tabindex="-1"></a><span class="fu">box</span>(<span class="at">bty =</span> <span class="st">&quot;l&quot;</span>)</span>
+<span id="cb56-93"><a href="GATSM.html#cb56-93" tabindex="-1"></a><span class="fu">text</span>(bp, <span class="dv">100</span> <span class="sc">*</span> plot_dat<span class="sc">$</span>r2 <span class="sc">+</span> <span class="fl">1.1</span>, <span class="fu">sprintf</span>(<span class="st">&quot;%.1f&quot;</span>, <span class="dv">100</span> <span class="sc">*</span> plot_dat<span class="sc">$</span>r2), <span class="at">cex =</span> <span class="fl">0.86</span>)</span>
+<span id="cb56-94"><a href="GATSM.html#cb56-94" tabindex="-1"></a><span class="fu">mtext</span>(<span class="st">&quot;Macro variables regressed on the first three yield principal components&quot;</span>,</span>
+<span id="cb56-95"><a href="GATSM.html#cb56-95" tabindex="-1"></a>      <span class="at">side =</span> <span class="dv">3</span>, <span class="at">line =</span> <span class="fl">0.1</span>, <span class="at">cex =</span> <span class="fl">0.95</span>)</span></code></pre></div>
 <p><img src="_main_files/figure-html/fig_GATSM_macro_spanning-1.png" width="691.2" /></p>
-<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="GATSM.html#cb54-1" tabindex="-1"></a><span class="fu">par</span>(op)</span>
-<span id="cb54-2"><a href="GATSM.html#cb54-2" tabindex="-1"></a></span>
-<span id="cb54-3"><a href="GATSM.html#cb54-3" tabindex="-1"></a><span class="fu">subset</span>(results, pcs <span class="sc">==</span> <span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="GATSM.html#cb57-1" tabindex="-1"></a><span class="fu">par</span>(op)</span>
+<span id="cb57-2"><a href="GATSM.html#cb57-2" tabindex="-1"></a></span>
+<span id="cb57-3"><a href="GATSM.html#cb57-3" tabindex="-1"></a><span class="fu">subset</span>(results, pcs <span class="sc">==</span> <span class="dv">3</span>)</span></code></pre></div>
 <pre><code>##             area   variable pcs         r2   n  start    end variable_label
 ## 2  United States  inflation   3 0.07256503 142 1990Q1 2025Q2      Inflation
 ## 5  United States gdp_growth   3 0.01189909 142 1990Q1 2025Q2     GDP growth
@@ -476,165 +503,165 @@ recover the model-implied term premia. The one-month yield in the same panel is
 used as the short rate, and the monthly maturity grid lets us construct
 one-month holding returns without interpolation. We estimate the model over the
 complete sample for which yields are available at all maturities up to 10 years.</p>
-<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="GATSM.html#cb56-1" tabindex="-1"></a><span class="co"># Purpose: This example estimates an ACM-style Gaussian affine model and plots</span></span>
-<span id="cb56-2"><a href="GATSM.html#cb56-2" tabindex="-1"></a><span class="co"># the resulting model-implied Treasury term premia.</span></span>
-<span id="cb56-3"><a href="GATSM.html#cb56-3" tabindex="-1"></a><span class="fu">library</span>(DTAM)</span>
-<span id="cb56-4"><a href="GATSM.html#cb56-4" tabindex="-1"></a></span>
-<span id="cb56-5"><a href="GATSM.html#cb56-5" tabindex="-1"></a>month_id <span class="ot">&lt;-</span> <span class="cf">function</span>(d) <span class="fu">format</span>(<span class="fu">as.Date</span>(d), <span class="st">&quot;%Y-%m&quot;</span>)</span>
-<span id="cb56-6"><a href="GATSM.html#cb56-6" tabindex="-1"></a></span>
-<span id="cb56-7"><a href="GATSM.html#cb56-7" tabindex="-1"></a>maturities <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">120</span></span>
-<span id="cb56-8"><a href="GATSM.html#cb56-8" tabindex="-1"></a>yield_cols <span class="ot">&lt;-</span> <span class="fu">sprintf</span>(<span class="st">&quot;yld_%dm&quot;</span>, maturities)</span>
-<span id="cb56-9"><a href="GATSM.html#cb56-9" tabindex="-1"></a>yields <span class="ot">&lt;-</span> YC_LW_FULL[, <span class="fu">c</span>(<span class="st">&quot;date&quot;</span>, yield_cols)]</span>
-<span id="cb56-10"><a href="GATSM.html#cb56-10" tabindex="-1"></a><span class="cf">for</span> (cc <span class="cf">in</span> yield_cols) {</span>
-<span id="cb56-11"><a href="GATSM.html#cb56-11" tabindex="-1"></a>  yields[[cc]][<span class="sc">!</span><span class="fu">is.finite</span>(yields[[cc]])] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb56-12"><a href="GATSM.html#cb56-12" tabindex="-1"></a>}</span>
-<span id="cb56-13"><a href="GATSM.html#cb56-13" tabindex="-1"></a></span>
-<span id="cb56-14"><a href="GATSM.html#cb56-14" tabindex="-1"></a>dat <span class="ot">&lt;-</span> yields[<span class="fu">complete.cases</span>(yields[, yield_cols]), ]</span>
-<span id="cb56-15"><a href="GATSM.html#cb56-15" tabindex="-1"></a>Y <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(dat[, yield_cols]) <span class="sc">/</span> <span class="dv">100</span></span>
-<span id="cb56-16"><a href="GATSM.html#cb56-16" tabindex="-1"></a>short_m <span class="ot">&lt;-</span> dat<span class="sc">$</span>yld_1m <span class="sc">/</span> <span class="dv">100</span> <span class="sc">/</span> <span class="dv">12</span></span>
-<span id="cb56-17"><a href="GATSM.html#cb56-17" tabindex="-1"></a>Tobs <span class="ot">&lt;-</span> <span class="fu">nrow</span>(Y)</span>
-<span id="cb56-18"><a href="GATSM.html#cb56-18" tabindex="-1"></a></span>
-<span id="cb56-19"><a href="GATSM.html#cb56-19" tabindex="-1"></a>pc <span class="ot">&lt;-</span> <span class="fu">prcomp</span>(Y, <span class="at">center =</span> <span class="cn">TRUE</span>, <span class="at">scale. =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb56-20"><a href="GATSM.html#cb56-20" tabindex="-1"></a>K <span class="ot">&lt;-</span> <span class="dv">5</span></span>
-<span id="cb56-21"><a href="GATSM.html#cb56-21" tabindex="-1"></a>X <span class="ot">&lt;-</span> pc<span class="sc">$</span>x[, <span class="dv">1</span><span class="sc">:</span>K, drop <span class="ot">=</span> <span class="cn">FALSE</span>]</span>
-<span id="cb56-22"><a href="GATSM.html#cb56-22" tabindex="-1"></a></span>
-<span id="cb56-23"><a href="GATSM.html#cb56-23" tabindex="-1"></a><span class="co"># Step 1: factor VAR.</span></span>
-<span id="cb56-24"><a href="GATSM.html#cb56-24" tabindex="-1"></a>X_lag <span class="ot">&lt;-</span> X[<span class="sc">-</span>Tobs, , drop <span class="ot">=</span> <span class="cn">FALSE</span>]</span>
-<span id="cb56-25"><a href="GATSM.html#cb56-25" tabindex="-1"></a>X_lead <span class="ot">&lt;-</span> X[<span class="sc">-</span><span class="dv">1</span>, , drop <span class="ot">=</span> <span class="cn">FALSE</span>]</span>
-<span id="cb56-26"><a href="GATSM.html#cb56-26" tabindex="-1"></a>var_fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(X_lead <span class="sc">~</span> X_lag)</span>
-<span id="cb56-27"><a href="GATSM.html#cb56-27" tabindex="-1"></a>mu <span class="ot">&lt;-</span> <span class="fu">coef</span>(var_fit)[<span class="dv">1</span>, ]</span>
-<span id="cb56-28"><a href="GATSM.html#cb56-28" tabindex="-1"></a>Phi <span class="ot">&lt;-</span> <span class="fu">t</span>(<span class="fu">coef</span>(var_fit)[<span class="sc">-</span><span class="dv">1</span>, , <span class="at">drop =</span> <span class="cn">FALSE</span>])</span>
-<span id="cb56-29"><a href="GATSM.html#cb56-29" tabindex="-1"></a>V <span class="ot">&lt;-</span> <span class="fu">residuals</span>(var_fit)</span>
-<span id="cb56-30"><a href="GATSM.html#cb56-30" tabindex="-1"></a>Sigma <span class="ot">&lt;-</span> <span class="fu">crossprod</span>(V) <span class="sc">/</span> <span class="fu">nrow</span>(V)</span>
-<span id="cb56-31"><a href="GATSM.html#cb56-31" tabindex="-1"></a></span>
-<span id="cb56-32"><a href="GATSM.html#cb56-32" tabindex="-1"></a><span class="co"># Step 2: one-month excess-return regressions.</span></span>
-<span id="cb56-33"><a href="GATSM.html#cb56-33" tabindex="-1"></a>ret_mats <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">24</span>, <span class="dv">120</span>, <span class="at">by =</span> <span class="dv">12</span>)</span>
-<span id="cb56-34"><a href="GATSM.html#cb56-34" tabindex="-1"></a>rx <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA_real_</span>, Tobs <span class="sc">-</span> <span class="dv">1</span>, <span class="fu">length</span>(ret_mats))</span>
-<span id="cb56-35"><a href="GATSM.html#cb56-35" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(ret_mats)) {</span>
-<span id="cb56-36"><a href="GATSM.html#cb56-36" tabindex="-1"></a>  n <span class="ot">&lt;-</span> ret_mats[i]</span>
-<span id="cb56-37"><a href="GATSM.html#cb56-37" tabindex="-1"></a>  p_t <span class="ot">&lt;-</span> <span class="sc">-</span>(n <span class="sc">/</span> <span class="dv">12</span>) <span class="sc">*</span> Y[<span class="sc">-</span>Tobs, n]</span>
-<span id="cb56-38"><a href="GATSM.html#cb56-38" tabindex="-1"></a>  p_next <span class="ot">&lt;-</span> <span class="sc">-</span>((n <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">/</span> <span class="dv">12</span>) <span class="sc">*</span> Y[<span class="sc">-</span><span class="dv">1</span>, n <span class="sc">-</span> <span class="dv">1</span>]</span>
-<span id="cb56-39"><a href="GATSM.html#cb56-39" tabindex="-1"></a>  rx[, i] <span class="ot">&lt;-</span> p_next <span class="sc">-</span> p_t <span class="sc">-</span> short_m[<span class="sc">-</span>Tobs]</span>
-<span id="cb56-40"><a href="GATSM.html#cb56-40" tabindex="-1"></a>}</span>
-<span id="cb56-41"><a href="GATSM.html#cb56-41" tabindex="-1"></a></span>
-<span id="cb56-42"><a href="GATSM.html#cb56-42" tabindex="-1"></a>Z <span class="ot">&lt;-</span> <span class="fu">cbind</span>(<span class="dv">1</span>, X_lag, V)</span>
-<span id="cb56-43"><a href="GATSM.html#cb56-43" tabindex="-1"></a>coef_rx <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA_real_</span>, <span class="fu">ncol</span>(Z), <span class="fu">length</span>(ret_mats))</span>
-<span id="cb56-44"><a href="GATSM.html#cb56-44" tabindex="-1"></a>resid_rx <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA_real_</span>, <span class="fu">nrow</span>(rx), <span class="fu">length</span>(ret_mats))</span>
-<span id="cb56-45"><a href="GATSM.html#cb56-45" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(ret_mats)) {</span>
-<span id="cb56-46"><a href="GATSM.html#cb56-46" tabindex="-1"></a>  fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(rx[, i] <span class="sc">~</span> Z[, <span class="sc">-</span><span class="dv">1</span>])</span>
-<span id="cb56-47"><a href="GATSM.html#cb56-47" tabindex="-1"></a>  coef_rx[, i] <span class="ot">&lt;-</span> <span class="fu">coef</span>(fit)</span>
-<span id="cb56-48"><a href="GATSM.html#cb56-48" tabindex="-1"></a>  resid_rx[, i] <span class="ot">&lt;-</span> <span class="fu">resid</span>(fit)</span>
-<span id="cb56-49"><a href="GATSM.html#cb56-49" tabindex="-1"></a>}</span>
-<span id="cb56-50"><a href="GATSM.html#cb56-50" tabindex="-1"></a></span>
-<span id="cb56-51"><a href="GATSM.html#cb56-51" tabindex="-1"></a>a <span class="ot">&lt;-</span> coef_rx[<span class="dv">1</span>, ]</span>
-<span id="cb56-52"><a href="GATSM.html#cb56-52" tabindex="-1"></a>D <span class="ot">&lt;-</span> <span class="fu">t</span>(coef_rx[<span class="dv">2</span><span class="sc">:</span>(K <span class="sc">+</span> <span class="dv">1</span>), , <span class="at">drop =</span> <span class="cn">FALSE</span>])</span>
-<span id="cb56-53"><a href="GATSM.html#cb56-53" tabindex="-1"></a>Beta <span class="ot">&lt;-</span> <span class="fu">t</span>(coef_rx[(K <span class="sc">+</span> <span class="dv">2</span>)<span class="sc">:</span>(<span class="dv">2</span> <span class="sc">*</span> K <span class="sc">+</span> <span class="dv">1</span>), , <span class="at">drop =</span> <span class="cn">FALSE</span>])</span>
-<span id="cb56-54"><a href="GATSM.html#cb56-54" tabindex="-1"></a>s2 <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(resid_rx<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb56-55"><a href="GATSM.html#cb56-55" tabindex="-1"></a>quad <span class="ot">&lt;-</span> <span class="fu">rowSums</span>((Beta <span class="sc">%*%</span> Sigma) <span class="sc">*</span> Beta)</span>
-<span id="cb56-56"><a href="GATSM.html#cb56-56" tabindex="-1"></a></span>
-<span id="cb56-57"><a href="GATSM.html#cb56-57" tabindex="-1"></a><span class="co"># Step 3: market prices of risk.</span></span>
-<span id="cb56-58"><a href="GATSM.html#cb56-58" tabindex="-1"></a>lambda0 <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(<span class="fu">solve</span>(<span class="fu">crossprod</span>(Beta), <span class="fu">crossprod</span>(Beta, a <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> (quad <span class="sc">+</span> s2))))</span>
-<span id="cb56-59"><a href="GATSM.html#cb56-59" tabindex="-1"></a>lambda1 <span class="ot">&lt;-</span> <span class="fu">solve</span>(<span class="fu">crossprod</span>(Beta), <span class="fu">crossprod</span>(Beta, D))</span>
-<span id="cb56-60"><a href="GATSM.html#cb56-60" tabindex="-1"></a></span>
-<span id="cb56-61"><a href="GATSM.html#cb56-61" tabindex="-1"></a>short_fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(short_m <span class="sc">~</span> X)</span>
-<span id="cb56-62"><a href="GATSM.html#cb56-62" tabindex="-1"></a>delta0 <span class="ot">&lt;-</span> <span class="fu">coef</span>(short_fit)[<span class="dv">1</span>]</span>
-<span id="cb56-63"><a href="GATSM.html#cb56-63" tabindex="-1"></a>delta1 <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(<span class="fu">coef</span>(short_fit)[<span class="sc">-</span><span class="dv">1</span>])</span>
-<span id="cb56-64"><a href="GATSM.html#cb56-64" tabindex="-1"></a></span>
-<span id="cb56-65"><a href="GATSM.html#cb56-65" tabindex="-1"></a>compute_yields <span class="ot">&lt;-</span> <span class="cf">function</span>(mu_use, Phi_use, <span class="at">H =</span> <span class="dv">120</span>) {</span>
-<span id="cb56-66"><a href="GATSM.html#cb56-66" tabindex="-1"></a>  ab <span class="ot">&lt;-</span> <span class="fu">compute_AB_classical</span>(</span>
-<span id="cb56-67"><a href="GATSM.html#cb56-67" tabindex="-1"></a>    <span class="at">xi0 =</span> delta0,</span>
-<span id="cb56-68"><a href="GATSM.html#cb56-68" tabindex="-1"></a>    <span class="at">xi1 =</span> <span class="fu">matrix</span>(delta1, <span class="at">ncol =</span> <span class="dv">1</span>),</span>
-<span id="cb56-69"><a href="GATSM.html#cb56-69" tabindex="-1"></a>    <span class="at">H =</span> H,</span>
-<span id="cb56-70"><a href="GATSM.html#cb56-70" tabindex="-1"></a>    <span class="at">psi =</span> psi_GaussianVAR,</span>
-<span id="cb56-71"><a href="GATSM.html#cb56-71" tabindex="-1"></a>    <span class="at">psi.parameterization =</span> <span class="fu">list</span>(</span>
-<span id="cb56-72"><a href="GATSM.html#cb56-72" tabindex="-1"></a>      <span class="at">mu =</span> <span class="fu">matrix</span>(mu_use, <span class="at">ncol =</span> <span class="dv">1</span>),</span>
-<span id="cb56-73"><a href="GATSM.html#cb56-73" tabindex="-1"></a>      <span class="at">Phi =</span> Phi_use,</span>
-<span id="cb56-74"><a href="GATSM.html#cb56-74" tabindex="-1"></a>      <span class="at">Sigma =</span> Sigma</span>
-<span id="cb56-75"><a href="GATSM.html#cb56-75" tabindex="-1"></a>    )</span>
-<span id="cb56-76"><a href="GATSM.html#cb56-76" tabindex="-1"></a>  )</span>
-<span id="cb56-77"><a href="GATSM.html#cb56-77" tabindex="-1"></a>  <span class="fu">sapply</span>(<span class="dv">1</span><span class="sc">:</span>H, <span class="cf">function</span>(h) {</span>
-<span id="cb56-78"><a href="GATSM.html#cb56-78" tabindex="-1"></a>    <span class="dv">12</span> <span class="sc">*</span> <span class="fu">as.vector</span>(ab<span class="sc">$</span>b[<span class="dv">1</span>, <span class="dv">1</span>, h] <span class="sc">+</span> X <span class="sc">%*%</span> ab<span class="sc">$</span>a[, <span class="dv">1</span>, h])</span>
-<span id="cb56-79"><a href="GATSM.html#cb56-79" tabindex="-1"></a>  })</span>
-<span id="cb56-80"><a href="GATSM.html#cb56-80" tabindex="-1"></a>}</span>
-<span id="cb56-81"><a href="GATSM.html#cb56-81" tabindex="-1"></a></span>
-<span id="cb56-82"><a href="GATSM.html#cb56-82" tabindex="-1"></a>yield_fit <span class="ot">&lt;-</span> <span class="fu">compute_yields</span>(mu <span class="sc">-</span> lambda0, Phi <span class="sc">-</span> lambda1, <span class="at">H =</span> <span class="dv">120</span>)</span>
-<span id="cb56-83"><a href="GATSM.html#cb56-83" tabindex="-1"></a>yield_eh <span class="ot">&lt;-</span> <span class="fu">compute_yields</span>(mu, Phi, <span class="at">H =</span> <span class="dv">120</span>)</span>
-<span id="cb56-84"><a href="GATSM.html#cb56-84" tabindex="-1"></a></span>
-<span id="cb56-85"><a href="GATSM.html#cb56-85" tabindex="-1"></a>horizons <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">24</span>, <span class="dv">60</span>, <span class="dv">120</span>)</span>
-<span id="cb56-86"><a href="GATSM.html#cb56-86" tabindex="-1"></a>tp_est <span class="ot">&lt;-</span> <span class="fu">sapply</span>(horizons, <span class="cf">function</span>(h) {</span>
-<span id="cb56-87"><a href="GATSM.html#cb56-87" tabindex="-1"></a>  <span class="dv">100</span> <span class="sc">*</span> (yield_fit[, h] <span class="sc">-</span> yield_eh[, h])</span>
-<span id="cb56-88"><a href="GATSM.html#cb56-88" tabindex="-1"></a>})</span>
-<span id="cb56-89"><a href="GATSM.html#cb56-89" tabindex="-1"></a><span class="fu">colnames</span>(tp_est) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;2-year&quot;</span>, <span class="st">&quot;5-year&quot;</span>, <span class="st">&quot;10-year&quot;</span>)</span>
-<span id="cb56-90"><a href="GATSM.html#cb56-90" tabindex="-1"></a></span>
-<span id="cb56-91"><a href="GATSM.html#cb56-91" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">date =</span> dat<span class="sc">$</span>date, tp_est)</span>
-<span id="cb56-92"><a href="GATSM.html#cb56-92" tabindex="-1"></a><span class="fu">names</span>(out)[<span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;TP2&quot;</span>, <span class="st">&quot;TP5&quot;</span>, <span class="st">&quot;TP10&quot;</span>)</span>
-<span id="cb56-93"><a href="GATSM.html#cb56-93" tabindex="-1"></a>out<span class="sc">$</span>m <span class="ot">&lt;-</span> <span class="fu">month_id</span>(out<span class="sc">$</span>date)</span>
-<span id="cb56-94"><a href="GATSM.html#cb56-94" tabindex="-1"></a></span>
-<span id="cb56-95"><a href="GATSM.html#cb56-95" tabindex="-1"></a>lambda_t <span class="ot">&lt;-</span> <span class="fu">sweep</span>(X <span class="sc">%*%</span> <span class="fu">t</span>(lambda1), <span class="dv">2</span>, lambda0, <span class="st">&quot;+&quot;</span>)</span>
-<span id="cb56-96"><a href="GATSM.html#cb56-96" tabindex="-1"></a>max_sr_monthly <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">exp</span>(<span class="fu">rowSums</span>((lambda_t <span class="sc">%*%</span> <span class="fu">solve</span>(Sigma)) <span class="sc">*</span> lambda_t)) <span class="sc">-</span> <span class="dv">1</span>)</span>
-<span id="cb56-97"><a href="GATSM.html#cb56-97" tabindex="-1"></a>out<span class="sc">$</span>MaxSR_annualized <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="dv">12</span>) <span class="sc">*</span> max_sr_monthly</span>
-<span id="cb56-98"><a href="GATSM.html#cb56-98" tabindex="-1"></a></span>
-<span id="cb56-99"><a href="GATSM.html#cb56-99" tabindex="-1"></a>op <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">1</span>), <span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">3.0</span>, <span class="fl">4.4</span>, <span class="fl">2.0</span>, <span class="fl">0.8</span>), <span class="at">las =</span> <span class="dv">1</span>)</span>
-<span id="cb56-100"><a href="GATSM.html#cb56-100" tabindex="-1"></a><span class="fu">matplot</span>(</span>
-<span id="cb56-101"><a href="GATSM.html#cb56-101" tabindex="-1"></a>  out<span class="sc">$</span>date,</span>
-<span id="cb56-102"><a href="GATSM.html#cb56-102" tabindex="-1"></a>  out[, <span class="fu">c</span>(<span class="st">&quot;TP2&quot;</span>, <span class="st">&quot;TP5&quot;</span>, <span class="st">&quot;TP10&quot;</span>)],</span>
-<span id="cb56-103"><a href="GATSM.html#cb56-103" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;n&quot;</span>,</span>
-<span id="cb56-104"><a href="GATSM.html#cb56-104" tabindex="-1"></a>  <span class="at">lty =</span> <span class="dv">1</span>,</span>
-<span id="cb56-105"><a href="GATSM.html#cb56-105" tabindex="-1"></a>  <span class="at">lwd =</span> <span class="fu">c</span>(<span class="fl">1.5</span>, <span class="fl">1.7</span>, <span class="fl">2.2</span>),</span>
-<span id="cb56-106"><a href="GATSM.html#cb56-106" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;grey65&quot;</span>, <span class="st">&quot;grey35&quot;</span>, <span class="st">&quot;black&quot;</span>),</span>
-<span id="cb56-107"><a href="GATSM.html#cb56-107" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;&quot;</span>,</span>
-<span id="cb56-108"><a href="GATSM.html#cb56-108" tabindex="-1"></a>  <span class="at">ylab =</span> <span class="st">&quot;Term premium (%)&quot;</span></span>
-<span id="cb56-109"><a href="GATSM.html#cb56-109" tabindex="-1"></a>)</span>
-<span id="cb56-110"><a href="GATSM.html#cb56-110" tabindex="-1"></a><span class="fu">title</span>(<span class="at">main =</span> <span class="st">&quot;(a) Estimated term premiums&quot;</span>, <span class="at">font.main =</span> <span class="dv">1</span>)</span>
-<span id="cb56-111"><a href="GATSM.html#cb56-111" tabindex="-1"></a><span class="fu">grid</span>()</span>
-<span id="cb56-112"><a href="GATSM.html#cb56-112" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">0</span>, <span class="at">col =</span> <span class="st">&quot;grey80&quot;</span>, <span class="at">lwd =</span> <span class="fl">0.8</span>)</span>
-<span id="cb56-113"><a href="GATSM.html#cb56-113" tabindex="-1"></a><span class="fu">matlines</span>(</span>
-<span id="cb56-114"><a href="GATSM.html#cb56-114" tabindex="-1"></a>  out<span class="sc">$</span>date,</span>
-<span id="cb56-115"><a href="GATSM.html#cb56-115" tabindex="-1"></a>  out[, <span class="fu">c</span>(<span class="st">&quot;TP2&quot;</span>, <span class="st">&quot;TP5&quot;</span>, <span class="st">&quot;TP10&quot;</span>)],</span>
-<span id="cb56-116"><a href="GATSM.html#cb56-116" tabindex="-1"></a>  <span class="at">lty =</span> <span class="dv">1</span>,</span>
-<span id="cb56-117"><a href="GATSM.html#cb56-117" tabindex="-1"></a>  <span class="at">lwd =</span> <span class="fu">c</span>(<span class="fl">1.5</span>, <span class="fl">1.7</span>, <span class="fl">2.2</span>),</span>
-<span id="cb56-118"><a href="GATSM.html#cb56-118" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;grey65&quot;</span>, <span class="st">&quot;grey35&quot;</span>, <span class="st">&quot;black&quot;</span>)</span>
-<span id="cb56-119"><a href="GATSM.html#cb56-119" tabindex="-1"></a>)</span>
-<span id="cb56-120"><a href="GATSM.html#cb56-120" tabindex="-1"></a><span class="fu">legend</span>(</span>
-<span id="cb56-121"><a href="GATSM.html#cb56-121" tabindex="-1"></a>  <span class="st">&quot;topright&quot;</span>,</span>
-<span id="cb56-122"><a href="GATSM.html#cb56-122" tabindex="-1"></a>  <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">&quot;2-year&quot;</span>, <span class="st">&quot;5-year&quot;</span>, <span class="st">&quot;10-year&quot;</span>),</span>
-<span id="cb56-123"><a href="GATSM.html#cb56-123" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;grey65&quot;</span>, <span class="st">&quot;grey35&quot;</span>, <span class="st">&quot;black&quot;</span>),</span>
-<span id="cb56-124"><a href="GATSM.html#cb56-124" tabindex="-1"></a>  <span class="at">lty =</span> <span class="dv">1</span>,</span>
-<span id="cb56-125"><a href="GATSM.html#cb56-125" tabindex="-1"></a>  <span class="at">lwd =</span> <span class="fu">c</span>(<span class="fl">1.5</span>, <span class="fl">1.7</span>, <span class="fl">2.2</span>),</span>
-<span id="cb56-126"><a href="GATSM.html#cb56-126" tabindex="-1"></a>  <span class="at">bty =</span> <span class="st">&quot;n&quot;</span></span>
-<span id="cb56-127"><a href="GATSM.html#cb56-127" tabindex="-1"></a>)</span>
-<span id="cb56-128"><a href="GATSM.html#cb56-128" tabindex="-1"></a></span>
-<span id="cb56-129"><a href="GATSM.html#cb56-129" tabindex="-1"></a><span class="fu">plot</span>(</span>
-<span id="cb56-130"><a href="GATSM.html#cb56-130" tabindex="-1"></a>  out<span class="sc">$</span>date,</span>
-<span id="cb56-131"><a href="GATSM.html#cb56-131" tabindex="-1"></a>  out<span class="sc">$</span>MaxSR_annualized,</span>
-<span id="cb56-132"><a href="GATSM.html#cb56-132" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;n&quot;</span>,</span>
-<span id="cb56-133"><a href="GATSM.html#cb56-133" tabindex="-1"></a>  <span class="at">log =</span> <span class="st">&quot;y&quot;</span>,</span>
-<span id="cb56-134"><a href="GATSM.html#cb56-134" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;&quot;</span>,</span>
-<span id="cb56-135"><a href="GATSM.html#cb56-135" tabindex="-1"></a>  <span class="at">ylab =</span> <span class="st">&quot;Annualized maximum Sharpe ratio&quot;</span></span>
-<span id="cb56-136"><a href="GATSM.html#cb56-136" tabindex="-1"></a>)</span>
-<span id="cb56-137"><a href="GATSM.html#cb56-137" tabindex="-1"></a><span class="fu">title</span>(<span class="at">main =</span> <span class="st">&quot;(b) Maximum Sharpe ratio&quot;</span>, <span class="at">font.main =</span> <span class="dv">1</span>)</span>
-<span id="cb56-138"><a href="GATSM.html#cb56-138" tabindex="-1"></a><span class="fu">grid</span>()</span>
-<span id="cb56-139"><a href="GATSM.html#cb56-139" tabindex="-1"></a><span class="fu">lines</span>(out<span class="sc">$</span>date, out<span class="sc">$</span>MaxSR_annualized, <span class="at">col =</span> <span class="st">&quot;black&quot;</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="GATSM.html#cb59-1" tabindex="-1"></a><span class="co"># Purpose: This example estimates an ACM-style Gaussian affine model and plots</span></span>
+<span id="cb59-2"><a href="GATSM.html#cb59-2" tabindex="-1"></a><span class="co"># the resulting model-implied Treasury term premia.</span></span>
+<span id="cb59-3"><a href="GATSM.html#cb59-3" tabindex="-1"></a><span class="fu">library</span>(DTAM)</span>
+<span id="cb59-4"><a href="GATSM.html#cb59-4" tabindex="-1"></a></span>
+<span id="cb59-5"><a href="GATSM.html#cb59-5" tabindex="-1"></a>month_id <span class="ot">&lt;-</span> <span class="cf">function</span>(d) <span class="fu">format</span>(<span class="fu">as.Date</span>(d), <span class="st">&quot;%Y-%m&quot;</span>)</span>
+<span id="cb59-6"><a href="GATSM.html#cb59-6" tabindex="-1"></a></span>
+<span id="cb59-7"><a href="GATSM.html#cb59-7" tabindex="-1"></a>maturities <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">120</span></span>
+<span id="cb59-8"><a href="GATSM.html#cb59-8" tabindex="-1"></a>yield_cols <span class="ot">&lt;-</span> <span class="fu">sprintf</span>(<span class="st">&quot;yld_%dm&quot;</span>, maturities)</span>
+<span id="cb59-9"><a href="GATSM.html#cb59-9" tabindex="-1"></a>yields <span class="ot">&lt;-</span> YC_LW_FULL[, <span class="fu">c</span>(<span class="st">&quot;date&quot;</span>, yield_cols)]</span>
+<span id="cb59-10"><a href="GATSM.html#cb59-10" tabindex="-1"></a><span class="cf">for</span> (cc <span class="cf">in</span> yield_cols) {</span>
+<span id="cb59-11"><a href="GATSM.html#cb59-11" tabindex="-1"></a>  yields[[cc]][<span class="sc">!</span><span class="fu">is.finite</span>(yields[[cc]])] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb59-12"><a href="GATSM.html#cb59-12" tabindex="-1"></a>}</span>
+<span id="cb59-13"><a href="GATSM.html#cb59-13" tabindex="-1"></a></span>
+<span id="cb59-14"><a href="GATSM.html#cb59-14" tabindex="-1"></a>dat <span class="ot">&lt;-</span> yields[<span class="fu">complete.cases</span>(yields[, yield_cols]), ]</span>
+<span id="cb59-15"><a href="GATSM.html#cb59-15" tabindex="-1"></a>Y <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(dat[, yield_cols]) <span class="sc">/</span> <span class="dv">100</span></span>
+<span id="cb59-16"><a href="GATSM.html#cb59-16" tabindex="-1"></a>short_m <span class="ot">&lt;-</span> dat<span class="sc">$</span>yld_1m <span class="sc">/</span> <span class="dv">100</span> <span class="sc">/</span> <span class="dv">12</span></span>
+<span id="cb59-17"><a href="GATSM.html#cb59-17" tabindex="-1"></a>Tobs <span class="ot">&lt;-</span> <span class="fu">nrow</span>(Y)</span>
+<span id="cb59-18"><a href="GATSM.html#cb59-18" tabindex="-1"></a></span>
+<span id="cb59-19"><a href="GATSM.html#cb59-19" tabindex="-1"></a>pc <span class="ot">&lt;-</span> <span class="fu">prcomp</span>(Y, <span class="at">center =</span> <span class="cn">TRUE</span>, <span class="at">scale. =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb59-20"><a href="GATSM.html#cb59-20" tabindex="-1"></a>K <span class="ot">&lt;-</span> <span class="dv">5</span></span>
+<span id="cb59-21"><a href="GATSM.html#cb59-21" tabindex="-1"></a>X <span class="ot">&lt;-</span> pc<span class="sc">$</span>x[, <span class="dv">1</span><span class="sc">:</span>K, drop <span class="ot">=</span> <span class="cn">FALSE</span>]</span>
+<span id="cb59-22"><a href="GATSM.html#cb59-22" tabindex="-1"></a></span>
+<span id="cb59-23"><a href="GATSM.html#cb59-23" tabindex="-1"></a><span class="co"># Step 1: factor VAR.</span></span>
+<span id="cb59-24"><a href="GATSM.html#cb59-24" tabindex="-1"></a>X_lag <span class="ot">&lt;-</span> X[<span class="sc">-</span>Tobs, , drop <span class="ot">=</span> <span class="cn">FALSE</span>]</span>
+<span id="cb59-25"><a href="GATSM.html#cb59-25" tabindex="-1"></a>X_lead <span class="ot">&lt;-</span> X[<span class="sc">-</span><span class="dv">1</span>, , drop <span class="ot">=</span> <span class="cn">FALSE</span>]</span>
+<span id="cb59-26"><a href="GATSM.html#cb59-26" tabindex="-1"></a>var_fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(X_lead <span class="sc">~</span> X_lag)</span>
+<span id="cb59-27"><a href="GATSM.html#cb59-27" tabindex="-1"></a>mu <span class="ot">&lt;-</span> <span class="fu">coef</span>(var_fit)[<span class="dv">1</span>, ]</span>
+<span id="cb59-28"><a href="GATSM.html#cb59-28" tabindex="-1"></a>Phi <span class="ot">&lt;-</span> <span class="fu">t</span>(<span class="fu">coef</span>(var_fit)[<span class="sc">-</span><span class="dv">1</span>, , <span class="at">drop =</span> <span class="cn">FALSE</span>])</span>
+<span id="cb59-29"><a href="GATSM.html#cb59-29" tabindex="-1"></a>V <span class="ot">&lt;-</span> <span class="fu">residuals</span>(var_fit)</span>
+<span id="cb59-30"><a href="GATSM.html#cb59-30" tabindex="-1"></a>Sigma <span class="ot">&lt;-</span> <span class="fu">crossprod</span>(V) <span class="sc">/</span> <span class="fu">nrow</span>(V)</span>
+<span id="cb59-31"><a href="GATSM.html#cb59-31" tabindex="-1"></a></span>
+<span id="cb59-32"><a href="GATSM.html#cb59-32" tabindex="-1"></a><span class="co"># Step 2: one-month excess-return regressions.</span></span>
+<span id="cb59-33"><a href="GATSM.html#cb59-33" tabindex="-1"></a>ret_mats <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">24</span>, <span class="dv">120</span>, <span class="at">by =</span> <span class="dv">12</span>)</span>
+<span id="cb59-34"><a href="GATSM.html#cb59-34" tabindex="-1"></a>rx <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA_real_</span>, Tobs <span class="sc">-</span> <span class="dv">1</span>, <span class="fu">length</span>(ret_mats))</span>
+<span id="cb59-35"><a href="GATSM.html#cb59-35" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(ret_mats)) {</span>
+<span id="cb59-36"><a href="GATSM.html#cb59-36" tabindex="-1"></a>  n <span class="ot">&lt;-</span> ret_mats[i]</span>
+<span id="cb59-37"><a href="GATSM.html#cb59-37" tabindex="-1"></a>  p_t <span class="ot">&lt;-</span> <span class="sc">-</span>(n <span class="sc">/</span> <span class="dv">12</span>) <span class="sc">*</span> Y[<span class="sc">-</span>Tobs, n]</span>
+<span id="cb59-38"><a href="GATSM.html#cb59-38" tabindex="-1"></a>  p_next <span class="ot">&lt;-</span> <span class="sc">-</span>((n <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">/</span> <span class="dv">12</span>) <span class="sc">*</span> Y[<span class="sc">-</span><span class="dv">1</span>, n <span class="sc">-</span> <span class="dv">1</span>]</span>
+<span id="cb59-39"><a href="GATSM.html#cb59-39" tabindex="-1"></a>  rx[, i] <span class="ot">&lt;-</span> p_next <span class="sc">-</span> p_t <span class="sc">-</span> short_m[<span class="sc">-</span>Tobs]</span>
+<span id="cb59-40"><a href="GATSM.html#cb59-40" tabindex="-1"></a>}</span>
+<span id="cb59-41"><a href="GATSM.html#cb59-41" tabindex="-1"></a></span>
+<span id="cb59-42"><a href="GATSM.html#cb59-42" tabindex="-1"></a>Z <span class="ot">&lt;-</span> <span class="fu">cbind</span>(<span class="dv">1</span>, X_lag, V)</span>
+<span id="cb59-43"><a href="GATSM.html#cb59-43" tabindex="-1"></a>coef_rx <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA_real_</span>, <span class="fu">ncol</span>(Z), <span class="fu">length</span>(ret_mats))</span>
+<span id="cb59-44"><a href="GATSM.html#cb59-44" tabindex="-1"></a>resid_rx <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA_real_</span>, <span class="fu">nrow</span>(rx), <span class="fu">length</span>(ret_mats))</span>
+<span id="cb59-45"><a href="GATSM.html#cb59-45" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(ret_mats)) {</span>
+<span id="cb59-46"><a href="GATSM.html#cb59-46" tabindex="-1"></a>  fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(rx[, i] <span class="sc">~</span> Z[, <span class="sc">-</span><span class="dv">1</span>])</span>
+<span id="cb59-47"><a href="GATSM.html#cb59-47" tabindex="-1"></a>  coef_rx[, i] <span class="ot">&lt;-</span> <span class="fu">coef</span>(fit)</span>
+<span id="cb59-48"><a href="GATSM.html#cb59-48" tabindex="-1"></a>  resid_rx[, i] <span class="ot">&lt;-</span> <span class="fu">resid</span>(fit)</span>
+<span id="cb59-49"><a href="GATSM.html#cb59-49" tabindex="-1"></a>}</span>
+<span id="cb59-50"><a href="GATSM.html#cb59-50" tabindex="-1"></a></span>
+<span id="cb59-51"><a href="GATSM.html#cb59-51" tabindex="-1"></a>a <span class="ot">&lt;-</span> coef_rx[<span class="dv">1</span>, ]</span>
+<span id="cb59-52"><a href="GATSM.html#cb59-52" tabindex="-1"></a>D <span class="ot">&lt;-</span> <span class="fu">t</span>(coef_rx[<span class="dv">2</span><span class="sc">:</span>(K <span class="sc">+</span> <span class="dv">1</span>), , <span class="at">drop =</span> <span class="cn">FALSE</span>])</span>
+<span id="cb59-53"><a href="GATSM.html#cb59-53" tabindex="-1"></a>Beta <span class="ot">&lt;-</span> <span class="fu">t</span>(coef_rx[(K <span class="sc">+</span> <span class="dv">2</span>)<span class="sc">:</span>(<span class="dv">2</span> <span class="sc">*</span> K <span class="sc">+</span> <span class="dv">1</span>), , <span class="at">drop =</span> <span class="cn">FALSE</span>])</span>
+<span id="cb59-54"><a href="GATSM.html#cb59-54" tabindex="-1"></a>s2 <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(resid_rx<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb59-55"><a href="GATSM.html#cb59-55" tabindex="-1"></a>quad <span class="ot">&lt;-</span> <span class="fu">rowSums</span>((Beta <span class="sc">%*%</span> Sigma) <span class="sc">*</span> Beta)</span>
+<span id="cb59-56"><a href="GATSM.html#cb59-56" tabindex="-1"></a></span>
+<span id="cb59-57"><a href="GATSM.html#cb59-57" tabindex="-1"></a><span class="co"># Step 3: market prices of risk.</span></span>
+<span id="cb59-58"><a href="GATSM.html#cb59-58" tabindex="-1"></a>lambda0 <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(<span class="fu">solve</span>(<span class="fu">crossprod</span>(Beta), <span class="fu">crossprod</span>(Beta, a <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> (quad <span class="sc">+</span> s2))))</span>
+<span id="cb59-59"><a href="GATSM.html#cb59-59" tabindex="-1"></a>lambda1 <span class="ot">&lt;-</span> <span class="fu">solve</span>(<span class="fu">crossprod</span>(Beta), <span class="fu">crossprod</span>(Beta, D))</span>
+<span id="cb59-60"><a href="GATSM.html#cb59-60" tabindex="-1"></a></span>
+<span id="cb59-61"><a href="GATSM.html#cb59-61" tabindex="-1"></a>short_fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(short_m <span class="sc">~</span> X)</span>
+<span id="cb59-62"><a href="GATSM.html#cb59-62" tabindex="-1"></a>delta0 <span class="ot">&lt;-</span> <span class="fu">coef</span>(short_fit)[<span class="dv">1</span>]</span>
+<span id="cb59-63"><a href="GATSM.html#cb59-63" tabindex="-1"></a>delta1 <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(<span class="fu">coef</span>(short_fit)[<span class="sc">-</span><span class="dv">1</span>])</span>
+<span id="cb59-64"><a href="GATSM.html#cb59-64" tabindex="-1"></a></span>
+<span id="cb59-65"><a href="GATSM.html#cb59-65" tabindex="-1"></a>compute_yields <span class="ot">&lt;-</span> <span class="cf">function</span>(mu_use, Phi_use, <span class="at">H =</span> <span class="dv">120</span>) {</span>
+<span id="cb59-66"><a href="GATSM.html#cb59-66" tabindex="-1"></a>  ab <span class="ot">&lt;-</span> <span class="fu">compute_AB_classical</span>(</span>
+<span id="cb59-67"><a href="GATSM.html#cb59-67" tabindex="-1"></a>    <span class="at">xi0 =</span> delta0,</span>
+<span id="cb59-68"><a href="GATSM.html#cb59-68" tabindex="-1"></a>    <span class="at">xi1 =</span> <span class="fu">matrix</span>(delta1, <span class="at">ncol =</span> <span class="dv">1</span>),</span>
+<span id="cb59-69"><a href="GATSM.html#cb59-69" tabindex="-1"></a>    <span class="at">H =</span> H,</span>
+<span id="cb59-70"><a href="GATSM.html#cb59-70" tabindex="-1"></a>    <span class="at">psi =</span> psi_GaussianVAR,</span>
+<span id="cb59-71"><a href="GATSM.html#cb59-71" tabindex="-1"></a>    <span class="at">psi.parameterization =</span> <span class="fu">list</span>(</span>
+<span id="cb59-72"><a href="GATSM.html#cb59-72" tabindex="-1"></a>      <span class="at">mu =</span> <span class="fu">matrix</span>(mu_use, <span class="at">ncol =</span> <span class="dv">1</span>),</span>
+<span id="cb59-73"><a href="GATSM.html#cb59-73" tabindex="-1"></a>      <span class="at">Phi =</span> Phi_use,</span>
+<span id="cb59-74"><a href="GATSM.html#cb59-74" tabindex="-1"></a>      <span class="at">Sigma =</span> Sigma</span>
+<span id="cb59-75"><a href="GATSM.html#cb59-75" tabindex="-1"></a>    )</span>
+<span id="cb59-76"><a href="GATSM.html#cb59-76" tabindex="-1"></a>  )</span>
+<span id="cb59-77"><a href="GATSM.html#cb59-77" tabindex="-1"></a>  <span class="fu">sapply</span>(<span class="dv">1</span><span class="sc">:</span>H, <span class="cf">function</span>(h) {</span>
+<span id="cb59-78"><a href="GATSM.html#cb59-78" tabindex="-1"></a>    <span class="dv">12</span> <span class="sc">*</span> <span class="fu">as.vector</span>(ab<span class="sc">$</span>b[<span class="dv">1</span>, <span class="dv">1</span>, h] <span class="sc">+</span> X <span class="sc">%*%</span> ab<span class="sc">$</span>a[, <span class="dv">1</span>, h])</span>
+<span id="cb59-79"><a href="GATSM.html#cb59-79" tabindex="-1"></a>  })</span>
+<span id="cb59-80"><a href="GATSM.html#cb59-80" tabindex="-1"></a>}</span>
+<span id="cb59-81"><a href="GATSM.html#cb59-81" tabindex="-1"></a></span>
+<span id="cb59-82"><a href="GATSM.html#cb59-82" tabindex="-1"></a>yield_fit <span class="ot">&lt;-</span> <span class="fu">compute_yields</span>(mu <span class="sc">-</span> lambda0, Phi <span class="sc">-</span> lambda1, <span class="at">H =</span> <span class="dv">120</span>)</span>
+<span id="cb59-83"><a href="GATSM.html#cb59-83" tabindex="-1"></a>yield_eh <span class="ot">&lt;-</span> <span class="fu">compute_yields</span>(mu, Phi, <span class="at">H =</span> <span class="dv">120</span>)</span>
+<span id="cb59-84"><a href="GATSM.html#cb59-84" tabindex="-1"></a></span>
+<span id="cb59-85"><a href="GATSM.html#cb59-85" tabindex="-1"></a>horizons <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">24</span>, <span class="dv">60</span>, <span class="dv">120</span>)</span>
+<span id="cb59-86"><a href="GATSM.html#cb59-86" tabindex="-1"></a>tp_est <span class="ot">&lt;-</span> <span class="fu">sapply</span>(horizons, <span class="cf">function</span>(h) {</span>
+<span id="cb59-87"><a href="GATSM.html#cb59-87" tabindex="-1"></a>  <span class="dv">100</span> <span class="sc">*</span> (yield_fit[, h] <span class="sc">-</span> yield_eh[, h])</span>
+<span id="cb59-88"><a href="GATSM.html#cb59-88" tabindex="-1"></a>})</span>
+<span id="cb59-89"><a href="GATSM.html#cb59-89" tabindex="-1"></a><span class="fu">colnames</span>(tp_est) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;2-year&quot;</span>, <span class="st">&quot;5-year&quot;</span>, <span class="st">&quot;10-year&quot;</span>)</span>
+<span id="cb59-90"><a href="GATSM.html#cb59-90" tabindex="-1"></a></span>
+<span id="cb59-91"><a href="GATSM.html#cb59-91" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">date =</span> dat<span class="sc">$</span>date, tp_est)</span>
+<span id="cb59-92"><a href="GATSM.html#cb59-92" tabindex="-1"></a><span class="fu">names</span>(out)[<span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;TP2&quot;</span>, <span class="st">&quot;TP5&quot;</span>, <span class="st">&quot;TP10&quot;</span>)</span>
+<span id="cb59-93"><a href="GATSM.html#cb59-93" tabindex="-1"></a>out<span class="sc">$</span>m <span class="ot">&lt;-</span> <span class="fu">month_id</span>(out<span class="sc">$</span>date)</span>
+<span id="cb59-94"><a href="GATSM.html#cb59-94" tabindex="-1"></a></span>
+<span id="cb59-95"><a href="GATSM.html#cb59-95" tabindex="-1"></a>lambda_t <span class="ot">&lt;-</span> <span class="fu">sweep</span>(X <span class="sc">%*%</span> <span class="fu">t</span>(lambda1), <span class="dv">2</span>, lambda0, <span class="st">&quot;+&quot;</span>)</span>
+<span id="cb59-96"><a href="GATSM.html#cb59-96" tabindex="-1"></a>max_sr_monthly <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">exp</span>(<span class="fu">rowSums</span>((lambda_t <span class="sc">%*%</span> <span class="fu">solve</span>(Sigma)) <span class="sc">*</span> lambda_t)) <span class="sc">-</span> <span class="dv">1</span>)</span>
+<span id="cb59-97"><a href="GATSM.html#cb59-97" tabindex="-1"></a>out<span class="sc">$</span>MaxSR_annualized <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="dv">12</span>) <span class="sc">*</span> max_sr_monthly</span>
+<span id="cb59-98"><a href="GATSM.html#cb59-98" tabindex="-1"></a></span>
+<span id="cb59-99"><a href="GATSM.html#cb59-99" tabindex="-1"></a>op <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">1</span>), <span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">3.0</span>, <span class="fl">4.4</span>, <span class="fl">2.0</span>, <span class="fl">0.8</span>), <span class="at">las =</span> <span class="dv">1</span>)</span>
+<span id="cb59-100"><a href="GATSM.html#cb59-100" tabindex="-1"></a><span class="fu">matplot</span>(</span>
+<span id="cb59-101"><a href="GATSM.html#cb59-101" tabindex="-1"></a>  out<span class="sc">$</span>date,</span>
+<span id="cb59-102"><a href="GATSM.html#cb59-102" tabindex="-1"></a>  out[, <span class="fu">c</span>(<span class="st">&quot;TP2&quot;</span>, <span class="st">&quot;TP5&quot;</span>, <span class="st">&quot;TP10&quot;</span>)],</span>
+<span id="cb59-103"><a href="GATSM.html#cb59-103" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;n&quot;</span>,</span>
+<span id="cb59-104"><a href="GATSM.html#cb59-104" tabindex="-1"></a>  <span class="at">lty =</span> <span class="dv">1</span>,</span>
+<span id="cb59-105"><a href="GATSM.html#cb59-105" tabindex="-1"></a>  <span class="at">lwd =</span> <span class="fu">c</span>(<span class="fl">1.5</span>, <span class="fl">1.7</span>, <span class="fl">2.2</span>),</span>
+<span id="cb59-106"><a href="GATSM.html#cb59-106" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;grey65&quot;</span>, <span class="st">&quot;grey35&quot;</span>, <span class="st">&quot;black&quot;</span>),</span>
+<span id="cb59-107"><a href="GATSM.html#cb59-107" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;&quot;</span>,</span>
+<span id="cb59-108"><a href="GATSM.html#cb59-108" tabindex="-1"></a>  <span class="at">ylab =</span> <span class="st">&quot;Term premium (%)&quot;</span></span>
+<span id="cb59-109"><a href="GATSM.html#cb59-109" tabindex="-1"></a>)</span>
+<span id="cb59-110"><a href="GATSM.html#cb59-110" tabindex="-1"></a><span class="fu">title</span>(<span class="at">main =</span> <span class="st">&quot;(a) Estimated term premiums&quot;</span>, <span class="at">font.main =</span> <span class="dv">1</span>)</span>
+<span id="cb59-111"><a href="GATSM.html#cb59-111" tabindex="-1"></a><span class="fu">grid</span>()</span>
+<span id="cb59-112"><a href="GATSM.html#cb59-112" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">0</span>, <span class="at">col =</span> <span class="st">&quot;grey80&quot;</span>, <span class="at">lwd =</span> <span class="fl">0.8</span>)</span>
+<span id="cb59-113"><a href="GATSM.html#cb59-113" tabindex="-1"></a><span class="fu">matlines</span>(</span>
+<span id="cb59-114"><a href="GATSM.html#cb59-114" tabindex="-1"></a>  out<span class="sc">$</span>date,</span>
+<span id="cb59-115"><a href="GATSM.html#cb59-115" tabindex="-1"></a>  out[, <span class="fu">c</span>(<span class="st">&quot;TP2&quot;</span>, <span class="st">&quot;TP5&quot;</span>, <span class="st">&quot;TP10&quot;</span>)],</span>
+<span id="cb59-116"><a href="GATSM.html#cb59-116" tabindex="-1"></a>  <span class="at">lty =</span> <span class="dv">1</span>,</span>
+<span id="cb59-117"><a href="GATSM.html#cb59-117" tabindex="-1"></a>  <span class="at">lwd =</span> <span class="fu">c</span>(<span class="fl">1.5</span>, <span class="fl">1.7</span>, <span class="fl">2.2</span>),</span>
+<span id="cb59-118"><a href="GATSM.html#cb59-118" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;grey65&quot;</span>, <span class="st">&quot;grey35&quot;</span>, <span class="st">&quot;black&quot;</span>)</span>
+<span id="cb59-119"><a href="GATSM.html#cb59-119" tabindex="-1"></a>)</span>
+<span id="cb59-120"><a href="GATSM.html#cb59-120" tabindex="-1"></a><span class="fu">legend</span>(</span>
+<span id="cb59-121"><a href="GATSM.html#cb59-121" tabindex="-1"></a>  <span class="st">&quot;topright&quot;</span>,</span>
+<span id="cb59-122"><a href="GATSM.html#cb59-122" tabindex="-1"></a>  <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">&quot;2-year&quot;</span>, <span class="st">&quot;5-year&quot;</span>, <span class="st">&quot;10-year&quot;</span>),</span>
+<span id="cb59-123"><a href="GATSM.html#cb59-123" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;grey65&quot;</span>, <span class="st">&quot;grey35&quot;</span>, <span class="st">&quot;black&quot;</span>),</span>
+<span id="cb59-124"><a href="GATSM.html#cb59-124" tabindex="-1"></a>  <span class="at">lty =</span> <span class="dv">1</span>,</span>
+<span id="cb59-125"><a href="GATSM.html#cb59-125" tabindex="-1"></a>  <span class="at">lwd =</span> <span class="fu">c</span>(<span class="fl">1.5</span>, <span class="fl">1.7</span>, <span class="fl">2.2</span>),</span>
+<span id="cb59-126"><a href="GATSM.html#cb59-126" tabindex="-1"></a>  <span class="at">bty =</span> <span class="st">&quot;n&quot;</span></span>
+<span id="cb59-127"><a href="GATSM.html#cb59-127" tabindex="-1"></a>)</span>
+<span id="cb59-128"><a href="GATSM.html#cb59-128" tabindex="-1"></a></span>
+<span id="cb59-129"><a href="GATSM.html#cb59-129" tabindex="-1"></a><span class="fu">plot</span>(</span>
+<span id="cb59-130"><a href="GATSM.html#cb59-130" tabindex="-1"></a>  out<span class="sc">$</span>date,</span>
+<span id="cb59-131"><a href="GATSM.html#cb59-131" tabindex="-1"></a>  out<span class="sc">$</span>MaxSR_annualized,</span>
+<span id="cb59-132"><a href="GATSM.html#cb59-132" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;n&quot;</span>,</span>
+<span id="cb59-133"><a href="GATSM.html#cb59-133" tabindex="-1"></a>  <span class="at">log =</span> <span class="st">&quot;y&quot;</span>,</span>
+<span id="cb59-134"><a href="GATSM.html#cb59-134" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;&quot;</span>,</span>
+<span id="cb59-135"><a href="GATSM.html#cb59-135" tabindex="-1"></a>  <span class="at">ylab =</span> <span class="st">&quot;Annualized maximum Sharpe ratio&quot;</span></span>
+<span id="cb59-136"><a href="GATSM.html#cb59-136" tabindex="-1"></a>)</span>
+<span id="cb59-137"><a href="GATSM.html#cb59-137" tabindex="-1"></a><span class="fu">title</span>(<span class="at">main =</span> <span class="st">&quot;(b) Maximum Sharpe ratio&quot;</span>, <span class="at">font.main =</span> <span class="dv">1</span>)</span>
+<span id="cb59-138"><a href="GATSM.html#cb59-138" tabindex="-1"></a><span class="fu">grid</span>()</span>
+<span id="cb59-139"><a href="GATSM.html#cb59-139" tabindex="-1"></a><span class="fu">lines</span>(out<span class="sc">$</span>date, out<span class="sc">$</span>MaxSR_annualized, <span class="at">col =</span> <span class="st">&quot;black&quot;</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span></code></pre></div>
 <p><img src="_main_files/figure-html/fig_GATSM_ACM_term_premia-1.png" width="691.2" /></p>
-<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="GATSM.html#cb57-1" tabindex="-1"></a><span class="fu">par</span>(op)</span>
-<span id="cb57-2"><a href="GATSM.html#cb57-2" tabindex="-1"></a></span>
-<span id="cb57-3"><a href="GATSM.html#cb57-3" tabindex="-1"></a>sample_table <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb57-4"><a href="GATSM.html#cb57-4" tabindex="-1"></a>  <span class="at">sample =</span> <span class="st">&quot;Estimation and figure&quot;</span>,</span>
-<span id="cb57-5"><a href="GATSM.html#cb57-5" tabindex="-1"></a>  <span class="at">start =</span> <span class="fu">min</span>(dat<span class="sc">$</span>date),</span>
-<span id="cb57-6"><a href="GATSM.html#cb57-6" tabindex="-1"></a>  <span class="at">end =</span> <span class="fu">max</span>(dat<span class="sc">$</span>date),</span>
-<span id="cb57-7"><a href="GATSM.html#cb57-7" tabindex="-1"></a>  <span class="at">observations =</span> <span class="fu">nrow</span>(dat)</span>
-<span id="cb57-8"><a href="GATSM.html#cb57-8" tabindex="-1"></a>)</span>
-<span id="cb57-9"><a href="GATSM.html#cb57-9" tabindex="-1"></a>sample_table</span></code></pre></div>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="GATSM.html#cb60-1" tabindex="-1"></a><span class="fu">par</span>(op)</span>
+<span id="cb60-2"><a href="GATSM.html#cb60-2" tabindex="-1"></a></span>
+<span id="cb60-3"><a href="GATSM.html#cb60-3" tabindex="-1"></a>sample_table <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb60-4"><a href="GATSM.html#cb60-4" tabindex="-1"></a>  <span class="at">sample =</span> <span class="st">&quot;Estimation and figure&quot;</span>,</span>
+<span id="cb60-5"><a href="GATSM.html#cb60-5" tabindex="-1"></a>  <span class="at">start =</span> <span class="fu">min</span>(dat<span class="sc">$</span>date),</span>
+<span id="cb60-6"><a href="GATSM.html#cb60-6" tabindex="-1"></a>  <span class="at">end =</span> <span class="fu">max</span>(dat<span class="sc">$</span>date),</span>
+<span id="cb60-7"><a href="GATSM.html#cb60-7" tabindex="-1"></a>  <span class="at">observations =</span> <span class="fu">nrow</span>(dat)</span>
+<span id="cb60-8"><a href="GATSM.html#cb60-8" tabindex="-1"></a>)</span>
+<span id="cb60-9"><a href="GATSM.html#cb60-9" tabindex="-1"></a>sample_table</span></code></pre></div>
 <pre><code>##                  sample      start        end observations
 ## 1 Estimation and figure 1971-08-01 2023-12-01          629</code></pre>
-<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="GATSM.html#cb59-1" tabindex="-1"></a>summary_table <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb59-2"><a href="GATSM.html#cb59-2" tabindex="-1"></a>  <span class="at">maturity =</span> <span class="fu">c</span>(<span class="st">&quot;2-year&quot;</span>, <span class="st">&quot;5-year&quot;</span>, <span class="st">&quot;10-year&quot;</span>),</span>
-<span id="cb59-3"><a href="GATSM.html#cb59-3" tabindex="-1"></a>  <span class="at">mean =</span> <span class="fu">c</span>(<span class="fu">mean</span>(out<span class="sc">$</span>TP2), <span class="fu">mean</span>(out<span class="sc">$</span>TP5), <span class="fu">mean</span>(out<span class="sc">$</span>TP10)),</span>
-<span id="cb59-4"><a href="GATSM.html#cb59-4" tabindex="-1"></a>  <span class="at">min =</span> <span class="fu">c</span>(<span class="fu">min</span>(out<span class="sc">$</span>TP2), <span class="fu">min</span>(out<span class="sc">$</span>TP5), <span class="fu">min</span>(out<span class="sc">$</span>TP10)),</span>
-<span id="cb59-5"><a href="GATSM.html#cb59-5" tabindex="-1"></a>  <span class="at">max =</span> <span class="fu">c</span>(<span class="fu">max</span>(out<span class="sc">$</span>TP2), <span class="fu">max</span>(out<span class="sc">$</span>TP5), <span class="fu">max</span>(out<span class="sc">$</span>TP10))</span>
-<span id="cb59-6"><a href="GATSM.html#cb59-6" tabindex="-1"></a>)</span>
-<span id="cb59-7"><a href="GATSM.html#cb59-7" tabindex="-1"></a>summary_table[, <span class="sc">-</span><span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">round</span>(summary_table[, <span class="sc">-</span><span class="dv">1</span>], <span class="dv">2</span>)</span>
-<span id="cb59-8"><a href="GATSM.html#cb59-8" tabindex="-1"></a>summary_table</span></code></pre></div>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="GATSM.html#cb62-1" tabindex="-1"></a>summary_table <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb62-2"><a href="GATSM.html#cb62-2" tabindex="-1"></a>  <span class="at">maturity =</span> <span class="fu">c</span>(<span class="st">&quot;2-year&quot;</span>, <span class="st">&quot;5-year&quot;</span>, <span class="st">&quot;10-year&quot;</span>),</span>
+<span id="cb62-3"><a href="GATSM.html#cb62-3" tabindex="-1"></a>  <span class="at">mean =</span> <span class="fu">c</span>(<span class="fu">mean</span>(out<span class="sc">$</span>TP2), <span class="fu">mean</span>(out<span class="sc">$</span>TP5), <span class="fu">mean</span>(out<span class="sc">$</span>TP10)),</span>
+<span id="cb62-4"><a href="GATSM.html#cb62-4" tabindex="-1"></a>  <span class="at">min =</span> <span class="fu">c</span>(<span class="fu">min</span>(out<span class="sc">$</span>TP2), <span class="fu">min</span>(out<span class="sc">$</span>TP5), <span class="fu">min</span>(out<span class="sc">$</span>TP10)),</span>
+<span id="cb62-5"><a href="GATSM.html#cb62-5" tabindex="-1"></a>  <span class="at">max =</span> <span class="fu">c</span>(<span class="fu">max</span>(out<span class="sc">$</span>TP2), <span class="fu">max</span>(out<span class="sc">$</span>TP5), <span class="fu">max</span>(out<span class="sc">$</span>TP10))</span>
+<span id="cb62-6"><a href="GATSM.html#cb62-6" tabindex="-1"></a>)</span>
+<span id="cb62-7"><a href="GATSM.html#cb62-7" tabindex="-1"></a>summary_table[, <span class="sc">-</span><span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">round</span>(summary_table[, <span class="sc">-</span><span class="dv">1</span>], <span class="dv">2</span>)</span>
+<span id="cb62-8"><a href="GATSM.html#cb62-8" tabindex="-1"></a>summary_table</span></code></pre></div>
 <pre><code>##   maturity mean   min  max
 ## 1   2-year 0.42 -0.73 2.41
 ## 2   5-year 1.14 -0.76 3.95
@@ -646,48 +673,48 @@ longest maturities are missing, are not used in the estimation.</p>
 with the official ACM 10-year term premium. This comparison is useful for
 checking the order of magnitude of the replication, but it is not meant as a
 standalone figure for the TeX version of the book.</p>
-<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="GATSM.html#cb61-1" tabindex="-1"></a><span class="co"># Purpose: This diagnostic compares the recomputed 10-year term premium with</span></span>
-<span id="cb61-2"><a href="GATSM.html#cb61-2" tabindex="-1"></a><span class="co"># the official ACM 10-year term premium.</span></span>
-<span id="cb61-3"><a href="GATSM.html#cb61-3" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;ACMTermPremium&quot;</span>, <span class="at">package =</span> <span class="st">&quot;DTAM&quot;</span>)</span>
-<span id="cb61-4"><a href="GATSM.html#cb61-4" tabindex="-1"></a></span>
-<span id="cb61-5"><a href="GATSM.html#cb61-5" tabindex="-1"></a>benchmark <span class="ot">&lt;-</span> ACMTermPremium[, <span class="fu">c</span>(<span class="st">&quot;date&quot;</span>, <span class="st">&quot;ACMTP10&quot;</span>)]</span>
-<span id="cb61-6"><a href="GATSM.html#cb61-6" tabindex="-1"></a>benchmark<span class="sc">$</span>m <span class="ot">&lt;-</span> <span class="fu">month_id</span>(benchmark<span class="sc">$</span>date)</span>
-<span id="cb61-7"><a href="GATSM.html#cb61-7" tabindex="-1"></a>check_out <span class="ot">&lt;-</span> <span class="fu">merge</span>(out[, <span class="fu">c</span>(<span class="st">&quot;date&quot;</span>, <span class="st">&quot;m&quot;</span>, <span class="st">&quot;TP10&quot;</span>)], benchmark[, <span class="fu">c</span>(<span class="st">&quot;m&quot;</span>, <span class="st">&quot;ACMTP10&quot;</span>)], <span class="at">by =</span> <span class="st">&quot;m&quot;</span>)</span>
-<span id="cb61-8"><a href="GATSM.html#cb61-8" tabindex="-1"></a>check_out <span class="ot">&lt;-</span> check_out[<span class="fu">order</span>(check_out<span class="sc">$</span>date), ]</span>
-<span id="cb61-9"><a href="GATSM.html#cb61-9" tabindex="-1"></a></span>
-<span id="cb61-10"><a href="GATSM.html#cb61-10" tabindex="-1"></a>op <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">4.2</span>, <span class="fl">4.4</span>, <span class="fl">1.2</span>, <span class="fl">0.8</span>), <span class="at">las =</span> <span class="dv">1</span>)</span>
-<span id="cb61-11"><a href="GATSM.html#cb61-11" tabindex="-1"></a><span class="fu">plot</span>(</span>
-<span id="cb61-12"><a href="GATSM.html#cb61-12" tabindex="-1"></a>  check_out<span class="sc">$</span>date,</span>
-<span id="cb61-13"><a href="GATSM.html#cb61-13" tabindex="-1"></a>  check_out<span class="sc">$</span>TP10,</span>
-<span id="cb61-14"><a href="GATSM.html#cb61-14" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;l&quot;</span>,</span>
-<span id="cb61-15"><a href="GATSM.html#cb61-15" tabindex="-1"></a>  <span class="at">lwd =</span> <span class="dv">2</span>,</span>
-<span id="cb61-16"><a href="GATSM.html#cb61-16" tabindex="-1"></a>  <span class="at">col =</span> <span class="st">&quot;black&quot;</span>,</span>
-<span id="cb61-17"><a href="GATSM.html#cb61-17" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;&quot;</span>,</span>
-<span id="cb61-18"><a href="GATSM.html#cb61-18" tabindex="-1"></a>  <span class="at">ylab =</span> <span class="st">&quot;10-year term premium (%)&quot;</span></span>
-<span id="cb61-19"><a href="GATSM.html#cb61-19" tabindex="-1"></a>)</span>
-<span id="cb61-20"><a href="GATSM.html#cb61-20" tabindex="-1"></a><span class="fu">lines</span>(check_out<span class="sc">$</span>date, check_out<span class="sc">$</span>ACMTP10, <span class="at">col =</span> <span class="st">&quot;grey45&quot;</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">lwd =</span> <span class="fl">1.7</span>)</span>
-<span id="cb61-21"><a href="GATSM.html#cb61-21" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">0</span>, <span class="at">col =</span> <span class="st">&quot;grey80&quot;</span>, <span class="at">lwd =</span> <span class="fl">0.8</span>)</span>
-<span id="cb61-22"><a href="GATSM.html#cb61-22" tabindex="-1"></a><span class="fu">legend</span>(</span>
-<span id="cb61-23"><a href="GATSM.html#cb61-23" tabindex="-1"></a>  <span class="st">&quot;topleft&quot;</span>,</span>
-<span id="cb61-24"><a href="GATSM.html#cb61-24" tabindex="-1"></a>  <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">&quot;Recomputed ACM-style&quot;</span>, <span class="st">&quot;Official ACM&quot;</span>),</span>
-<span id="cb61-25"><a href="GATSM.html#cb61-25" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;grey45&quot;</span>),</span>
-<span id="cb61-26"><a href="GATSM.html#cb61-26" tabindex="-1"></a>  <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>),</span>
-<span id="cb61-27"><a href="GATSM.html#cb61-27" tabindex="-1"></a>  <span class="at">lwd =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="fl">1.7</span>),</span>
-<span id="cb61-28"><a href="GATSM.html#cb61-28" tabindex="-1"></a>  <span class="at">bty =</span> <span class="st">&quot;n&quot;</span></span>
-<span id="cb61-29"><a href="GATSM.html#cb61-29" tabindex="-1"></a>)</span>
-<span id="cb61-30"><a href="GATSM.html#cb61-30" tabindex="-1"></a><span class="fu">mtext</span>(<span class="st">&quot;Diagnostic comparison with the official ACM 10-year term premium&quot;</span>, <span class="at">side =</span> <span class="dv">3</span>, <span class="at">line =</span> <span class="fl">0.1</span>, <span class="at">cex =</span> <span class="fl">0.95</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="GATSM.html#cb64-1" tabindex="-1"></a><span class="co"># Purpose: This diagnostic compares the recomputed 10-year term premium with</span></span>
+<span id="cb64-2"><a href="GATSM.html#cb64-2" tabindex="-1"></a><span class="co"># the official ACM 10-year term premium.</span></span>
+<span id="cb64-3"><a href="GATSM.html#cb64-3" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;ACMTermPremium&quot;</span>, <span class="at">package =</span> <span class="st">&quot;DTAM&quot;</span>)</span>
+<span id="cb64-4"><a href="GATSM.html#cb64-4" tabindex="-1"></a></span>
+<span id="cb64-5"><a href="GATSM.html#cb64-5" tabindex="-1"></a>benchmark <span class="ot">&lt;-</span> ACMTermPremium[, <span class="fu">c</span>(<span class="st">&quot;date&quot;</span>, <span class="st">&quot;ACMTP10&quot;</span>)]</span>
+<span id="cb64-6"><a href="GATSM.html#cb64-6" tabindex="-1"></a>benchmark<span class="sc">$</span>m <span class="ot">&lt;-</span> <span class="fu">month_id</span>(benchmark<span class="sc">$</span>date)</span>
+<span id="cb64-7"><a href="GATSM.html#cb64-7" tabindex="-1"></a>check_out <span class="ot">&lt;-</span> <span class="fu">merge</span>(out[, <span class="fu">c</span>(<span class="st">&quot;date&quot;</span>, <span class="st">&quot;m&quot;</span>, <span class="st">&quot;TP10&quot;</span>)], benchmark[, <span class="fu">c</span>(<span class="st">&quot;m&quot;</span>, <span class="st">&quot;ACMTP10&quot;</span>)], <span class="at">by =</span> <span class="st">&quot;m&quot;</span>)</span>
+<span id="cb64-8"><a href="GATSM.html#cb64-8" tabindex="-1"></a>check_out <span class="ot">&lt;-</span> check_out[<span class="fu">order</span>(check_out<span class="sc">$</span>date), ]</span>
+<span id="cb64-9"><a href="GATSM.html#cb64-9" tabindex="-1"></a></span>
+<span id="cb64-10"><a href="GATSM.html#cb64-10" tabindex="-1"></a>op <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">4.2</span>, <span class="fl">4.4</span>, <span class="fl">1.2</span>, <span class="fl">0.8</span>), <span class="at">las =</span> <span class="dv">1</span>)</span>
+<span id="cb64-11"><a href="GATSM.html#cb64-11" tabindex="-1"></a><span class="fu">plot</span>(</span>
+<span id="cb64-12"><a href="GATSM.html#cb64-12" tabindex="-1"></a>  check_out<span class="sc">$</span>date,</span>
+<span id="cb64-13"><a href="GATSM.html#cb64-13" tabindex="-1"></a>  check_out<span class="sc">$</span>TP10,</span>
+<span id="cb64-14"><a href="GATSM.html#cb64-14" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;l&quot;</span>,</span>
+<span id="cb64-15"><a href="GATSM.html#cb64-15" tabindex="-1"></a>  <span class="at">lwd =</span> <span class="dv">2</span>,</span>
+<span id="cb64-16"><a href="GATSM.html#cb64-16" tabindex="-1"></a>  <span class="at">col =</span> <span class="st">&quot;black&quot;</span>,</span>
+<span id="cb64-17"><a href="GATSM.html#cb64-17" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;&quot;</span>,</span>
+<span id="cb64-18"><a href="GATSM.html#cb64-18" tabindex="-1"></a>  <span class="at">ylab =</span> <span class="st">&quot;10-year term premium (%)&quot;</span></span>
+<span id="cb64-19"><a href="GATSM.html#cb64-19" tabindex="-1"></a>)</span>
+<span id="cb64-20"><a href="GATSM.html#cb64-20" tabindex="-1"></a><span class="fu">lines</span>(check_out<span class="sc">$</span>date, check_out<span class="sc">$</span>ACMTP10, <span class="at">col =</span> <span class="st">&quot;grey45&quot;</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">lwd =</span> <span class="fl">1.7</span>)</span>
+<span id="cb64-21"><a href="GATSM.html#cb64-21" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">0</span>, <span class="at">col =</span> <span class="st">&quot;grey80&quot;</span>, <span class="at">lwd =</span> <span class="fl">0.8</span>)</span>
+<span id="cb64-22"><a href="GATSM.html#cb64-22" tabindex="-1"></a><span class="fu">legend</span>(</span>
+<span id="cb64-23"><a href="GATSM.html#cb64-23" tabindex="-1"></a>  <span class="st">&quot;topleft&quot;</span>,</span>
+<span id="cb64-24"><a href="GATSM.html#cb64-24" tabindex="-1"></a>  <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">&quot;Recomputed ACM-style&quot;</span>, <span class="st">&quot;Official ACM&quot;</span>),</span>
+<span id="cb64-25"><a href="GATSM.html#cb64-25" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;grey45&quot;</span>),</span>
+<span id="cb64-26"><a href="GATSM.html#cb64-26" tabindex="-1"></a>  <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>),</span>
+<span id="cb64-27"><a href="GATSM.html#cb64-27" tabindex="-1"></a>  <span class="at">lwd =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="fl">1.7</span>),</span>
+<span id="cb64-28"><a href="GATSM.html#cb64-28" tabindex="-1"></a>  <span class="at">bty =</span> <span class="st">&quot;n&quot;</span></span>
+<span id="cb64-29"><a href="GATSM.html#cb64-29" tabindex="-1"></a>)</span>
+<span id="cb64-30"><a href="GATSM.html#cb64-30" tabindex="-1"></a><span class="fu">mtext</span>(<span class="st">&quot;Diagnostic comparison with the official ACM 10-year term premium&quot;</span>, <span class="at">side =</span> <span class="dv">3</span>, <span class="at">line =</span> <span class="fl">0.1</span>, <span class="at">cex =</span> <span class="fl">0.95</span>)</span></code></pre></div>
 <p><img src="_main_files/figure-html/fig_GATSM_ACM_term_premia_check-1.png" width="691.2" /></p>
-<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="GATSM.html#cb62-1" tabindex="-1"></a><span class="fu">par</span>(op)</span>
-<span id="cb62-2"><a href="GATSM.html#cb62-2" tabindex="-1"></a></span>
-<span id="cb62-3"><a href="GATSM.html#cb62-3" tabindex="-1"></a>check_table <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb62-4"><a href="GATSM.html#cb62-4" tabindex="-1"></a>  <span class="at">series =</span> <span class="fu">c</span>(<span class="st">&quot;Recomputed ACM-style&quot;</span>, <span class="st">&quot;Official ACM&quot;</span>),</span>
-<span id="cb62-5"><a href="GATSM.html#cb62-5" tabindex="-1"></a>  <span class="at">mean =</span> <span class="fu">c</span>(<span class="fu">mean</span>(check_out<span class="sc">$</span>TP10), <span class="fu">mean</span>(check_out<span class="sc">$</span>ACMTP10)),</span>
-<span id="cb62-6"><a href="GATSM.html#cb62-6" tabindex="-1"></a>  <span class="at">min =</span> <span class="fu">c</span>(<span class="fu">min</span>(check_out<span class="sc">$</span>TP10), <span class="fu">min</span>(check_out<span class="sc">$</span>ACMTP10)),</span>
-<span id="cb62-7"><a href="GATSM.html#cb62-7" tabindex="-1"></a>  <span class="at">max =</span> <span class="fu">c</span>(<span class="fu">max</span>(check_out<span class="sc">$</span>TP10), <span class="fu">max</span>(check_out<span class="sc">$</span>ACMTP10)),</span>
-<span id="cb62-8"><a href="GATSM.html#cb62-8" tabindex="-1"></a>  <span class="at">correlation_with_ACM =</span> <span class="fu">c</span>(<span class="fu">cor</span>(check_out<span class="sc">$</span>TP10, check_out<span class="sc">$</span>ACMTP10), <span class="dv">1</span>)</span>
-<span id="cb62-9"><a href="GATSM.html#cb62-9" tabindex="-1"></a>)</span>
-<span id="cb62-10"><a href="GATSM.html#cb62-10" tabindex="-1"></a>check_table[, <span class="sc">-</span><span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">round</span>(check_table[, <span class="sc">-</span><span class="dv">1</span>], <span class="dv">2</span>)</span>
-<span id="cb62-11"><a href="GATSM.html#cb62-11" tabindex="-1"></a>check_table</span></code></pre></div>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="GATSM.html#cb65-1" tabindex="-1"></a><span class="fu">par</span>(op)</span>
+<span id="cb65-2"><a href="GATSM.html#cb65-2" tabindex="-1"></a></span>
+<span id="cb65-3"><a href="GATSM.html#cb65-3" tabindex="-1"></a>check_table <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb65-4"><a href="GATSM.html#cb65-4" tabindex="-1"></a>  <span class="at">series =</span> <span class="fu">c</span>(<span class="st">&quot;Recomputed ACM-style&quot;</span>, <span class="st">&quot;Official ACM&quot;</span>),</span>
+<span id="cb65-5"><a href="GATSM.html#cb65-5" tabindex="-1"></a>  <span class="at">mean =</span> <span class="fu">c</span>(<span class="fu">mean</span>(check_out<span class="sc">$</span>TP10), <span class="fu">mean</span>(check_out<span class="sc">$</span>ACMTP10)),</span>
+<span id="cb65-6"><a href="GATSM.html#cb65-6" tabindex="-1"></a>  <span class="at">min =</span> <span class="fu">c</span>(<span class="fu">min</span>(check_out<span class="sc">$</span>TP10), <span class="fu">min</span>(check_out<span class="sc">$</span>ACMTP10)),</span>
+<span id="cb65-7"><a href="GATSM.html#cb65-7" tabindex="-1"></a>  <span class="at">max =</span> <span class="fu">c</span>(<span class="fu">max</span>(check_out<span class="sc">$</span>TP10), <span class="fu">max</span>(check_out<span class="sc">$</span>ACMTP10)),</span>
+<span id="cb65-8"><a href="GATSM.html#cb65-8" tabindex="-1"></a>  <span class="at">correlation_with_ACM =</span> <span class="fu">c</span>(<span class="fu">cor</span>(check_out<span class="sc">$</span>TP10, check_out<span class="sc">$</span>ACMTP10), <span class="dv">1</span>)</span>
+<span id="cb65-9"><a href="GATSM.html#cb65-9" tabindex="-1"></a>)</span>
+<span id="cb65-10"><a href="GATSM.html#cb65-10" tabindex="-1"></a>check_table[, <span class="sc">-</span><span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">round</span>(check_table[, <span class="sc">-</span><span class="dv">1</span>], <span class="dv">2</span>)</span>
+<span id="cb65-11"><a href="GATSM.html#cb65-11" tabindex="-1"></a>check_table</span></code></pre></div>
 <pre><code>##                 series mean   min  max correlation_with_ACM
 ## 1 Recomputed ACM-style 1.75 -0.73 5.01                 0.99
 ## 2         Official ACM 1.65 -1.32 5.14                 1.00</code></pre>
@@ -701,44 +728,44 @@ cumulative log inflation is conditionally Gaussian. The following calculation
 uses the U.S. CPI series in <code>DTAM</code> to give a simple historical order of magnitude
 for this term at a five-year horizon. It is only a historical benchmark, not an
 estimate of the corresponding conditional physical or risk-neutral variance.</p>
-<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="GATSM.html#cb64-1" tabindex="-1"></a><span class="co"># Purpose: Estimate the empirical order of magnitude of the Jensen term in the</span></span>
-<span id="cb64-2"><a href="GATSM.html#cb64-2" tabindex="-1"></a><span class="co"># five-year log-inflation component using U.S. CPI data from DTAM.</span></span>
-<span id="cb64-3"><a href="GATSM.html#cb64-3" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;Data_Macro_US_monthly&quot;</span>, <span class="at">package =</span> <span class="st">&quot;DTAM&quot;</span>)</span>
-<span id="cb64-4"><a href="GATSM.html#cb64-4" tabindex="-1"></a></span>
-<span id="cb64-5"><a href="GATSM.html#cb64-5" tabindex="-1"></a>h_months <span class="ot">&lt;-</span> <span class="dv">60</span></span>
-<span id="cb64-6"><a href="GATSM.html#cb64-6" tabindex="-1"></a>h_years <span class="ot">&lt;-</span> <span class="dv">5</span></span>
-<span id="cb64-7"><a href="GATSM.html#cb64-7" tabindex="-1"></a>cpi_us <span class="ot">&lt;-</span> Data_Macro_US_monthly<span class="sc">$</span>CPIAUCSL</span>
-<span id="cb64-8"><a href="GATSM.html#cb64-8" tabindex="-1"></a>dates_us <span class="ot">&lt;-</span> Data_Macro_US_monthly<span class="sc">$</span>date</span>
-<span id="cb64-9"><a href="GATSM.html#cb64-9" tabindex="-1"></a></span>
-<span id="cb64-10"><a href="GATSM.html#cb64-10" tabindex="-1"></a>pi_5y <span class="ot">&lt;-</span> <span class="fu">log</span>(</span>
-<span id="cb64-11"><a href="GATSM.html#cb64-11" tabindex="-1"></a>  cpi_us[(h_months <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span><span class="fu">length</span>(cpi_us)] <span class="sc">/</span></span>
-<span id="cb64-12"><a href="GATSM.html#cb64-12" tabindex="-1"></a>    cpi_us[<span class="dv">1</span><span class="sc">:</span>(<span class="fu">length</span>(cpi_us) <span class="sc">-</span> h_months)]</span>
-<span id="cb64-13"><a href="GATSM.html#cb64-13" tabindex="-1"></a>)</span>
-<span id="cb64-14"><a href="GATSM.html#cb64-14" tabindex="-1"></a>pi_5y_dates <span class="ot">&lt;-</span> dates_us[(h_months <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span><span class="fu">length</span>(dates_us)]</span>
-<span id="cb64-15"><a href="GATSM.html#cb64-15" tabindex="-1"></a></span>
-<span id="cb64-16"><a href="GATSM.html#cb64-16" tabindex="-1"></a>jensen_summary <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">start_date =</span> <span class="cn">NULL</span>) {</span>
-<span id="cb64-17"><a href="GATSM.html#cb64-17" tabindex="-1"></a>  keep <span class="ot">&lt;-</span> <span class="fu">is.finite</span>(pi_5y)</span>
-<span id="cb64-18"><a href="GATSM.html#cb64-18" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(start_date)) {</span>
-<span id="cb64-19"><a href="GATSM.html#cb64-19" tabindex="-1"></a>    keep <span class="ot">&lt;-</span> keep <span class="sc">&amp;</span> pi_5y_dates <span class="sc">&gt;=</span> <span class="fu">as.Date</span>(start_date)</span>
-<span id="cb64-20"><a href="GATSM.html#cb64-20" tabindex="-1"></a>  }</span>
-<span id="cb64-21"><a href="GATSM.html#cb64-21" tabindex="-1"></a>  jensen_bps <span class="ot">&lt;-</span> <span class="dv">10000</span> <span class="sc">*</span> <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">var</span>(pi_5y[keep]) <span class="sc">/</span> h_years</span>
-<span id="cb64-22"><a href="GATSM.html#cb64-22" tabindex="-1"></a>  <span class="fu">data.frame</span>(</span>
-<span id="cb64-23"><a href="GATSM.html#cb64-23" tabindex="-1"></a>    <span class="at">sample_start =</span> <span class="fu">min</span>(pi_5y_dates[keep]),</span>
-<span id="cb64-24"><a href="GATSM.html#cb64-24" tabindex="-1"></a>    <span class="at">sample_end =</span> <span class="fu">max</span>(pi_5y_dates[keep]),</span>
-<span id="cb64-25"><a href="GATSM.html#cb64-25" tabindex="-1"></a>    <span class="at">observations =</span> <span class="fu">sum</span>(keep),</span>
-<span id="cb64-26"><a href="GATSM.html#cb64-26" tabindex="-1"></a>    <span class="at">sd_average_inflation =</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">sd</span>(pi_5y[keep] <span class="sc">/</span> h_years),</span>
-<span id="cb64-27"><a href="GATSM.html#cb64-27" tabindex="-1"></a>    <span class="at">jensen_term_bps =</span> jensen_bps</span>
-<span id="cb64-28"><a href="GATSM.html#cb64-28" tabindex="-1"></a>  )</span>
-<span id="cb64-29"><a href="GATSM.html#cb64-29" tabindex="-1"></a>}</span>
-<span id="cb64-30"><a href="GATSM.html#cb64-30" tabindex="-1"></a></span>
-<span id="cb64-31"><a href="GATSM.html#cb64-31" tabindex="-1"></a>jensen_table <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
-<span id="cb64-32"><a href="GATSM.html#cb64-32" tabindex="-1"></a>  <span class="st">`</span><span class="at">Full sample</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">jensen_summary</span>(),</span>
-<span id="cb64-33"><a href="GATSM.html#cb64-33" tabindex="-1"></a>  <span class="st">`</span><span class="at">Since 1990</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">jensen_summary</span>(<span class="st">&quot;1990-01-01&quot;</span>)</span>
-<span id="cb64-34"><a href="GATSM.html#cb64-34" tabindex="-1"></a>)</span>
-<span id="cb64-35"><a href="GATSM.html#cb64-35" tabindex="-1"></a></span>
-<span id="cb64-36"><a href="GATSM.html#cb64-36" tabindex="-1"></a>jensen_table<span class="sc">$</span>sd_average_inflation <span class="ot">&lt;-</span> <span class="fu">round</span>(jensen_table<span class="sc">$</span>sd_average_inflation, <span class="dv">2</span>)</span>
-<span id="cb64-37"><a href="GATSM.html#cb64-37" tabindex="-1"></a>jensen_table<span class="sc">$</span>jensen_term_bps <span class="ot">&lt;-</span> <span class="fu">round</span>(jensen_table<span class="sc">$</span>jensen_term_bps, <span class="dv">1</span>)</span>
-<span id="cb64-38"><a href="GATSM.html#cb64-38" tabindex="-1"></a>jensen_table</span></code></pre></div>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="GATSM.html#cb67-1" tabindex="-1"></a><span class="co"># Purpose: Estimate the empirical order of magnitude of the Jensen term in the</span></span>
+<span id="cb67-2"><a href="GATSM.html#cb67-2" tabindex="-1"></a><span class="co"># five-year log-inflation component using U.S. CPI data from DTAM.</span></span>
+<span id="cb67-3"><a href="GATSM.html#cb67-3" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;Data_Macro_US_monthly&quot;</span>, <span class="at">package =</span> <span class="st">&quot;DTAM&quot;</span>)</span>
+<span id="cb67-4"><a href="GATSM.html#cb67-4" tabindex="-1"></a></span>
+<span id="cb67-5"><a href="GATSM.html#cb67-5" tabindex="-1"></a>h_months <span class="ot">&lt;-</span> <span class="dv">60</span></span>
+<span id="cb67-6"><a href="GATSM.html#cb67-6" tabindex="-1"></a>h_years <span class="ot">&lt;-</span> <span class="dv">5</span></span>
+<span id="cb67-7"><a href="GATSM.html#cb67-7" tabindex="-1"></a>cpi_us <span class="ot">&lt;-</span> Data_Macro_US_monthly<span class="sc">$</span>CPIAUCSL</span>
+<span id="cb67-8"><a href="GATSM.html#cb67-8" tabindex="-1"></a>dates_us <span class="ot">&lt;-</span> Data_Macro_US_monthly<span class="sc">$</span>date</span>
+<span id="cb67-9"><a href="GATSM.html#cb67-9" tabindex="-1"></a></span>
+<span id="cb67-10"><a href="GATSM.html#cb67-10" tabindex="-1"></a>pi_5y <span class="ot">&lt;-</span> <span class="fu">log</span>(</span>
+<span id="cb67-11"><a href="GATSM.html#cb67-11" tabindex="-1"></a>  cpi_us[(h_months <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span><span class="fu">length</span>(cpi_us)] <span class="sc">/</span></span>
+<span id="cb67-12"><a href="GATSM.html#cb67-12" tabindex="-1"></a>    cpi_us[<span class="dv">1</span><span class="sc">:</span>(<span class="fu">length</span>(cpi_us) <span class="sc">-</span> h_months)]</span>
+<span id="cb67-13"><a href="GATSM.html#cb67-13" tabindex="-1"></a>)</span>
+<span id="cb67-14"><a href="GATSM.html#cb67-14" tabindex="-1"></a>pi_5y_dates <span class="ot">&lt;-</span> dates_us[(h_months <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span><span class="fu">length</span>(dates_us)]</span>
+<span id="cb67-15"><a href="GATSM.html#cb67-15" tabindex="-1"></a></span>
+<span id="cb67-16"><a href="GATSM.html#cb67-16" tabindex="-1"></a>jensen_summary <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">start_date =</span> <span class="cn">NULL</span>) {</span>
+<span id="cb67-17"><a href="GATSM.html#cb67-17" tabindex="-1"></a>  keep <span class="ot">&lt;-</span> <span class="fu">is.finite</span>(pi_5y)</span>
+<span id="cb67-18"><a href="GATSM.html#cb67-18" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(start_date)) {</span>
+<span id="cb67-19"><a href="GATSM.html#cb67-19" tabindex="-1"></a>    keep <span class="ot">&lt;-</span> keep <span class="sc">&amp;</span> pi_5y_dates <span class="sc">&gt;=</span> <span class="fu">as.Date</span>(start_date)</span>
+<span id="cb67-20"><a href="GATSM.html#cb67-20" tabindex="-1"></a>  }</span>
+<span id="cb67-21"><a href="GATSM.html#cb67-21" tabindex="-1"></a>  jensen_bps <span class="ot">&lt;-</span> <span class="dv">10000</span> <span class="sc">*</span> <span class="fl">0.5</span> <span class="sc">*</span> <span class="fu">var</span>(pi_5y[keep]) <span class="sc">/</span> h_years</span>
+<span id="cb67-22"><a href="GATSM.html#cb67-22" tabindex="-1"></a>  <span class="fu">data.frame</span>(</span>
+<span id="cb67-23"><a href="GATSM.html#cb67-23" tabindex="-1"></a>    <span class="at">sample_start =</span> <span class="fu">min</span>(pi_5y_dates[keep]),</span>
+<span id="cb67-24"><a href="GATSM.html#cb67-24" tabindex="-1"></a>    <span class="at">sample_end =</span> <span class="fu">max</span>(pi_5y_dates[keep]),</span>
+<span id="cb67-25"><a href="GATSM.html#cb67-25" tabindex="-1"></a>    <span class="at">observations =</span> <span class="fu">sum</span>(keep),</span>
+<span id="cb67-26"><a href="GATSM.html#cb67-26" tabindex="-1"></a>    <span class="at">sd_average_inflation =</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">sd</span>(pi_5y[keep] <span class="sc">/</span> h_years),</span>
+<span id="cb67-27"><a href="GATSM.html#cb67-27" tabindex="-1"></a>    <span class="at">jensen_term_bps =</span> jensen_bps</span>
+<span id="cb67-28"><a href="GATSM.html#cb67-28" tabindex="-1"></a>  )</span>
+<span id="cb67-29"><a href="GATSM.html#cb67-29" tabindex="-1"></a>}</span>
+<span id="cb67-30"><a href="GATSM.html#cb67-30" tabindex="-1"></a></span>
+<span id="cb67-31"><a href="GATSM.html#cb67-31" tabindex="-1"></a>jensen_table <span class="ot">&lt;-</span> <span class="fu">rbind</span>(</span>
+<span id="cb67-32"><a href="GATSM.html#cb67-32" tabindex="-1"></a>  <span class="st">`</span><span class="at">Full sample</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">jensen_summary</span>(),</span>
+<span id="cb67-33"><a href="GATSM.html#cb67-33" tabindex="-1"></a>  <span class="st">`</span><span class="at">Since 1990</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">jensen_summary</span>(<span class="st">&quot;1990-01-01&quot;</span>)</span>
+<span id="cb67-34"><a href="GATSM.html#cb67-34" tabindex="-1"></a>)</span>
+<span id="cb67-35"><a href="GATSM.html#cb67-35" tabindex="-1"></a></span>
+<span id="cb67-36"><a href="GATSM.html#cb67-36" tabindex="-1"></a>jensen_table<span class="sc">$</span>sd_average_inflation <span class="ot">&lt;-</span> <span class="fu">round</span>(jensen_table<span class="sc">$</span>sd_average_inflation, <span class="dv">2</span>)</span>
+<span id="cb67-37"><a href="GATSM.html#cb67-37" tabindex="-1"></a>jensen_table<span class="sc">$</span>jensen_term_bps <span class="ot">&lt;-</span> <span class="fu">round</span>(jensen_table<span class="sc">$</span>jensen_term_bps, <span class="dv">1</span>)</span>
+<span id="cb67-38"><a href="GATSM.html#cb67-38" tabindex="-1"></a>jensen_table</span></code></pre></div>
 <pre><code>##             sample_start sample_end observations sd_average_inflation
 ## Full sample   1964-01-01 2025-06-01          738                 2.15
 ## Since 1990    1990-01-01 2025-06-01          426                 0.88
@@ -746,6 +773,12 @@ estimate of the corresponding conditional physical or risk-neutral variance.</p>
 ## Full sample            11.6
 ## Since 1990              1.9</code></pre>
 
+</div>
+</div>
+<h3>References<a href="references.html#references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-ipekKisacikoglu2026" class="csl-entry">
+İpek, Mahmut S., and Burçin Kısacıkoğlu. 2026. <span>“Estimating Euro Area Output Gap Dynamics: Evidence from the Updated Area-Wide Model Database.”</span> <em>European Economic Review</em> 181: 105179. <a href="https://doi.org/10.1016/j.euroecorev.2025.105179">https://doi.org/10.1016/j.euroecorev.2025.105179</a>.
 </div>
 </div>
             </section>

@@ -420,8 +420,8 @@ legend("topright",
        col= c("darkgrey","black"),
        seg.len = 3)
 
-# Compute probability of default:
-PD <- 1 - exp(t(apply(f_PD,1,cumsum)))
+# Compute the cumulative probability of default from cumulative intensities.
+PD <- 1 - exp(-t(apply(f_PD,1,cumsum)))
 
 ```
 
@@ -569,8 +569,8 @@ legend("topright",
 # lines(y_simul,col="red",lwd=2,lty=3)
 # -----------------------------------------------------------------------------
 
-# Probability of default:
-PD <- 1 - exp(t(apply(f_PD,1,cumsum)))
+# Compute the cumulative probability of default from cumulative intensities.
+PD <- 1 - exp(-t(apply(f_PD,1,cumsum)))
 
 plot(10000*(y_bond[,H]-y_rf[,H]),type="l",col="white",las=1,
      ylim=10000*c(0,.045),xlab="",ylab="",
@@ -581,7 +581,7 @@ lines(10000*(y_bond[,H]-y_rf[,H]),col="black",lwd=2,lty=3)
 
 legend("topleft",
        c(expression(paste("Credit spread (",{r^d}[t*','*h]," - ",tilde(r)[t*','*h],")",sep="")),
-         expression(paste("Default probability (annualized)",sep=""))),
+         expression(paste("Average default intensity (annualized)",sep=""))),
        lty=c(3,1),
        lwd=c(2,2),
        pt.cex = 1,

@@ -9,6 +9,11 @@ is deliberately descriptive: low \(R^2\) values do not, by themselves, reject a
 structural term-structure model, but they show why empirical work often introduces
 unspanned macroeconomic variables.
 
+The euro-area real GDP, HICP, and unemployment series are drawn from the March
+2026 vintage of the Updated Area-Wide Model Database. Its construction and
+updating methodology are documented by @ipekKisacikoglu2026; the current
+vintage is distributed through the EABCN Area-Wide Model data page.
+
 ```{r fig_GATSM_macro_spanning, fig.width=7.2, fig.height=4.4}
 # Purpose: This example checks how much macroeconomic variation is spanned by
 # the first three empirical yield-curve principal components in the U.S. and euro area.

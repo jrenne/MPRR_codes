@@ -23,7 +23,7 @@
 <meta name="author" content="Jean-Paul Renne, Alain Monfort, Fulvio Pegoraro, and Guillaume Roussellet" />
 
 
-<meta name="date" content="2026-07-09" />
+<meta name="date" content="2026-08-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -122,6 +122,29 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <style type="text/css">
   
   div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
 </style>
 
 <link rel="stylesheet" href="style.css" type="text/css" />
@@ -342,7 +365,95 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="PricingRNdynamics" class="section level1 hasAnchor" number="2">
 <h1><span class="header-section-number">Chapter 2</span> No-arbitrage pricing and risk-neutral dynamics<a href="PricingRNdynamics.html#PricingRNdynamics" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p>This chapter is mainly theoretical and does not have dedicated replication code.</p>
+<p>Most of this chapter is theoretical. The following example illustrates how a stochastic
+discount factor transforms physical probabilities into risk-neutral probabilities in a
+three-state economy.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="PricingRNdynamics.html#cb7-1" tabindex="-1"></a><span class="co"># Purpose: Compare physical and risk-neutral probabilities implied by a simple SDF.</span></span>
+<span id="cb7-2"><a href="PricingRNdynamics.html#cb7-2" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="PricingRNdynamics.html#cb7-3" tabindex="-1"></a>states <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Normal&quot;</span>, <span class="st">&quot;Good&quot;</span>, <span class="st">&quot;Bad&quot;</span>)</span>
+<span id="cb7-4"><a href="PricingRNdynamics.html#cb7-4" tabindex="-1"></a>physical_prob <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.60</span>, <span class="fl">0.25</span>, <span class="fl">0.15</span>)</span>
+<span id="cb7-5"><a href="PricingRNdynamics.html#cb7-5" tabindex="-1"></a>sdf <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.90</span>, <span class="fl">0.80</span>, <span class="fl">1.60</span>)</span>
+<span id="cb7-6"><a href="PricingRNdynamics.html#cb7-6" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="PricingRNdynamics.html#cb7-7" tabindex="-1"></a><span class="co"># State prices, risk-free discount factor, and risk-neutral probabilities.</span></span>
+<span id="cb7-8"><a href="PricingRNdynamics.html#cb7-8" tabindex="-1"></a>state_price <span class="ot">&lt;-</span> physical_prob <span class="sc">*</span> sdf</span>
+<span id="cb7-9"><a href="PricingRNdynamics.html#cb7-9" tabindex="-1"></a>risk_free_discount <span class="ot">&lt;-</span> <span class="fu">sum</span>(state_price)</span>
+<span id="cb7-10"><a href="PricingRNdynamics.html#cb7-10" tabindex="-1"></a>short_rate <span class="ot">&lt;-</span> <span class="sc">-</span><span class="fu">log</span>(risk_free_discount)</span>
+<span id="cb7-11"><a href="PricingRNdynamics.html#cb7-11" tabindex="-1"></a>risk_neutral_prob <span class="ot">&lt;-</span> state_price <span class="sc">/</span> risk_free_discount</span>
+<span id="cb7-12"><a href="PricingRNdynamics.html#cb7-12" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="PricingRNdynamics.html#cb7-13" tabindex="-1"></a><span class="co"># Payoffs of the procyclical and insurance assets used in the book.</span></span>
+<span id="cb7-14"><a href="PricingRNdynamics.html#cb7-14" tabindex="-1"></a>payoff_procyclical <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">100</span>, <span class="dv">130</span>, <span class="dv">50</span>)</span>
+<span id="cb7-15"><a href="PricingRNdynamics.html#cb7-15" tabindex="-1"></a>payoff_insurance <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">100</span>, <span class="dv">70</span>, <span class="dv">150</span>)</span>
+<span id="cb7-16"><a href="PricingRNdynamics.html#cb7-16" tabindex="-1"></a>physical_expected_payoff <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb7-17"><a href="PricingRNdynamics.html#cb7-17" tabindex="-1"></a>  <span class="at">procyclical =</span> <span class="fu">sum</span>(physical_prob <span class="sc">*</span> payoff_procyclical),</span>
+<span id="cb7-18"><a href="PricingRNdynamics.html#cb7-18" tabindex="-1"></a>  <span class="at">insurance =</span> <span class="fu">sum</span>(physical_prob <span class="sc">*</span> payoff_insurance)</span>
+<span id="cb7-19"><a href="PricingRNdynamics.html#cb7-19" tabindex="-1"></a>)</span>
+<span id="cb7-20"><a href="PricingRNdynamics.html#cb7-20" tabindex="-1"></a>risk_neutral_expected_payoff <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb7-21"><a href="PricingRNdynamics.html#cb7-21" tabindex="-1"></a>  <span class="at">procyclical =</span> <span class="fu">sum</span>(risk_neutral_prob <span class="sc">*</span> payoff_procyclical),</span>
+<span id="cb7-22"><a href="PricingRNdynamics.html#cb7-22" tabindex="-1"></a>  <span class="at">insurance =</span> <span class="fu">sum</span>(risk_neutral_prob <span class="sc">*</span> payoff_insurance)</span>
+<span id="cb7-23"><a href="PricingRNdynamics.html#cb7-23" tabindex="-1"></a>)</span>
+<span id="cb7-24"><a href="PricingRNdynamics.html#cb7-24" tabindex="-1"></a>asset_price <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb7-25"><a href="PricingRNdynamics.html#cb7-25" tabindex="-1"></a>  <span class="at">procyclical =</span> <span class="fu">sum</span>(state_price <span class="sc">*</span> payoff_procyclical),</span>
+<span id="cb7-26"><a href="PricingRNdynamics.html#cb7-26" tabindex="-1"></a>  <span class="at">insurance =</span> <span class="fu">sum</span>(state_price <span class="sc">*</span> payoff_insurance)</span>
+<span id="cb7-27"><a href="PricingRNdynamics.html#cb7-27" tabindex="-1"></a>)</span>
+<span id="cb7-28"><a href="PricingRNdynamics.html#cb7-28" tabindex="-1"></a></span>
+<span id="cb7-29"><a href="PricingRNdynamics.html#cb7-29" tabindex="-1"></a><span class="co"># Report the quantities used in the text and verify the pricing identity.</span></span>
+<span id="cb7-30"><a href="PricingRNdynamics.html#cb7-30" tabindex="-1"></a>three_state_results <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb7-31"><a href="PricingRNdynamics.html#cb7-31" tabindex="-1"></a>  <span class="at">state =</span> states,</span>
+<span id="cb7-32"><a href="PricingRNdynamics.html#cb7-32" tabindex="-1"></a>  <span class="at">physical_prob =</span> physical_prob,</span>
+<span id="cb7-33"><a href="PricingRNdynamics.html#cb7-33" tabindex="-1"></a>  <span class="at">sdf =</span> sdf,</span>
+<span id="cb7-34"><a href="PricingRNdynamics.html#cb7-34" tabindex="-1"></a>  <span class="at">state_price =</span> state_price,</span>
+<span id="cb7-35"><a href="PricingRNdynamics.html#cb7-35" tabindex="-1"></a>  <span class="at">risk_neutral_prob =</span> risk_neutral_prob,</span>
+<span id="cb7-36"><a href="PricingRNdynamics.html#cb7-36" tabindex="-1"></a>  <span class="at">payoff_procyclical =</span> payoff_procyclical,</span>
+<span id="cb7-37"><a href="PricingRNdynamics.html#cb7-37" tabindex="-1"></a>  <span class="at">payoff_insurance =</span> payoff_insurance</span>
+<span id="cb7-38"><a href="PricingRNdynamics.html#cb7-38" tabindex="-1"></a>)</span>
+<span id="cb7-39"><a href="PricingRNdynamics.html#cb7-39" tabindex="-1"></a><span class="fu">print</span>(three_state_results)</span></code></pre></div>
+<pre><code>##    state physical_prob sdf state_price risk_neutral_prob payoff_procyclical
+## 1 Normal          0.60 0.9        0.54         0.5510204                100
+## 2   Good          0.25 0.8        0.20         0.2040816                130
+## 3    Bad          0.15 1.6        0.24         0.2448980                 50
+##   payoff_insurance
+## 1              100
+## 2               70
+## 3              150</code></pre>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="PricingRNdynamics.html#cb9-1" tabindex="-1"></a><span class="fu">stopifnot</span>(</span>
+<span id="cb9-2"><a href="PricingRNdynamics.html#cb9-2" tabindex="-1"></a>  <span class="fu">abs</span>(<span class="fu">sum</span>(risk_neutral_prob) <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">&lt;</span> <span class="fl">1e-12</span>,</span>
+<span id="cb9-3"><a href="PricingRNdynamics.html#cb9-3" tabindex="-1"></a>  <span class="fu">all</span>(<span class="fu">abs</span>(physical_expected_payoff <span class="sc">-</span> <span class="dv">100</span>) <span class="sc">&lt;</span> <span class="fl">1e-12</span>),</span>
+<span id="cb9-4"><a href="PricingRNdynamics.html#cb9-4" tabindex="-1"></a>  <span class="fu">all</span>(<span class="fu">abs</span>(asset_price <span class="sc">-</span> risk_free_discount <span class="sc">*</span> risk_neutral_expected_payoff) <span class="sc">&lt;</span> <span class="fl">1e-12</span>),</span>
+<span id="cb9-5"><a href="PricingRNdynamics.html#cb9-5" tabindex="-1"></a>  <span class="fu">abs</span>(asset_price[<span class="st">&quot;procyclical&quot;</span>] <span class="sc">-</span> <span class="dv">92</span>) <span class="sc">&lt;</span> <span class="fl">1e-12</span>,</span>
+<span id="cb9-6"><a href="PricingRNdynamics.html#cb9-6" tabindex="-1"></a>  <span class="fu">abs</span>(asset_price[<span class="st">&quot;insurance&quot;</span>] <span class="sc">-</span> <span class="dv">104</span>) <span class="sc">&lt;</span> <span class="fl">1e-12</span></span>
+<span id="cb9-7"><a href="PricingRNdynamics.html#cb9-7" tabindex="-1"></a>)</span>
+<span id="cb9-8"><a href="PricingRNdynamics.html#cb9-8" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="PricingRNdynamics.html#cb9-9" tabindex="-1"></a><span class="co"># Compare physical and risk-neutral probabilities.</span></span>
+<span id="cb9-10"><a href="PricingRNdynamics.html#cb9-10" tabindex="-1"></a>probabilities_to_plot <span class="ot">&lt;-</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">rbind</span>(</span>
+<span id="cb9-11"><a href="PricingRNdynamics.html#cb9-11" tabindex="-1"></a>  <span class="st">&quot;Physical probability&quot;</span> <span class="ot">=</span> physical_prob,</span>
+<span id="cb9-12"><a href="PricingRNdynamics.html#cb9-12" tabindex="-1"></a>  <span class="st">&quot;Risk-neutral probability&quot;</span> <span class="ot">=</span> risk_neutral_prob</span>
+<span id="cb9-13"><a href="PricingRNdynamics.html#cb9-13" tabindex="-1"></a>)</span>
+<span id="cb9-14"><a href="PricingRNdynamics.html#cb9-14" tabindex="-1"></a></span>
+<span id="cb9-15"><a href="PricingRNdynamics.html#cb9-15" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">4.2</span>, <span class="fl">4.3</span>, <span class="fl">0.8</span>, <span class="fl">0.8</span>))</span>
+<span id="cb9-16"><a href="PricingRNdynamics.html#cb9-16" tabindex="-1"></a>bar_positions <span class="ot">&lt;-</span> <span class="fu">barplot</span>(</span>
+<span id="cb9-17"><a href="PricingRNdynamics.html#cb9-17" tabindex="-1"></a>  probabilities_to_plot,</span>
+<span id="cb9-18"><a href="PricingRNdynamics.html#cb9-18" tabindex="-1"></a>  <span class="at">beside =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb9-19"><a href="PricingRNdynamics.html#cb9-19" tabindex="-1"></a>  <span class="at">names.arg =</span> states,</span>
+<span id="cb9-20"><a href="PricingRNdynamics.html#cb9-20" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;lightgrey&quot;</span>, <span class="st">&quot;darkgrey&quot;</span>),</span>
+<span id="cb9-21"><a href="PricingRNdynamics.html#cb9-21" tabindex="-1"></a>  <span class="at">border =</span> <span class="st">&quot;black&quot;</span>,</span>
+<span id="cb9-22"><a href="PricingRNdynamics.html#cb9-22" tabindex="-1"></a>  <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">70</span>),</span>
+<span id="cb9-23"><a href="PricingRNdynamics.html#cb9-23" tabindex="-1"></a>  <span class="at">ylab =</span> <span class="st">&quot;Probability (percent)&quot;</span>,</span>
+<span id="cb9-24"><a href="PricingRNdynamics.html#cb9-24" tabindex="-1"></a>  <span class="at">las =</span> <span class="dv">1</span></span>
+<span id="cb9-25"><a href="PricingRNdynamics.html#cb9-25" tabindex="-1"></a>)</span>
+<span id="cb9-26"><a href="PricingRNdynamics.html#cb9-26" tabindex="-1"></a><span class="fu">text</span>(</span>
+<span id="cb9-27"><a href="PricingRNdynamics.html#cb9-27" tabindex="-1"></a>  bar_positions,</span>
+<span id="cb9-28"><a href="PricingRNdynamics.html#cb9-28" tabindex="-1"></a>  probabilities_to_plot <span class="sc">+</span> <span class="fl">2.2</span>,</span>
+<span id="cb9-29"><a href="PricingRNdynamics.html#cb9-29" tabindex="-1"></a>  <span class="at">labels =</span> <span class="fu">sprintf</span>(<span class="st">&quot;%.1f&quot;</span>, probabilities_to_plot),</span>
+<span id="cb9-30"><a href="PricingRNdynamics.html#cb9-30" tabindex="-1"></a>  <span class="at">cex =</span> <span class="fl">0.85</span></span>
+<span id="cb9-31"><a href="PricingRNdynamics.html#cb9-31" tabindex="-1"></a>)</span>
+<span id="cb9-32"><a href="PricingRNdynamics.html#cb9-32" tabindex="-1"></a><span class="fu">legend</span>(</span>
+<span id="cb9-33"><a href="PricingRNdynamics.html#cb9-33" tabindex="-1"></a>  <span class="st">&quot;topright&quot;</span>,</span>
+<span id="cb9-34"><a href="PricingRNdynamics.html#cb9-34" tabindex="-1"></a>  <span class="at">legend =</span> <span class="fu">rownames</span>(probabilities_to_plot),</span>
+<span id="cb9-35"><a href="PricingRNdynamics.html#cb9-35" tabindex="-1"></a>  <span class="at">fill =</span> <span class="fu">c</span>(<span class="st">&quot;lightgrey&quot;</span>, <span class="st">&quot;darkgrey&quot;</span>),</span>
+<span id="cb9-36"><a href="PricingRNdynamics.html#cb9-36" tabindex="-1"></a>  <span class="at">border =</span> <span class="st">&quot;black&quot;</span>,</span>
+<span id="cb9-37"><a href="PricingRNdynamics.html#cb9-37" tabindex="-1"></a>  <span class="at">bty =</span> <span class="st">&quot;n&quot;</span></span>
+<span id="cb9-38"><a href="PricingRNdynamics.html#cb9-38" tabindex="-1"></a>)</span></code></pre></div>
+<p><img src="_main_files/figure-html/fig_three_state_probabilities-1.png" width="672" /></p>
 
 </div>
             </section>
