@@ -16,7 +16,7 @@
 }
 
 .book .book-body .page-wrapper .page-inner {
-  max-width: 880px;
+  max-width: 920px;
   padding: 34px 32px 60px;
 }
 
@@ -77,6 +77,21 @@
 .book-summary {
   background: #f8fafb;
   border-right: 1px solid var(--mprr-border);
+}
+
+@media (min-width: 1100px) {
+  .book .book-summary {
+    left: -340px;
+    width: 340px;
+  }
+
+  .book.with-summary .book-summary {
+    left: 0;
+  }
+
+  .book.with-summary .book-body {
+    left: 340px;
+  }
 }
 
 .book-summary ul.summary li a,
