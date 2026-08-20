@@ -1,14 +1,223 @@
+:root {
+  --mprr-blue: #245b7d;
+  --mprr-blue-dark: #173e59;
+  --mprr-blue-pale: #edf4f8;
+  --mprr-text: #29343d;
+  --mprr-muted: #667581;
+  --mprr-border: #dce4e9;
+  --mprr-code: #f6f8fa;
+}
+
+/* Main reading area */
+.book.font-family-1,
+.book .book-body .page-wrapper .page-inner {
+  color: var(--mprr-text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+.book .book-body .page-wrapper .page-inner {
+  max-width: 880px;
+  padding: 34px 32px 60px;
+}
+
+.book-header {
+  border-bottom: 1px solid #e7ecef;
+}
+
+.book-header h1 {
+  color: #50606c;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.book-body .body-inner {
+  background: #fff;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal {
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal p,
+.book .book-body .page-wrapper .page-inner section.normal li {
+  line-height: 1.65;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal h1,
+.book .book-body .page-wrapper .page-inner section.normal h2,
+.book .book-body .page-wrapper .page-inner section.normal h3 {
+  color: var(--mprr-blue-dark);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal h1 {
+  border-bottom: 1px solid var(--mprr-border);
+  font-size: 2.1em;
+  margin-bottom: 0.8em;
+  padding-bottom: 0.28em;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal h2 {
+  font-size: 1.55em;
+  margin-top: 1.8em;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal h3 {
+  font-size: 1.25em;
+  margin-top: 1.55em;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal a {
+  color: var(--mprr-blue);
+}
+
+/* Table of contents */
+.book-summary {
+  background: #f8fafb;
+  border-right: 1px solid var(--mprr-border);
+}
+
+.book-summary ul.summary li a,
+.book-summary ul.summary li span {
+  color: #394954;
+  line-height: 1.35;
+  padding-bottom: 7px;
+  padding-top: 7px;
+}
+
+.book-summary ul.summary > li:first-child a {
+  color: var(--mprr-blue-dark);
+  font-weight: 650;
+  padding-bottom: 12px;
+  padding-top: 15px;
+}
+
+.book-summary ul.summary li.active > a {
+  background: var(--mprr-blue-pale);
+  border-left: 3px solid var(--mprr-blue);
+  color: var(--mprr-blue-dark);
+  font-weight: 600;
+  padding-left: 12px;
+}
+
+.book-summary ul.summary li ul li a {
+  color: #5e6c76;
+  font-size: 13px;
+}
+
+/* Figures, tables, and captions */
+.book .book-body .page-wrapper .page-inner section.normal img {
+  display: block;
+  height: auto;
+  margin: 1.3em auto 0.7em;
+  max-width: 100%;
+}
+
 p.caption {
-  color: #777;
-  margin-top: 10px;
+  color: var(--mprr-muted);
+  font-size: 0.92em;
+  line-height: 1.45;
+  margin-top: 8px;
+  text-align: left;
 }
-p code {
-  white-space: inherit;
+
+.book .book-body .page-wrapper .page-inner section.normal table {
+  border: 1px solid var(--mprr-border);
+  font-size: 0.94em;
+  margin: 1.4em auto;
 }
-pre {
+
+.book .book-body .page-wrapper .page-inner section.normal table th {
+  background: var(--mprr-blue-pale);
+  color: var(--mprr-blue-dark);
+}
+
+.book .book-body .page-wrapper .page-inner section.normal table td,
+.book .book-body .page-wrapper .page-inner section.normal table th {
+  border-color: var(--mprr-border);
+  padding: 8px 10px;
+}
+
+/* Folded code chunks */
+details.chunk-details {
+  background: #fbfcfd;
+  border: 1px solid var(--mprr-border);
+  border-radius: 6px;
+  margin: 1em 0 1.35em;
+  overflow: hidden;
+}
+
+summary.chunk-summary {
+  color: var(--mprr-blue);
+  cursor: pointer;
+  font-size: 0.9em;
+  font-weight: 600;
+  padding: 8px 12px;
+}
+
+details.chunk-details[open] summary.chunk-summary {
+  border-bottom: 1px solid var(--mprr-border);
+}
+
+.book .book-body .page-wrapper .page-inner section.normal pre {
+  background: var(--mprr-code);
+  border: 1px solid var(--mprr-border);
+  border-radius: 5px;
+  font-size: 0.86em;
+  line-height: 1.5;
   word-break: normal;
   word-wrap: normal;
 }
+
+details.chunk-details pre {
+  border: 0 !important;
+  border-radius: 0 !important;
+  margin: 0 !important;
+}
+
+p code {
+  background: #f0f3f5;
+  border-radius: 3px;
+  padding: 0.1em 0.3em;
+  white-space: inherit;
+}
+
 pre code {
   white-space: inherit;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal blockquote {
+  border-left-color: #8fb1c7;
+  color: #53636f;
+}
+
+.footnotes {
+  color: var(--mprr-muted);
+  font-size: 0.92em;
+}
+
+/* Keep only the controls useful for navigating and reading the code. */
+.book-header a[aria-label="Edit"],
+.book-header a[aria-label="Download"],
+.book-header a[aria-label="Information about the toolbar"],
+.book-header a[aria-label="Twitter"],
+.book-header a[aria-label="Facebook"],
+.book-header a[aria-label="Share"] {
+  display: none !important;
+}
+
+@media (max-width: 700px) {
+  .book .book-body .page-wrapper .page-inner {
+    padding: 24px 20px 45px;
+  }
+
+  .book .book-body .page-wrapper .page-inner section.normal {
+    font-size: 15px;
+  }
+
+  .book .book-body .page-wrapper .page-inner section.normal h1 {
+    font-size: 1.8em;
+  }
 }

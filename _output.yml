@@ -6,9 +6,11 @@ bookdown::gitbook:
       before: |
         <li><a href="./">Asset Pricing with Discrete-Time Affine Processes</a></li>
       after: |
-        <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
-    edit: https://github.com/USERNAME/REPO/edit/BRANCH/%s
-    download: ["pdf", "epub"]
+        <li><a href="https://github.com/jrenne/MPRR_codes" target="_blank">Source code on GitHub</a></li>
+    sharing:
+      facebook: no
+      twitter: no
+      all: []
 bookdown::pdf_book:
   includes:
     in_header: preamble.tex
