@@ -5,19 +5,6 @@ that belong to the `DTAM` package are documented and distributed through that
 package. Licensed or otherwise restricted inputs are kept locally in the
 Git-ignored `private_data/` directory and are not part of this repository.
 
-## `ta-us-treasury-sifma.xlsx`
-
-Source workbook for the Treasury issuance and outstanding-debt example in
-Chapter 3. The code uses the `Issuance` and `Outstanding` sheets. The workbook
-was downloaded from SIFMA Research's U.S. Treasury Securities Statistics page:
-
-<https://www.sifma.org/research/statistics/us-fixed-income-securities-statistics>
-
-The workbook identifies the underlying sources for the series used in the book
-as the U.S. Department of the Treasury and the Bureau of the Fiscal Service.
-Users should cite SIFMA and the underlying source and check SIFMA's current
-website terms before redistributing the workbook or using it commercially.
-
 ## `Futures_extraction_template.xlsx`
 
 A blank workbook supplied to help readers reconstruct the natural-gas futures
@@ -67,3 +54,16 @@ Sources:
 - [Federal Reserve charge-off and delinquency release](https://www.federalreserve.gov/releases/chargeoff/)
 - [Federal Reserve series `CORBLACBS`](https://fred.stlouisfed.org/series/CORBLACBS)
 - [Amato and Remolona (2003), "The credit spread puzzle"](https://www.bis.org/publ/qtrpdf/r_qt0312e.pdf)
+
+## Restricted source used locally
+
+The Treasury issuance and outstanding-debt example in Chapter 3 uses the
+`Issuance` and `Outstanding` sheets of SIFMA Research's U.S. Treasury
+Securities Statistics workbook:
+
+<https://www.sifma.org/research/statistics/us-fixed-income-securities-statistics>
+
+The workbook is not redistributed. An authorized local copy may be stored as
+`private_data/ta-us-treasury-sifma.xlsx`; that directory is excluded from Git.
+The workbook identifies the underlying sources for the series used in the book
+as the U.S. Department of the Treasury and the Bureau of the Fiscal Service.

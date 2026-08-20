@@ -46,7 +46,6 @@ a-varg-term-structure-model-can-generate-movements
 a-three-regime-gaussian-regime-switching-short-rate
 ShadowRate
 shadow-rate-and-unconstrained-gaussian-term-structures-in-the-simple-wu-xia-setting
-shadow-rate-bond-pricing-and-monte-carlo-validation
 the-lower-bound-changes-conditional-rate-volatility-across-maturities
 the-shadow-rate-idea-in-a-small-new-keynesian-model-with-nominal-and-real-curves
 shadow-rate-pricing-of-defaultable-bond-spreads
@@ -54,6 +53,7 @@ shadow-default-intensity-and-credit-spreads-in-a-fiscal-limits-setting
 non-gaussian-shadow-rate-model-with-jump-like-factors
 shadow-rate-with-arg-stochastic-volatility
 affine-transform-methods-to-a-simple-climate-finance-model
+monte-carlo-assessment-of-the-affine-approximation-used-in-the-scc-example
 forward-futures-dividends-commodity-pricing-and-convenience-yields
 persistent-seasonal-factors-can-generate-recurring-convenience-yield-patterns
 observed-futures-term-structures-at-a-few-selected-dates

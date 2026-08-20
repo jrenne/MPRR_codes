@@ -197,7 +197,7 @@ par(op)
 ## Treasury issuance and outstanding debt by maturity
 
 This example documents the maturity composition of Treasury issuance and the stock of debt outstanding.
-The source workbook is available from [SIFMA's U.S. Fixed Income Securities Statistics page](https://www.sifma.org/research/statistics/us-fixed-income-securities-statistics). The workbook identifies the underlying sources for the series used here as the U.S. Department of the Treasury and the Bureau of the Fiscal Service.
+The source workbook is available from [SIFMA's U.S. Fixed Income Securities Statistics page](https://www.sifma.org/research/statistics/us-fixed-income-securities-statistics). The workbook identifies the underlying sources for the series used here as the U.S. Department of the Treasury and the Bureau of the Fiscal Service. Because the workbook is subject to SIFMA's terms of use, it is not redistributed with this repository; the code below can be run after an authorized copy has been placed in the local `private_data` directory.
 
 ```{r SIFMA, fig.width = 10, fig.height = 5}
 # Purpose: This example documents the maturity composition of Treasury issuance and the stock of
@@ -206,6 +206,17 @@ library(tidyverse)
 library(zoo)
 library(patchwork)
 library(readxl)
+
+sifma_path <- "private_data/ta-us-treasury-sifma.xlsx"
+if (!file.exists(sifma_path)) {
+  stop(
+    paste0(
+      "The SIFMA source workbook is not distributed with this repository. ",
+      "Obtain an authorized copy and save it as ", sifma_path, "."
+    ),
+    call. = FALSE
+  )
+}
 
 theme_baseR <- function() {
   theme_classic(base_size = 12) +
@@ -228,7 +239,7 @@ theme_baseR <- function() {
 }
 
 # Load and reshape Treasury issuance data.
-ta_us_treasury_sifma <- read_excel("data/ta-us-treasury-sifma.xlsx", sheet = "Issuance", skip = 5)
+ta_us_treasury_sifma <- read_excel(sifma_path, sheet = "Issuance", skip = 5)
 ta_us_treasury_sifma <- ta_us_treasury_sifma %>%
   as_tibble() %>%
   dplyr::select(-...5, -...9, -...13)
@@ -251,7 +262,7 @@ ta_us_treasury_sifma <- ta_us_treasury_sifma %>%
 
 # Load and reshape the outstanding-debt data.
 ta_us_treasury_sifma_OS <- read_excel(
-  "data/ta-us-treasury-sifma.xlsx",
+  sifma_path,
   sheet = "Outstanding",
   skip = 3
 )
