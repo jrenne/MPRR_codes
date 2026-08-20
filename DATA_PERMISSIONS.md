@@ -29,6 +29,14 @@ Git-ignored `private_data/` directory and are not distributed. These include:
 - natural-gas futures observations obtained through licensed LSEG Workspace
   and Datastream access.
 
+On 20 August 2026, an LSEG account manager confirmed in writing that the
+natural-gas futures chart identified in the request may appear in the book and
+on its public companion website, provided that the chart displays a clear and
+visible source. The chart therefore carries the wording "Source: LSEG
+Datastream via LSEG Workspace." This confirmation does not authorize
+redistribution of the underlying observations, which remain private and are
+not included in this repository or in DTAM.
+
 Readers should obtain these inputs from their original provider under terms
 applicable to their own access. Source pages are linked at the relevant point
 in the Bookdown and in `data/README.md`.
