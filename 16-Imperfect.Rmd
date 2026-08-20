@@ -1222,8 +1222,6 @@ for(indic_FI in all_indic_FI){
   if(!indic_FI){
     # Imperfect information
     model <- model_IIRE
-    model$Psi0 <- model$Psi0 + model$Gamma0
-    model$Gamma0 <- 0*model$Gamma0
   }else{
     # Full information
     model <- model_IIRE
@@ -1233,6 +1231,9 @@ for(indic_FI in all_indic_FI){
   }
   
   res <- solve_Learning_RE(model)
+  if(!all(res$converged) || max(res$structural_residuals) > 1e-8){
+    stop("The imperfect-information RE solution failed its equilibrium checks.")
+  }
   
   for(shock in 1:nb_shocks){
     x <- c(res$Sigma12_ww[,shock])
