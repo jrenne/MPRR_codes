@@ -132,4 +132,3 @@ additional-implications-of-the-bcm-imperfect-information-model
 rational-expectation-framework-with-longer-horizon
 the-imperfect-information-framework-to-an-ireland-style-new-keynesian-model
 imperfect-information-and-rational-expectations
-url-your-book-url-like-httpsbookdown.orgyihuibookdown

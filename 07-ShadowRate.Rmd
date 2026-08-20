@@ -216,7 +216,7 @@ legend("bottomright",legend = legend_labels,
 
 This example embeds the shadow-rate idea in a small New Keynesian model with nominal and real curves.
 
-```{r fig_SR2, fig.width=7, fig.height=4}
+```{r fig_SR2, fig.width=7, fig.height=4, results='hide'}
 # Purpose: This example embeds the shadow-rate idea in a small New Keynesian model with nominal
 # and real curves
 library(DTAM)
@@ -1069,9 +1069,12 @@ compute_SCC <- function(model,HH=200,
 res_SCC <- compute_SCC(model,HH=HH,indic_compute_riskpremium=TRUE)
 SCC <- res_SCC$SCC
 
-# Print the SCC with and without the risk-premium component.
-print(SCC)
-print(res_SCC$SCC_noRP)
+# Report the SCC with and without the risk-premium component.
+scc_summary <- data.frame(
+  estimate = c("With risk adjustment", "Without risk adjustment"),
+  value = round(c(SCC, res_SCC$SCC_noRP), 2)
+)
+knitr::kable(scc_summary, col.names = c("Estimate", "SCC"))
 
 ```
 
@@ -1252,7 +1255,7 @@ legend("topright", legend = legend_labels, lty = 1:3, lwd = 2)
 
 The final block checks the analytical formula against simulated paths of the climate-economy system.
 
-```{r SCC_check_formula}
+```{r SCC_check_formula, results='hide'}
 # Purpose: Check the analytical formula against simulated climate-economy paths.
 # Check formulas using simulations.
 

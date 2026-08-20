@@ -2,7 +2,7 @@
 
 ## Standard framework
 
-This example compares standard structural and reduced-form views of credit spreads. The empirical illustration combines a maturity-matched 20-year corporate credit spread with a rescaled business-loan loss indicator. The spread is the difference between the U.S. Treasury's 20-year High Quality Market (HQM) corporate spot rate and its 20-year Treasury Nominal Coupon-Issue (TNC) spot rate; the source workbooks and methodology are available from the [HQM](https://home.treasury.gov/data/treasury-coupon-issues-and-corporate-bond-yield-curve/corporate-bond-yield-curve) and [TNC](https://home.treasury.gov/data/treasury-coupon-issues-and-corporate-bond-yield-curves/treasury-coupon-issues) yield-curve pages. The credit-loss indicator uses the Federal Reserve Board's [business-loan charge-off rate](https://www.federalreserve.gov/releases/chargeoff/), rescaled so that its average expected loss corresponds to high-quality U.S. corporate bonds [@AmatoRemolona2003].^[We first average the quarterly charge-off rates within each calendar year and normalize the resulting series by its 1986--2024 mean. Amato and Remolona [-@AmatoRemolona2003, Table 1] report expected losses of 0.61, 2.70, and 7.32 basis points for AAA-, AA-, and A-rated bonds in their longest maturity bucket. We use their equal-weight average, 3.54 basis points, and map expected loss into the physical default intensity using the recovery rate assumed below. The companion workbook records the source observations and each transformation.]
+This example compares standard structural and reduced-form views of credit spreads. The empirical illustration combines a maturity-matched 20-year corporate credit spread with a rescaled business-loan loss indicator. The spread is the difference between the U.S. Treasury's 20-year High Quality Market (HQM) corporate spot rate and its 20-year Treasury Nominal Coupon-Issue (TNC) spot rate; the source workbooks and methodology are available from the [HQM](https://home.treasury.gov/data/treasury-coupon-issues-and-corporate-bond-yield-curve/corporate-bond-yield-curve) and [TNC](https://home.treasury.gov/data/treasury-coupon-issues-and-corporate-bond-yield-curves/treasury-coupon-issues) yield-curve pages. The credit-loss indicator uses the Federal Reserve Board's [business-loan charge-off rate](https://www.federalreserve.gov/releases/chargeoff/), rescaled so that its average expected loss corresponds to high-quality U.S. corporate bonds [@AmatoRemolona2003].^[Amato and Remolona [-@AmatoRemolona2003, Table 1] report expected losses of 0.61, 2.70, and 7.32 basis points for AAA-, AA-, and A-rated bonds in their longest maturity bucket; their equal-weight average is 3.54 basis points. Let $c_t$ denote the charge-off rate averaged over the quarters of year $t$, and let $\bar c$ be its 1986--2024 average. We set $\mathrm{EL}_t=(3.54\text{ basis points})c_t/\bar c$, so that the sample average of $\mathrm{EL}_t$ is exactly 3.54 basis points. We then set the physical default-intensity indicator to $\lambda_t=\mathrm{EL}_t/(1-\zeta)$, where $\zeta$ is the recovery rate assumed below. The companion workbook records the source observations and each transformation.]
 
 ```{r fig_standardCreditFedLoss, fig.width=5.5, fig.height=7}
 # Purpose: This example compares standard structural and reduced-form views of credit spreads
@@ -44,16 +44,16 @@ loss_data <- subset(loss_data,
                     year >= 1986 & year <= 2024 &
                       complete.cases(loss_data))
 
-Credit_spds <- merge(spread_data, loss_data, by = "year", all = FALSE)
-stopifnot(nrow(Credit_spds) == 39,
-          !anyDuplicated(Credit_spds$year),
-          all(Credit_spds$HQM_TNC_spd > 0),
-          all(Credit_spds$default_intensity_pct >= 0))
+credit_data <- merge(spread_data, loss_data, by = "year", all = FALSE)
+stopifnot(nrow(credit_data) == 39,
+          !anyDuplicated(credit_data$year),
+          all(credit_data$HQM_TNC_spd > 0),
+          all(credit_data$default_intensity_pct >= 0))
 
 RR <- .6
-lambda       <- Credit_spds$default_intensity_pct/100
-spd_HQM_TNC  <- Credit_spds$HQM_TNC_spd/100
-stopifnot(max(abs(lambda*(1-RR) - Credit_spds$expected_loss_bp/10000)) < 1e-10)
+lambda       <- credit_data$default_intensity_pct/100
+spd_HQM_TNC  <- credit_data$HQM_TNC_spd/100
+stopifnot(max(abs(lambda*(1-RR) - credit_data$expected_loss_bp/10000)) < 1e-10)
 
 # The observed spread and model bond both have a 20-year maturity.
 H <- 20
@@ -235,14 +235,14 @@ PD_Q_H2 <- 1 - exp(surviv_proba_Q$B[1,e,H2] + Y %*% surviv_proba_Q$A[,e,H2])
 par(mfrow=c(3,1))
 par(plt=c(.1,.95,.2,.85))
 
-plot(Credit_spds$year,Credit_spds$default_intensity_pct,
-     ylim=c(0,1.2*max(c(Credit_spds$default_intensity_pct,
-                        Credit_spds$HQM_TNC_spd))),col="white",
+plot(credit_data$year,credit_data$default_intensity_pct,
+     ylim=c(0,1.2*max(c(credit_data$default_intensity_pct,
+                        credit_data$HQM_TNC_spd))),col="white",
      xlab="",ylab="in percent",las=1,
      main=expression(paste("(a) Default-intensity indicator and 20-year credit spread",sep="")))
 grid()
-lines(Credit_spds$year,Credit_spds$default_intensity_pct,lwd=2,lty=2)
-lines(Credit_spds$year,Credit_spds$HQM_TNC_spd,col="dark grey",type="b",lwd=2)
+lines(credit_data$year,credit_data$default_intensity_pct,lwd=2,lty=2)
+lines(credit_data$year,credit_data$HQM_TNC_spd,col="dark grey",type="b",lwd=2)
 
 legend("topleft",
        legend=c(expression(paste("Default-intensity indicator",sep="")),
@@ -252,13 +252,13 @@ legend("topleft",
        col=c("black","dark grey"),
        lwd = 2,bty = "n",seg.len = 3)
 
-plot(Credit_spds$year,100*lambda,
+plot(credit_data$year,100*lambda,
      ylim=c(0,1.2*max(c(100*lambda,100*x))),col="white",
      xlab="",ylab="in percent",las=1,
      main=expression(paste("(b) Factors ",x[t]," and ",lambda[t],sep="")))
 grid()
-lines(Credit_spds$year,100*lambda,lwd=2,type="b",pch=3)
-lines(Credit_spds$year,100*x,col="dark grey",lwd=2,type="b",pch=0)
+lines(credit_data$year,100*lambda,lwd=2,type="b",pch=3)
+lines(credit_data$year,100*x,col="dark grey",lwd=2,type="b",pch=0)
 
 legend("topleft",
        legend=c(expression(x[t]),expression(lambda[t])),
@@ -267,15 +267,15 @@ legend("topleft",
        col=c("dark grey","black"),
        lwd = 2,bty = "n")
 
-plot(Credit_spds$year,100*lambda,
+plot(credit_data$year,100*lambda,
      ylim=c(0,120*max(PD_Q_H2)),col="white",
      xlab="",ylab="in percent",las=1,
      main=expression(paste("(c) Physical and risk-neutral probabilities of default (PD)",sep="")))
 grid()
-lines(Credit_spds$year,100*PD_P_H1,lwd=2,lty=1)
-lines(Credit_spds$year,100*PD_Q_H1,lwd=2,lty=3)
-lines(Credit_spds$year,100*PD_P_H2,lwd=2,lty=1,col="dark grey")
-lines(Credit_spds$year,100*PD_Q_H2,lwd=2,lty=3,col="dark grey")
+lines(credit_data$year,100*PD_P_H1,lwd=2,lty=1)
+lines(credit_data$year,100*PD_Q_H1,lwd=3,lty=3,lend="round")
+lines(credit_data$year,100*PD_P_H2,lwd=2,lty=1,col="dark grey")
+lines(credit_data$year,100*PD_Q_H2,lwd=3,lty=3,col="dark grey",lend="round")
 
 legend("topleft",
        legend=c("5-year physical PD",
@@ -284,7 +284,7 @@ legend("topleft",
                 "10-year risk-neutral PD"),
        lty=c(1,3,1,3),
        col=c("black","black","dark grey","dark grey"),
-       lwd = 2,bty = "n",seg.len = 3)
+       lwd = c(2,3,2,3),bty = "n",seg.len = 3)
 ```
 
 
@@ -295,6 +295,8 @@ legend("topleft",
 
 
 This example illustrates bond pricing and migration dynamics in a ratings-based framework.
+
+The spectral construction preserves unit row sums and the absorbing default state, but it does not impose non-negativity of every entry of the transition matrix. Under the present calibration, violations larger than $5\times10^{-5}$ have probability of about $3\times10^{-7}$ per period.
 
 ```{r fig_Ratings, fig.width=8, fig.height=4.5}
 # Purpose: This example illustrates bond pricing and migration dynamics in a ratings-based

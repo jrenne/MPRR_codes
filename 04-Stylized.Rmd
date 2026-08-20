@@ -45,8 +45,15 @@ selected_dates  <- complete.cases(YC_LW$yld_10y)
 yds             <- YC_LW[selected_dates,indic1m:indic10y]
 PCA             <- prcomp(yds)
 
-# Report the cumulative variance explained by the principal components.
-print(cumsum(PCA$sdev^2/sum(PCA$sdev^2)))
+# Report the cumulative variance explained by the first principal components.
+pca_variance_share <- cumsum(PCA$sdev^2/sum(PCA$sdev^2))
+knitr::kable(
+  data.frame(
+    principal_component = 1:3,
+    cumulative_variance_share = round(pca_variance_share[1:3], 4)
+  ),
+  col.names = c("Principal component", "Cumulative variance share")
+)
 
 # Plot the first principal-component loading by maturity.
 par(mfrow=c(1,2))
@@ -736,7 +743,14 @@ PCA_xsr <- xsr_tibb %>%
   dplyr::select( - date, - `holding period`) %>%
   princomp()
 
-print(cumsum(PCA_xsr$sdev^2/sum(PCA_xsr$sdev^2)))
+xsr_variance_share <- cumsum(PCA_xsr$sdev^2/sum(PCA_xsr$sdev^2))
+knitr::kable(
+  data.frame(
+    principal_component = 1:3,
+    cumulative_variance_share = round(xsr_variance_share[1:3], 4)
+  ),
+  col.names = c("Principal component", "Cumulative variance share")
+)
 
 # Extract dates for the PCA score panel.
 # Plot the first loadings and the corresponding scores.
@@ -846,8 +860,17 @@ This example reports the unconditional mean and volatility of the short rate.
 # Purpose: This example reports the unconditional mean and volatility of the short rate
 library(DTAM)
 # Report the unconditional mean and volatility of the short rate.
-mean(YC_US$DTB3,na.rm=TRUE)
-sd(YC_US$DTB3,na.rm=TRUE)
+short_rate_summary <- data.frame(
+  statistic = c("Mean", "Standard deviation"),
+  percent = round(c(
+    mean(YC_US$DTB3, na.rm = TRUE),
+    sd(YC_US$DTB3, na.rm = TRUE)
+  ), 2)
+)
+knitr::kable(
+  short_rate_summary,
+  col.names = c("Statistic", "Percent")
+)
 ```
 
 <!-- Prepare figure comparing yields and SPFs: -->
@@ -1782,6 +1805,9 @@ decomp_check_table <- data.frame(
 decomp_check_table[, -1] <- round(decomp_check_table[, -1], 3)
 decomp_check_table
 
-max(abs(nom_EH_check - nom_YC_EH_sim))
-range(real_short_sim - (real_short_delta0 + state_sim %*% real_short_delta1))
+# Retain numerical identity checks without printing them in the rendered chapter.
+nominal_eh_identity_error <- max(abs(nom_EH_check - nom_YC_EH_sim))
+real_short_identity_range <- range(
+  real_short_sim - (real_short_delta0 + state_sim %*% real_short_delta1)
+)
 ```

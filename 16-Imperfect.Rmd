@@ -125,7 +125,7 @@ legend("topright",
 
 This short block computes auxiliary objects used in the imperfect-information examples that follow.
 
-```{r}
+```{r results='hide'}
 # Purpose: Compute the low-frequency contribution to consumption-growth variance.
 # Computation of share of variance of dc accounted for by low-frequency component:
 

@@ -129,15 +129,13 @@ matrix_periods <- rbind(c(1950,2019),
                         c(1980,2019))
 
 list.of.JST.ctries <- levels(as.factor(JSTdataset$iso))
-# remove countries with no equity return data:
-list.of.JST.ctries <- list.of.JST.ctries[!(list.of.JST.ctries %in% c("CAN","IRL"))]
 
-matrix_corresp_ctries <- rbind(c("AUS","BEL","CAN","CHE","DEU","DNK","ESP",
-                                 "FIN","FRA","GBR","IRL","ITA","JPN","NLD","NOR",
+matrix_corresp_ctries <- rbind(c("AUS","BEL","CHE","DEU","DNK","ESP",
+                                 "FIN","FRA","GBR","ITA","JPN","NLD","NOR",
                                  "PRT","SWE","USA"),
-                               c("Australia","Belgium","Canada","Switzerland","Germany",
+                               c("Australia","Belgium","Switzerland","Germany",
                                  "Denmark","Spain","Finland","France","U.K.",
-                                 "Ireland","Italy","Japan","Netherlands","Norway",
+                                 "Italy","Japan","Netherlands","Norway",
                                  "Portugal","Sweden","U.S.A."))
 
 # outputs: Sample-period,
@@ -145,8 +143,7 @@ matrix_corresp_ctries <- rbind(c("AUS","BEL","CAN","CHE","DEU","DNK","ESP",
 #          Sharpe ratio, RRA1, RRA2
 matrix_result <- array(NaN,c(length(list.of.JST.ctries),9,dim(matrix_periods)[1]))
 
-DATA <- JSTdataset[,c("year","iso","cpi","stir","ltrate","eq_tr",
-                      "rconsbarro")]
+DATA <- JSTdataset[, c("year", "iso", "cpi", "stir", "eq_tr", "rconsbarro")]
 
 for(period in 1:dim(matrix_periods)[1]){
   first.year <- matrix_periods[period,1]

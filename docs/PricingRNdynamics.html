@@ -23,7 +23,7 @@
 <meta name="author" content="Jean-Paul Renne, Alain Monfort, Fulvio Pegoraro, and Guillaume Roussellet" />
 
 
-<meta name="date" content="2026-08-19" />
+<meta name="date" content="2026-08-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -49,6 +49,7 @@
 
 
 
+<link href="libs/codefolding-lua-1.1/codefolding-lua.css" rel="stylesheet" />
 <link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
 <link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
@@ -368,6 +369,7 @@ div.csl-indent {
 <p>Most of this chapter is theoretical. The following example illustrates how a stochastic
 discount factor transforms physical probabilities into risk-neutral probabilities in a
 three-state economy.</p>
+<details class=chunk-details><summary class=chunk-summary><span class=chunk-summary-text>Code</span></summary>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="PricingRNdynamics.html#cb7-1" tabindex="-1"></a><span class="co"># Purpose: Compare physical and risk-neutral probabilities implied by a simple SDF.</span></span>
 <span id="cb7-2"><a href="PricingRNdynamics.html#cb7-2" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="PricingRNdynamics.html#cb7-3" tabindex="-1"></a>states <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Normal&quot;</span>, <span class="st">&quot;Good&quot;</span>, <span class="st">&quot;Bad&quot;</span>)</span>
@@ -407,6 +409,7 @@ three-state economy.</p>
 <span id="cb7-37"><a href="PricingRNdynamics.html#cb7-37" tabindex="-1"></a>  <span class="at">payoff_insurance =</span> payoff_insurance</span>
 <span id="cb7-38"><a href="PricingRNdynamics.html#cb7-38" tabindex="-1"></a>)</span>
 <span id="cb7-39"><a href="PricingRNdynamics.html#cb7-39" tabindex="-1"></a><span class="fu">print</span>(three_state_results)</span></code></pre></div>
+</details>
 <pre><code>##    state physical_prob sdf state_price risk_neutral_prob payoff_procyclical
 ## 1 Normal          0.60 0.9        0.54         0.5510204                100
 ## 2   Good          0.25 0.8        0.20         0.2040816                130
@@ -415,6 +418,7 @@ three-state economy.</p>
 ## 1              100
 ## 2               70
 ## 3              150</code></pre>
+<details class=chunk-details><summary class=chunk-summary><span class=chunk-summary-text>Code</span></summary>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="PricingRNdynamics.html#cb9-1" tabindex="-1"></a><span class="fu">stopifnot</span>(</span>
 <span id="cb9-2"><a href="PricingRNdynamics.html#cb9-2" tabindex="-1"></a>  <span class="fu">abs</span>(<span class="fu">sum</span>(risk_neutral_prob) <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">&lt;</span> <span class="fl">1e-12</span>,</span>
 <span id="cb9-3"><a href="PricingRNdynamics.html#cb9-3" tabindex="-1"></a>  <span class="fu">all</span>(<span class="fu">abs</span>(physical_expected_payoff <span class="sc">-</span> <span class="dv">100</span>) <span class="sc">&lt;</span> <span class="fl">1e-12</span>),</span>
@@ -453,6 +457,7 @@ three-state economy.</p>
 <span id="cb9-36"><a href="PricingRNdynamics.html#cb9-36" tabindex="-1"></a>  <span class="at">border =</span> <span class="st">&quot;black&quot;</span>,</span>
 <span id="cb9-37"><a href="PricingRNdynamics.html#cb9-37" tabindex="-1"></a>  <span class="at">bty =</span> <span class="st">&quot;n&quot;</span></span>
 <span id="cb9-38"><a href="PricingRNdynamics.html#cb9-38" tabindex="-1"></a>)</span></code></pre></div>
+</details>
 <p><img src="_main_files/figure-html/fig_three_state_probabilities-1.png" width="672" /></p>
 
 </div>

@@ -23,7 +23,7 @@
 <meta name="author" content="Jean-Paul Renne, Alain Monfort, Fulvio Pegoraro, and Guillaume Roussellet" />
 
 
-<meta name="date" content="2026-08-19" />
+<meta name="date" content="2026-08-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -49,6 +49,7 @@
 
 
 
+<link href="libs/codefolding-lua-1.1/codefolding-lua.css" rel="stylesheet" />
 <link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
 <link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
@@ -369,6 +370,7 @@ div.csl-indent {
 <div id="a-simple-gaussian-ar1-generates-nonlinear-transforms-such-as-squared-states" class="section level2 hasAnchor" number="1.1">
 <h2><span class="header-section-number">1.1</span> A simple Gaussian AR(1) generates nonlinear transforms such as squared states<a href="affine.html#a-simple-gaussian-ar1-generates-nonlinear-transforms-such-as-squared-states" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>This example shows how a simple Gaussian AR(1) generates nonlinear transforms such as squared states.</p>
+<details class=chunk-details><summary class=chunk-summary><span class=chunk-summary-text>Code</span></summary>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="affine.html#cb1-1" tabindex="-1"></a><span class="co"># Purpose: This example shows how a simple Gaussian AR(1) generates nonlinear transforms such as</span></span>
 <span id="cb1-2"><a href="affine.html#cb1-2" tabindex="-1"></a><span class="co"># squared states</span></span>
 <span id="cb1-3"><a href="affine.html#cb1-3" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
@@ -395,12 +397,14 @@ div.csl-indent {
 <span id="cb1-24"><a href="affine.html#cb1-24" tabindex="-1"></a><span class="fu">plot</span>(x<span class="sc">^</span><span class="dv">2</span>, <span class="at">type =</span> <span class="st">&quot;l&quot;</span>, <span class="at">xlab =</span> <span class="st">&quot;&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;&quot;</span>, <span class="at">las =</span> <span class="dv">1</span>,</span>
 <span id="cb1-25"><a href="affine.html#cb1-25" tabindex="-1"></a>     <span class="at">main =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;(b) &quot;</span>, {x[t]}<span class="sc">^</span><span class="dv">2</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>)), <span class="at">lwd =</span> <span class="dv">2</span>)</span>
 <span id="cb1-26"><a href="affine.html#cb1-26" tabindex="-1"></a><span class="fu">grid</span>()</span></code></pre></div>
+</details>
 <p><img src="_main_files/figure-html/fig_QTSM1-1.png" width="768" /></p>
 <p>The following code produces a figure illustrating ARG processes.</p>
 </div>
 <div id="standard-arg-and-arg0-processes" class="section level2 hasAnchor" number="1.2">
 <h2><span class="header-section-number">1.2</span> Standard ARG and ARG0 processes<a href="affine.html#standard-arg-and-arg0-processes" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>This example contrasts a standard ARG process with its ARG0 counterpart.</p>
+<details class=chunk-details><summary class=chunk-summary><span class=chunk-summary-text>Code</span></summary>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="affine.html#cb2-1" tabindex="-1"></a><span class="co"># Purpose: This example contrasts a standard ARG process with its ARG0 counterpart</span></span>
 <span id="cb2-2"><a href="affine.html#cb2-2" tabindex="-1"></a><span class="fu">library</span>(DTAM)</span>
 <span id="cb2-3"><a href="affine.html#cb2-3" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
@@ -417,12 +421,14 @@ div.csl-indent {
 <span id="cb2-14"><a href="affine.html#cb2-14" tabindex="-1"></a><span class="fu">plot</span>(W, <span class="at">type =</span> <span class="st">&quot;l&quot;</span>, <span class="at">xlab =</span> <span class="st">&quot;&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;&quot;</span>, <span class="at">las =</span> <span class="dv">1</span>,</span>
 <span id="cb2-15"><a href="affine.html#cb2-15" tabindex="-1"></a>     <span class="at">main =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;(b) &quot;</span>, ARG[<span class="dv">0</span>], <span class="st">&quot; process&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>)), <span class="at">lwd =</span> <span class="dv">2</span>)</span>
 <span id="cb2-16"><a href="affine.html#cb2-16" tabindex="-1"></a><span class="fu">grid</span>()</span></code></pre></div>
+</details>
 <p><img src="_main_files/figure-html/fig_ARG1-1.png" width="768" /></p>
 <p>The following code simulates a Poisson process.</p>
 </div>
 <div id="the-jump-like-dynamics-generated-by-a-compound-poisson-process" class="section level2 hasAnchor" number="1.3">
 <h2><span class="header-section-number">1.3</span> The jump-like dynamics generated by a compound Poisson process<a href="affine.html#the-jump-like-dynamics-generated-by-a-compound-poisson-process" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>This example illustrates the jump-like dynamics generated by a compound Poisson process.</p>
+<details class=chunk-details><summary class=chunk-summary><span class=chunk-summary-text>Code</span></summary>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="affine.html#cb3-1" tabindex="-1"></a><span class="co"># Purpose: This example illustrates the jump-like dynamics generated by a compound Poisson</span></span>
 <span id="cb3-2"><a href="affine.html#cb3-2" tabindex="-1"></a><span class="co"># process</span></span>
 <span id="cb3-3"><a href="affine.html#cb3-3" tabindex="-1"></a><span class="fu">library</span>(DTAM)</span>
@@ -433,12 +439,14 @@ div.csl-indent {
 <span id="cb3-8"><a href="affine.html#cb3-8" tabindex="-1"></a>W <span class="ot">&lt;-</span> <span class="fu">simul_compound_poisson</span>(<span class="dv">200</span>, <span class="at">Gamma =</span> <span class="dv">1</span>, <span class="at">Pi =</span> <span class="fl">0.95</span>, <span class="at">lambda =</span> .<span class="dv">1</span>)</span>
 <span id="cb3-9"><a href="affine.html#cb3-9" tabindex="-1"></a><span class="fu">plot</span>(W, <span class="at">type =</span> <span class="st">&quot;l&quot;</span>, <span class="at">las =</span> <span class="dv">1</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">xlab =</span> <span class="st">&quot;&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;&quot;</span>)</span>
 <span id="cb3-10"><a href="affine.html#cb3-10" tabindex="-1"></a><span class="fu">grid</span>()</span></code></pre></div>
+</details>
 <p><img src="_main_files/figure-html/fig_Poisson1-1.png" width="768" /></p>
 <p>The following code simulate a recursive Gaussian-ARG process.</p>
 </div>
 <div id="recursive-gaussian-arg-model-with-crisis-and-gdp-growth-components" class="section level2 hasAnchor" number="1.4">
 <h2><span class="header-section-number">1.4</span> Recursive Gaussian-ARG model with crisis and GDP-growth components<a href="affine.html#recursive-gaussian-arg-model-with-crisis-and-gdp-growth-components" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>This example builds a two-factor recursive Gaussian-ARG system with a crisis component and GDP-growth component.</p>
+<details class=chunk-details><summary class=chunk-summary><span class=chunk-summary-text>Code</span></summary>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="affine.html#cb4-1" tabindex="-1"></a><span class="co"># Purpose: This example builds a two-factor recursive Gaussian-ARG system with a crisis</span></span>
 <span id="cb4-2"><a href="affine.html#cb4-2" tabindex="-1"></a><span class="co"># component and GDP-growth component</span></span>
 <span id="cb4-3"><a href="affine.html#cb4-3" tabindex="-1"></a><span class="fu">library</span>(DTAM)</span>
@@ -477,12 +485,14 @@ div.csl-indent {
 <span id="cb4-36"><a href="affine.html#cb4-36" tabindex="-1"></a><span class="fu">plot</span>(W2, <span class="at">type =</span> <span class="st">&quot;l&quot;</span>, <span class="at">xlab =</span> <span class="st">&quot;&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;&quot;</span>, <span class="at">las =</span> <span class="dv">1</span>,</span>
 <span id="cb4-37"><a href="affine.html#cb4-37" tabindex="-1"></a>     <span class="at">main =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;(b) &quot;</span>, w[<span class="dv">2</span><span class="sc">*</span><span class="st">&#39;,&#39;</span><span class="sc">*</span>t], <span class="st">&quot; process&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>)), <span class="at">lwd =</span> <span class="dv">2</span>)</span>
 <span id="cb4-38"><a href="affine.html#cb4-38" tabindex="-1"></a><span class="fu">grid</span>()</span></code></pre></div>
+</details>
 <p><img src="_main_files/figure-html/fig_bivarARGGaussian-1.png" width="768" /></p>
 <p>The following code uses the previous model to compute forecasts of GDP (GDP growth is <span class="math inline">\(w_{2,t}\)</span> of the previous process, and <span class="math inline">\(w_{1,t}\)</span> is a crisis regime).</p>
 </div>
 <div id="gdp-forecasts-under-different-crisis-states" class="section level2 hasAnchor" number="1.5">
 <h2><span class="header-section-number">1.5</span> GDP forecasts under different crisis states<a href="affine.html#gdp-forecasts-under-different-crisis-states" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>This example shows how the previous model can be used to produce horizon-by-horizon GDP forecasts under different crisis states.</p>
+<details class=chunk-details><summary class=chunk-summary><span class=chunk-summary-text>Code</span></summary>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="affine.html#cb5-1" tabindex="-1"></a><span class="co"># Purpose: This example shows how the previous model can be used to produce horizon-by-horizon</span></span>
 <span id="cb5-2"><a href="affine.html#cb5-2" tabindex="-1"></a><span class="co"># GDP forecasts under different crisis states</span></span>
 <span id="cb5-3"><a href="affine.html#cb5-3" tabindex="-1"></a>psi <span class="ot">&lt;-</span> <span class="cf">function</span>(U, model) {</span>
@@ -544,12 +554,14 @@ div.csl-indent {
 <span id="cb5-59"><a href="affine.html#cb5-59" tabindex="-1"></a>       <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>),</span>
 <span id="cb5-60"><a href="affine.html#cb5-60" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;grey&quot;</span>, <span class="st">&quot;black&quot;</span>),</span>
 <span id="cb5-61"><a href="affine.html#cb5-61" tabindex="-1"></a>       <span class="at">lwd =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>), <span class="at">bty =</span> <span class="st">&quot;n&quot;</span>)</span></code></pre></div>
+</details>
 <p><img src="_main_files/figure-html/fig_GDP-1.png" width="768" /></p>
 <p>The following code displays the conditional pdf of GDP at different horizons.</p>
 </div>
 <div id="laplace-transforms-can-recover-the-full-conditional-distribution-of-future-gdp-growth" class="section level2 hasAnchor" number="1.6">
 <h2><span class="header-section-number">1.6</span> Laplace transforms can recover the full conditional distribution of future GDP growth<a href="affine.html#laplace-transforms-can-recover-the-full-conditional-distribution-of-future-gdp-growth" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>This example illustrates how Laplace transforms can recover the full conditional distribution of future GDP growth.</p>
+<details class=chunk-details><summary class=chunk-summary><span class=chunk-summary-text>Code</span></summary>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="affine.html#cb6-1" tabindex="-1"></a><span class="co"># Purpose: This example illustrates how Laplace transforms can recover the full conditional</span></span>
 <span id="cb6-2"><a href="affine.html#cb6-2" tabindex="-1"></a><span class="co"># distribution of future GDP growth</span></span>
 <span id="cb6-3"><a href="affine.html#cb6-3" tabindex="-1"></a><span class="fu">library</span>(DTAM)</span>
@@ -624,6 +636,7 @@ div.csl-indent {
 <span id="cb6-72"><a href="affine.html#cb6-72" tabindex="-1"></a>       <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>),</span>
 <span id="cb6-73"><a href="affine.html#cb6-73" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;grey&quot;</span>, <span class="st">&quot;black&quot;</span>),</span>
 <span id="cb6-74"><a href="affine.html#cb6-74" tabindex="-1"></a>       <span class="at">lwd =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>), <span class="at">bty =</span> <span class="st">&quot;n&quot;</span>)</span></code></pre></div>
+</details>
 <p><img src="_main_files/figure-html/fig_CDFGP-1.png" width="768" /></p>
 
 </div>

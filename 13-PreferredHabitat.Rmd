@@ -807,7 +807,7 @@ write(latex.table, file = latex.file)
 
 This final block explores an additional calibration of the preferred-habitat model.
 
-```{r ccc}
+```{r ccc, results='hide'}
 # Purpose: Check the additional preferred-habitat calibration and perpetuity price.
 
 # Check perpetuity price:

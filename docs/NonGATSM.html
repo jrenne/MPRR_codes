@@ -23,7 +23,7 @@
 <meta name="author" content="Jean-Paul Renne, Alain Monfort, Fulvio Pegoraro, and Guillaume Roussellet" />
 
 
-<meta name="date" content="2026-08-19" />
+<meta name="date" content="2026-08-20" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -49,6 +49,7 @@
 
 
 
+<link href="libs/codefolding-lua-1.1/codefolding-lua.css" rel="stylesheet" />
 <link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
 <link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
@@ -375,134 +376,136 @@ nonnegative factor that Granger-causes the first one through a positive
 <span class="math inline">\(\beta_{1,2}\)</span> coefficient. As a result, two dates may feature the same
 current short-term rate <span class="math inline">\(r_t = 0\)</span>, but different values of <span class="math inline">\(w_{2,t}\)</span>, and
 hence different yield curves because expected future short rates differ.</p>
-<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="NonGATSM.html#cb69-1" tabindex="-1"></a><span class="co"># Purpose: This example illustrates how a VARG term-structure model can generate movements</span></span>
-<span id="cb69-2"><a href="NonGATSM.html#cb69-2" tabindex="-1"></a><span class="fu">library</span>(DTAM)</span>
-<span id="cb69-3"><a href="NonGATSM.html#cb69-3" tabindex="-1"></a></span>
-<span id="cb69-4"><a href="NonGATSM.html#cb69-4" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb69-5"><a href="NonGATSM.html#cb69-5" tabindex="-1"></a></span>
-<span id="cb69-6"><a href="NonGATSM.html#cb69-6" tabindex="-1"></a>TT <span class="ot">&lt;-</span> <span class="dv">150</span></span>
-<span id="cb69-7"><a href="NonGATSM.html#cb69-7" tabindex="-1"></a>H  <span class="ot">&lt;-</span> <span class="dv">10</span></span>
-<span id="cb69-8"><a href="NonGATSM.html#cb69-8" tabindex="-1"></a></span>
-<span id="cb69-9"><a href="NonGATSM.html#cb69-9" tabindex="-1"></a><span class="co"># Two-factor VARG:</span></span>
-<span id="cb69-10"><a href="NonGATSM.html#cb69-10" tabindex="-1"></a><span class="co"># - factor 1 is the short-term rate r_t = w_{1,t} and has nu_1 = 0,</span></span>
-<span id="cb69-11"><a href="NonGATSM.html#cb69-11" tabindex="-1"></a><span class="co">#   so its conditional distribution admits a Dirac mass at zero;</span></span>
-<span id="cb69-12"><a href="NonGATSM.html#cb69-12" tabindex="-1"></a><span class="co"># - factor 2 is persistent and causes factor 1.</span></span>
-<span id="cb69-13"><a href="NonGATSM.html#cb69-13" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb69-14"><a href="NonGATSM.html#cb69-14" tabindex="-1"></a>  <span class="at">alpha   =</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="fl">0.20</span>, <span class="fl">0.05</span>), <span class="at">ncol =</span> <span class="dv">1</span>),</span>
-<span id="cb69-15"><a href="NonGATSM.html#cb69-15" tabindex="-1"></a>  <span class="at">nu      =</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.5</span>), <span class="at">ncol =</span> <span class="dv">1</span>),</span>
-<span id="cb69-16"><a href="NonGATSM.html#cb69-16" tabindex="-1"></a>  <span class="at">mu      =</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="fl">0.004</span>, <span class="fl">0.0025</span>), <span class="at">ncol =</span> <span class="dv">1</span>),</span>
-<span id="cb69-17"><a href="NonGATSM.html#cb69-17" tabindex="-1"></a>  <span class="at">beta    =</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">225</span>, <span class="dv">14</span>,</span>
-<span id="cb69-18"><a href="NonGATSM.html#cb69-18" tabindex="-1"></a>                     <span class="dv">0</span>,  <span class="dv">380</span>), <span class="dv">2</span>, <span class="dv">2</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb69-19"><a href="NonGATSM.html#cb69-19" tabindex="-1"></a>  <span class="at">alpha_w =</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>), <span class="at">ncol =</span> <span class="dv">1</span>),</span>
-<span id="cb69-20"><a href="NonGATSM.html#cb69-20" tabindex="-1"></a>  <span class="at">n_w     =</span> <span class="dv">2</span></span>
-<span id="cb69-21"><a href="NonGATSM.html#cb69-21" tabindex="-1"></a>)</span>
-<span id="cb69-22"><a href="NonGATSM.html#cb69-22" tabindex="-1"></a><span class="co"># In particular, beta_11 * mu_1 = 0.9, so the short-term rate is highly persistent.</span></span>
-<span id="cb69-23"><a href="NonGATSM.html#cb69-23" tabindex="-1"></a></span>
-<span id="cb69-24"><a href="NonGATSM.html#cb69-24" tabindex="-1"></a>xi0 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb69-25"><a href="NonGATSM.html#cb69-25" tabindex="-1"></a>xi1 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>), <span class="at">ncol =</span> <span class="dv">1</span>)</span>
-<span id="cb69-26"><a href="NonGATSM.html#cb69-26" tabindex="-1"></a></span>
-<span id="cb69-27"><a href="NonGATSM.html#cb69-27" tabindex="-1"></a><span class="co"># Risk-neutral dynamics and affine bond-pricing coefficients.</span></span>
-<span id="cb69-28"><a href="NonGATSM.html#cb69-28" tabindex="-1"></a>modelQ <span class="ot">&lt;-</span> <span class="fu">make_VARG_Q</span>(model)</span>
-<span id="cb69-29"><a href="NonGATSM.html#cb69-29" tabindex="-1"></a>AB <span class="ot">&lt;-</span> <span class="fu">compute_AB_classical</span>(</span>
-<span id="cb69-30"><a href="NonGATSM.html#cb69-30" tabindex="-1"></a>  <span class="at">xi0 =</span> xi0,</span>
-<span id="cb69-31"><a href="NonGATSM.html#cb69-31" tabindex="-1"></a>  <span class="at">xi1 =</span> xi1,</span>
-<span id="cb69-32"><a href="NonGATSM.html#cb69-32" tabindex="-1"></a>  <span class="at">H =</span> H,</span>
-<span id="cb69-33"><a href="NonGATSM.html#cb69-33" tabindex="-1"></a>  <span class="at">psi =</span> psi_VARG,</span>
-<span id="cb69-34"><a href="NonGATSM.html#cb69-34" tabindex="-1"></a>  <span class="at">psi.parameterization =</span> modelQ</span>
-<span id="cb69-35"><a href="NonGATSM.html#cb69-35" tabindex="-1"></a>)</span>
-<span id="cb69-36"><a href="NonGATSM.html#cb69-36" tabindex="-1"></a></span>
-<span id="cb69-37"><a href="NonGATSM.html#cb69-37" tabindex="-1"></a><span class="co"># Simulate the physical dynamics from the unconditional mean.</span></span>
-<span id="cb69-38"><a href="NonGATSM.html#cb69-38" tabindex="-1"></a>w0 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">compute_uncondmean_VARG</span>(model))</span>
-<span id="cb69-39"><a href="NonGATSM.html#cb69-39" tabindex="-1"></a>simX <span class="ot">&lt;-</span> <span class="fu">t</span>(<span class="fu">simul_VARG</span>(model, <span class="at">nb_periods =</span> TT <span class="sc">-</span> <span class="dv">1</span>, <span class="at">w0 =</span> w0))</span>
-<span id="cb69-40"><a href="NonGATSM.html#cb69-40" tabindex="-1"></a></span>
-<span id="cb69-41"><a href="NonGATSM.html#cb69-41" tabindex="-1"></a><span class="co"># Compute the whole yield curve at each date.</span></span>
-<span id="cb69-42"><a href="NonGATSM.html#cb69-42" tabindex="-1"></a>yields <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">1</span>, TT, <span class="dv">1</span>) <span class="sc">%*%</span> <span class="fu">matrix</span>(AB<span class="sc">$</span>b, <span class="at">nrow =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb69-43"><a href="NonGATSM.html#cb69-43" tabindex="-1"></a>  simX <span class="sc">%*%</span> <span class="fu">matrix</span>(AB<span class="sc">$</span>a, <span class="fu">dim</span>(AB<span class="sc">$</span>a)[<span class="dv">1</span>], <span class="fu">dim</span>(AB<span class="sc">$</span>a)[<span class="dv">3</span>])</span>
-<span id="cb69-44"><a href="NonGATSM.html#cb69-44" tabindex="-1"></a></span>
-<span id="cb69-45"><a href="NonGATSM.html#cb69-45" tabindex="-1"></a><span class="co"># One-step-ahead probability that the short-term rate stays at zero.</span></span>
-<span id="cb69-46"><a href="NonGATSM.html#cb69-46" tabindex="-1"></a>p_stay_zero <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="sc">-</span>(model<span class="sc">$</span>alpha[<span class="dv">1</span>] <span class="sc">+</span> simX <span class="sc">%*%</span> <span class="fu">matrix</span>(model<span class="sc">$</span>beta[<span class="dv">1</span>, ], <span class="at">ncol =</span> <span class="dv">1</span>)))</span>
-<span id="cb69-47"><a href="NonGATSM.html#cb69-47" tabindex="-1"></a></span>
-<span id="cb69-48"><a href="NonGATSM.html#cb69-48" tabindex="-1"></a><span class="co"># Select two dates such that r_t = 0 but w_{2,t} differs sharply.</span></span>
-<span id="cb69-49"><a href="NonGATSM.html#cb69-49" tabindex="-1"></a>idx_zero <span class="ot">&lt;-</span> <span class="fu">which</span>(simX[, <span class="dv">1</span>] <span class="sc">&lt;</span> <span class="fl">1e-12</span>)</span>
-<span id="cb69-50"><a href="NonGATSM.html#cb69-50" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">length</span>(idx_zero) <span class="sc">&gt;=</span> <span class="dv">2</span>)</span>
-<span id="cb69-51"><a href="NonGATSM.html#cb69-51" tabindex="-1"></a>i_low  <span class="ot">&lt;-</span> idx_zero[<span class="fu">which.min</span>(simX[idx_zero, <span class="dv">2</span>])]</span>
-<span id="cb69-52"><a href="NonGATSM.html#cb69-52" tabindex="-1"></a>i_high <span class="ot">&lt;-</span> idx_zero[<span class="fu">which.max</span>(simX[idx_zero, <span class="dv">2</span>])]</span>
-<span id="cb69-53"><a href="NonGATSM.html#cb69-53" tabindex="-1"></a></span>
-<span id="cb69-54"><a href="NonGATSM.html#cb69-54" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">1</span>), <span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">3.2</span>, <span class="fl">4.2</span>, <span class="fl">2.8</span>, <span class="fl">1.2</span>))</span>
-<span id="cb69-55"><a href="NonGATSM.html#cb69-55" tabindex="-1"></a></span>
-<span id="cb69-56"><a href="NonGATSM.html#cb69-56" tabindex="-1"></a><span class="co"># Panel (a): short rate and long yield through time.</span></span>
-<span id="cb69-57"><a href="NonGATSM.html#cb69-57" tabindex="-1"></a><span class="fu">plot</span>(</span>
-<span id="cb69-58"><a href="NonGATSM.html#cb69-58" tabindex="-1"></a>  <span class="dv">1</span><span class="sc">:</span>TT, <span class="dv">100</span> <span class="sc">*</span> yields[, H],</span>
-<span id="cb69-59"><a href="NonGATSM.html#cb69-59" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;l&quot;</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">&quot;black&quot;</span>, <span class="at">las =</span> <span class="dv">1</span>,</span>
-<span id="cb69-60"><a href="NonGATSM.html#cb69-60" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;time&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;in percent&quot;</span>,</span>
-<span id="cb69-61"><a href="NonGATSM.html#cb69-61" tabindex="-1"></a>  <span class="at">ylim =</span> <span class="dv">120</span> <span class="sc">*</span> <span class="fu">range</span>(<span class="fu">c</span>(simX[, <span class="dv">1</span>], yields[, H])),</span>
-<span id="cb69-62"><a href="NonGATSM.html#cb69-62" tabindex="-1"></a>  <span class="at">main =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;(a) Short-term rate and 10-period yield&quot;</span>))</span>
-<span id="cb69-63"><a href="NonGATSM.html#cb69-63" tabindex="-1"></a>)</span>
-<span id="cb69-64"><a href="NonGATSM.html#cb69-64" tabindex="-1"></a><span class="fu">grid</span>()</span>
-<span id="cb69-65"><a href="NonGATSM.html#cb69-65" tabindex="-1"></a><span class="fu">lines</span>(<span class="dv">1</span><span class="sc">:</span>TT, <span class="dv">100</span> <span class="sc">*</span> simX[, <span class="dv">1</span>], <span class="at">col =</span> <span class="st">&quot;darkgrey&quot;</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
-<span id="cb69-66"><a href="NonGATSM.html#cb69-66" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> i_low,  <span class="at">col =</span> <span class="st">&quot;grey40&quot;</span>, <span class="at">lty =</span> <span class="dv">3</span>)</span>
-<span id="cb69-67"><a href="NonGATSM.html#cb69-67" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> i_high, <span class="at">col =</span> <span class="st">&quot;black&quot;</span>,  <span class="at">lty =</span> <span class="dv">3</span>)</span>
-<span id="cb69-68"><a href="NonGATSM.html#cb69-68" tabindex="-1"></a><span class="fu">legend</span>(</span>
-<span id="cb69-69"><a href="NonGATSM.html#cb69-69" tabindex="-1"></a>  <span class="st">&quot;topleft&quot;</span>,</span>
-<span id="cb69-70"><a href="NonGATSM.html#cb69-70" tabindex="-1"></a>  <span class="at">legend =</span> <span class="fu">c</span>(</span>
-<span id="cb69-71"><a href="NonGATSM.html#cb69-71" tabindex="-1"></a>    <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;Short-term rate (&quot;</span>,r[t],<span class="st">&quot;)&quot;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>)),</span>
-<span id="cb69-72"><a href="NonGATSM.html#cb69-72" tabindex="-1"></a>    <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;Long-term rate (&quot;</span>,r[t<span class="sc">*</span><span class="st">&quot;,&quot;</span><span class="sc">*</span><span class="dv">10</span>],<span class="st">&quot;)&quot;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>))</span>
-<span id="cb69-73"><a href="NonGATSM.html#cb69-73" tabindex="-1"></a>  ),</span>
-<span id="cb69-74"><a href="NonGATSM.html#cb69-74" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;darkgrey&quot;</span>, <span class="st">&quot;black&quot;</span>),</span>
-<span id="cb69-75"><a href="NonGATSM.html#cb69-75" tabindex="-1"></a>  <span class="at">lwd =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>),</span>
-<span id="cb69-76"><a href="NonGATSM.html#cb69-76" tabindex="-1"></a>  <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>),</span>
-<span id="cb69-77"><a href="NonGATSM.html#cb69-77" tabindex="-1"></a>  <span class="at">seg.len =</span> <span class="dv">3</span>,</span>
-<span id="cb69-78"><a href="NonGATSM.html#cb69-78" tabindex="-1"></a>  <span class="at">bty =</span> <span class="st">&quot;n&quot;</span></span>
-<span id="cb69-79"><a href="NonGATSM.html#cb69-79" tabindex="-1"></a>)</span>
-<span id="cb69-80"><a href="NonGATSM.html#cb69-80" tabindex="-1"></a></span>
-<span id="cb69-81"><a href="NonGATSM.html#cb69-81" tabindex="-1"></a><span class="co"># Panel (b): yield curves at two dates with the same current short rate r_t = 0.</span></span>
-<span id="cb69-82"><a href="NonGATSM.html#cb69-82" tabindex="-1"></a><span class="fu">plot</span>(</span>
-<span id="cb69-83"><a href="NonGATSM.html#cb69-83" tabindex="-1"></a>  <span class="dv">1</span><span class="sc">:</span>H, <span class="dv">100</span> <span class="sc">*</span> yields[i_low, ],</span>
-<span id="cb69-84"><a href="NonGATSM.html#cb69-84" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;l&quot;</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">&quot;grey70&quot;</span>, <span class="at">las =</span> <span class="dv">1</span>, <span class="at">lty =</span> <span class="dv">2</span>,</span>
-<span id="cb69-85"><a href="NonGATSM.html#cb69-85" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;maturity&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;in percent&quot;</span>,</span>
-<span id="cb69-86"><a href="NonGATSM.html#cb69-86" tabindex="-1"></a>  <span class="at">ylim =</span> <span class="dv">120</span> <span class="sc">*</span> <span class="fu">range</span>(yields[<span class="fu">c</span>(i_low, i_high), ]),</span>
-<span id="cb69-87"><a href="NonGATSM.html#cb69-87" tabindex="-1"></a>  <span class="at">main =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;(b) Yield curves at two dates with &quot;</span>,r[t],<span class="st">&quot; = 0&quot;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>))</span>
-<span id="cb69-88"><a href="NonGATSM.html#cb69-88" tabindex="-1"></a>)</span>
-<span id="cb69-89"><a href="NonGATSM.html#cb69-89" tabindex="-1"></a><span class="fu">grid</span>()</span>
-<span id="cb69-90"><a href="NonGATSM.html#cb69-90" tabindex="-1"></a><span class="fu">lines</span>(<span class="dv">1</span><span class="sc">:</span>H, <span class="dv">100</span> <span class="sc">*</span> yields[i_high, ], <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">&quot;black&quot;</span>)</span>
-<span id="cb69-91"><a href="NonGATSM.html#cb69-91" tabindex="-1"></a><span class="fu">legend</span>(</span>
-<span id="cb69-92"><a href="NonGATSM.html#cb69-92" tabindex="-1"></a>  <span class="st">&quot;topleft&quot;</span>,</span>
-<span id="cb69-93"><a href="NonGATSM.html#cb69-93" tabindex="-1"></a>  <span class="at">legend =</span> <span class="fu">c</span>(</span>
-<span id="cb69-94"><a href="NonGATSM.html#cb69-94" tabindex="-1"></a>    <span class="fu">bquote</span>(<span class="fu">paste</span>(<span class="st">&quot;date &quot;</span>, .(i_low), <span class="st">&quot;: &quot;</span>, r[t], <span class="st">&quot; = 0, &quot;</span>,</span>
-<span id="cb69-95"><a href="NonGATSM.html#cb69-95" tabindex="-1"></a>                 w[<span class="dv">2</span><span class="sc">*</span><span class="st">&quot;,&quot;</span><span class="sc">*</span>t], <span class="st">&quot; = &quot;</span>,</span>
-<span id="cb69-96"><a href="NonGATSM.html#cb69-96" tabindex="-1"></a>                 .(<span class="fu">format</span>(<span class="fu">round</span>(simX[i_low, <span class="dv">2</span>], <span class="dv">3</span>), <span class="at">nsmall =</span> <span class="dv">3</span>)))),</span>
-<span id="cb69-97"><a href="NonGATSM.html#cb69-97" tabindex="-1"></a>    <span class="fu">bquote</span>(<span class="fu">paste</span>(<span class="st">&quot;date &quot;</span>, .(i_high), <span class="st">&quot;: &quot;</span>, r[t], <span class="st">&quot; = 0, &quot;</span>,</span>
-<span id="cb69-98"><a href="NonGATSM.html#cb69-98" tabindex="-1"></a>                 w[<span class="dv">2</span><span class="sc">*</span><span class="st">&quot;,&quot;</span><span class="sc">*</span>t], <span class="st">&quot; = &quot;</span>,</span>
-<span id="cb69-99"><a href="NonGATSM.html#cb69-99" tabindex="-1"></a>                 .(<span class="fu">format</span>(<span class="fu">round</span>(simX[i_high, <span class="dv">2</span>], <span class="dv">3</span>), <span class="at">nsmall =</span> <span class="dv">3</span>))))</span>
-<span id="cb69-100"><a href="NonGATSM.html#cb69-100" tabindex="-1"></a>  ),</span>
-<span id="cb69-101"><a href="NonGATSM.html#cb69-101" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;grey70&quot;</span>, <span class="st">&quot;black&quot;</span>),</span>
-<span id="cb69-102"><a href="NonGATSM.html#cb69-102" tabindex="-1"></a>  <span class="at">lwd =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>),</span>
-<span id="cb69-103"><a href="NonGATSM.html#cb69-103" tabindex="-1"></a>  <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">1</span>),</span>
-<span id="cb69-104"><a href="NonGATSM.html#cb69-104" tabindex="-1"></a>  <span class="at">seg.len =</span> <span class="dv">3</span>,</span>
-<span id="cb69-105"><a href="NonGATSM.html#cb69-105" tabindex="-1"></a>  <span class="at">cex =</span> <span class="fl">1.0</span>,</span>
-<span id="cb69-106"><a href="NonGATSM.html#cb69-106" tabindex="-1"></a>  <span class="at">bty =</span> <span class="st">&quot;n&quot;</span></span>
-<span id="cb69-107"><a href="NonGATSM.html#cb69-107" tabindex="-1"></a>)</span>
-<span id="cb69-108"><a href="NonGATSM.html#cb69-108" tabindex="-1"></a></span>
-<span id="cb69-109"><a href="NonGATSM.html#cb69-109" tabindex="-1"></a><span class="co"># Panel (c): one-step-ahead probability that the short rate remains at zero.</span></span>
-<span id="cb69-110"><a href="NonGATSM.html#cb69-110" tabindex="-1"></a><span class="fu">plot</span>(</span>
-<span id="cb69-111"><a href="NonGATSM.html#cb69-111" tabindex="-1"></a>  <span class="dv">1</span><span class="sc">:</span>TT, <span class="dv">100</span> <span class="sc">*</span> <span class="fu">c</span>(p_stay_zero),</span>
-<span id="cb69-112"><a href="NonGATSM.html#cb69-112" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;l&quot;</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">&quot;black&quot;</span>, <span class="at">las =</span> <span class="dv">1</span>,</span>
-<span id="cb69-113"><a href="NonGATSM.html#cb69-113" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;time&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;in percent&quot;</span>,</span>
-<span id="cb69-114"><a href="NonGATSM.html#cb69-114" tabindex="-1"></a>  <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">105</span>),</span>
-<span id="cb69-115"><a href="NonGATSM.html#cb69-115" tabindex="-1"></a>  <span class="at">main =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;(c) One-step-ahead probability that &quot;</span>,r[t<span class="sc">+</span><span class="dv">1</span>],<span class="st">&quot; = 0&quot;</span>))</span>
-<span id="cb69-116"><a href="NonGATSM.html#cb69-116" tabindex="-1"></a>)</span>
-<span id="cb69-117"><a href="NonGATSM.html#cb69-117" tabindex="-1"></a><span class="fu">grid</span>()</span>
-<span id="cb69-118"><a href="NonGATSM.html#cb69-118" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> i_low,  <span class="at">col =</span> <span class="st">&quot;grey40&quot;</span>, <span class="at">lty =</span> <span class="dv">3</span>)</span>
-<span id="cb69-119"><a href="NonGATSM.html#cb69-119" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> i_high, <span class="at">col =</span> <span class="st">&quot;black&quot;</span>,  <span class="at">lty =</span> <span class="dv">3</span>)</span>
-<span id="cb69-120"><a href="NonGATSM.html#cb69-120" tabindex="-1"></a><span class="fu">legend</span>(</span>
-<span id="cb69-121"><a href="NonGATSM.html#cb69-121" tabindex="-1"></a>  <span class="st">&quot;topright&quot;</span>,</span>
-<span id="cb69-122"><a href="NonGATSM.html#cb69-122" tabindex="-1"></a>  <span class="at">legend =</span> <span class="fu">c</span>(<span class="fu">expression</span>(<span class="fu">P</span>(r[t<span class="sc">+</span><span class="dv">1</span>] <span class="sc">==</span> <span class="dv">0</span> <span class="sc">%.%</span> <span class="st">&quot;|&quot;</span> <span class="sc">%.%</span> <span class="fu">underline</span>(w[t])))),</span>
-<span id="cb69-123"><a href="NonGATSM.html#cb69-123" tabindex="-1"></a>  <span class="at">col =</span> <span class="st">&quot;black&quot;</span>,</span>
-<span id="cb69-124"><a href="NonGATSM.html#cb69-124" tabindex="-1"></a>  <span class="at">lwd =</span> <span class="dv">2</span>,</span>
-<span id="cb69-125"><a href="NonGATSM.html#cb69-125" tabindex="-1"></a>  <span class="at">lty =</span> <span class="dv">1</span>,</span>
-<span id="cb69-126"><a href="NonGATSM.html#cb69-126" tabindex="-1"></a>  <span class="at">seg.len =</span> <span class="dv">3</span>,</span>
-<span id="cb69-127"><a href="NonGATSM.html#cb69-127" tabindex="-1"></a>  <span class="at">bty =</span> <span class="st">&quot;n&quot;</span></span>
-<span id="cb69-128"><a href="NonGATSM.html#cb69-128" tabindex="-1"></a>)</span></code></pre></div>
+<details class=chunk-details><summary class=chunk-summary><span class=chunk-summary-text>Code</span></summary>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="NonGATSM.html#cb61-1" tabindex="-1"></a><span class="co"># Purpose: This example illustrates how a VARG term-structure model can generate movements</span></span>
+<span id="cb61-2"><a href="NonGATSM.html#cb61-2" tabindex="-1"></a><span class="fu">library</span>(DTAM)</span>
+<span id="cb61-3"><a href="NonGATSM.html#cb61-3" tabindex="-1"></a></span>
+<span id="cb61-4"><a href="NonGATSM.html#cb61-4" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb61-5"><a href="NonGATSM.html#cb61-5" tabindex="-1"></a></span>
+<span id="cb61-6"><a href="NonGATSM.html#cb61-6" tabindex="-1"></a>TT <span class="ot">&lt;-</span> <span class="dv">150</span></span>
+<span id="cb61-7"><a href="NonGATSM.html#cb61-7" tabindex="-1"></a>H  <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb61-8"><a href="NonGATSM.html#cb61-8" tabindex="-1"></a></span>
+<span id="cb61-9"><a href="NonGATSM.html#cb61-9" tabindex="-1"></a><span class="co"># Two-factor VARG:</span></span>
+<span id="cb61-10"><a href="NonGATSM.html#cb61-10" tabindex="-1"></a><span class="co"># - factor 1 is the short-term rate r_t = w_{1,t} and has nu_1 = 0,</span></span>
+<span id="cb61-11"><a href="NonGATSM.html#cb61-11" tabindex="-1"></a><span class="co">#   so its conditional distribution admits a Dirac mass at zero;</span></span>
+<span id="cb61-12"><a href="NonGATSM.html#cb61-12" tabindex="-1"></a><span class="co"># - factor 2 is persistent and causes factor 1.</span></span>
+<span id="cb61-13"><a href="NonGATSM.html#cb61-13" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb61-14"><a href="NonGATSM.html#cb61-14" tabindex="-1"></a>  <span class="at">alpha   =</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="fl">0.20</span>, <span class="fl">0.05</span>), <span class="at">ncol =</span> <span class="dv">1</span>),</span>
+<span id="cb61-15"><a href="NonGATSM.html#cb61-15" tabindex="-1"></a>  <span class="at">nu      =</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.5</span>), <span class="at">ncol =</span> <span class="dv">1</span>),</span>
+<span id="cb61-16"><a href="NonGATSM.html#cb61-16" tabindex="-1"></a>  <span class="at">mu      =</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="fl">0.004</span>, <span class="fl">0.0025</span>), <span class="at">ncol =</span> <span class="dv">1</span>),</span>
+<span id="cb61-17"><a href="NonGATSM.html#cb61-17" tabindex="-1"></a>  <span class="at">beta    =</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">225</span>, <span class="dv">14</span>,</span>
+<span id="cb61-18"><a href="NonGATSM.html#cb61-18" tabindex="-1"></a>                     <span class="dv">0</span>,  <span class="dv">380</span>), <span class="dv">2</span>, <span class="dv">2</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb61-19"><a href="NonGATSM.html#cb61-19" tabindex="-1"></a>  <span class="at">alpha_w =</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>), <span class="at">ncol =</span> <span class="dv">1</span>),</span>
+<span id="cb61-20"><a href="NonGATSM.html#cb61-20" tabindex="-1"></a>  <span class="at">n_w     =</span> <span class="dv">2</span></span>
+<span id="cb61-21"><a href="NonGATSM.html#cb61-21" tabindex="-1"></a>)</span>
+<span id="cb61-22"><a href="NonGATSM.html#cb61-22" tabindex="-1"></a><span class="co"># In particular, beta_11 * mu_1 = 0.9, so the short-term rate is highly persistent.</span></span>
+<span id="cb61-23"><a href="NonGATSM.html#cb61-23" tabindex="-1"></a></span>
+<span id="cb61-24"><a href="NonGATSM.html#cb61-24" tabindex="-1"></a>xi0 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb61-25"><a href="NonGATSM.html#cb61-25" tabindex="-1"></a>xi1 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>), <span class="at">ncol =</span> <span class="dv">1</span>)</span>
+<span id="cb61-26"><a href="NonGATSM.html#cb61-26" tabindex="-1"></a></span>
+<span id="cb61-27"><a href="NonGATSM.html#cb61-27" tabindex="-1"></a><span class="co"># Risk-neutral dynamics and affine bond-pricing coefficients.</span></span>
+<span id="cb61-28"><a href="NonGATSM.html#cb61-28" tabindex="-1"></a>modelQ <span class="ot">&lt;-</span> <span class="fu">make_VARG_Q</span>(model)</span>
+<span id="cb61-29"><a href="NonGATSM.html#cb61-29" tabindex="-1"></a>AB <span class="ot">&lt;-</span> <span class="fu">compute_AB_classical</span>(</span>
+<span id="cb61-30"><a href="NonGATSM.html#cb61-30" tabindex="-1"></a>  <span class="at">xi0 =</span> xi0,</span>
+<span id="cb61-31"><a href="NonGATSM.html#cb61-31" tabindex="-1"></a>  <span class="at">xi1 =</span> xi1,</span>
+<span id="cb61-32"><a href="NonGATSM.html#cb61-32" tabindex="-1"></a>  <span class="at">H =</span> H,</span>
+<span id="cb61-33"><a href="NonGATSM.html#cb61-33" tabindex="-1"></a>  <span class="at">psi =</span> psi_VARG,</span>
+<span id="cb61-34"><a href="NonGATSM.html#cb61-34" tabindex="-1"></a>  <span class="at">psi.parameterization =</span> modelQ</span>
+<span id="cb61-35"><a href="NonGATSM.html#cb61-35" tabindex="-1"></a>)</span>
+<span id="cb61-36"><a href="NonGATSM.html#cb61-36" tabindex="-1"></a></span>
+<span id="cb61-37"><a href="NonGATSM.html#cb61-37" tabindex="-1"></a><span class="co"># Simulate the physical dynamics from the unconditional mean.</span></span>
+<span id="cb61-38"><a href="NonGATSM.html#cb61-38" tabindex="-1"></a>w0 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">compute_uncondmean_VARG</span>(model))</span>
+<span id="cb61-39"><a href="NonGATSM.html#cb61-39" tabindex="-1"></a>simX <span class="ot">&lt;-</span> <span class="fu">t</span>(<span class="fu">simul_VARG</span>(model, <span class="at">nb_periods =</span> TT <span class="sc">-</span> <span class="dv">1</span>, <span class="at">w0 =</span> w0))</span>
+<span id="cb61-40"><a href="NonGATSM.html#cb61-40" tabindex="-1"></a></span>
+<span id="cb61-41"><a href="NonGATSM.html#cb61-41" tabindex="-1"></a><span class="co"># Compute the whole yield curve at each date.</span></span>
+<span id="cb61-42"><a href="NonGATSM.html#cb61-42" tabindex="-1"></a>yields <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">1</span>, TT, <span class="dv">1</span>) <span class="sc">%*%</span> <span class="fu">matrix</span>(AB<span class="sc">$</span>b, <span class="at">nrow =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb61-43"><a href="NonGATSM.html#cb61-43" tabindex="-1"></a>  simX <span class="sc">%*%</span> <span class="fu">matrix</span>(AB<span class="sc">$</span>a, <span class="fu">dim</span>(AB<span class="sc">$</span>a)[<span class="dv">1</span>], <span class="fu">dim</span>(AB<span class="sc">$</span>a)[<span class="dv">3</span>])</span>
+<span id="cb61-44"><a href="NonGATSM.html#cb61-44" tabindex="-1"></a></span>
+<span id="cb61-45"><a href="NonGATSM.html#cb61-45" tabindex="-1"></a><span class="co"># One-step-ahead probability that the short-term rate stays at zero.</span></span>
+<span id="cb61-46"><a href="NonGATSM.html#cb61-46" tabindex="-1"></a>p_stay_zero <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="sc">-</span>(model<span class="sc">$</span>alpha[<span class="dv">1</span>] <span class="sc">+</span> simX <span class="sc">%*%</span> <span class="fu">matrix</span>(model<span class="sc">$</span>beta[<span class="dv">1</span>, ], <span class="at">ncol =</span> <span class="dv">1</span>)))</span>
+<span id="cb61-47"><a href="NonGATSM.html#cb61-47" tabindex="-1"></a></span>
+<span id="cb61-48"><a href="NonGATSM.html#cb61-48" tabindex="-1"></a><span class="co"># Select two dates such that r_t = 0 but w_{2,t} differs sharply.</span></span>
+<span id="cb61-49"><a href="NonGATSM.html#cb61-49" tabindex="-1"></a>idx_zero <span class="ot">&lt;-</span> <span class="fu">which</span>(simX[, <span class="dv">1</span>] <span class="sc">&lt;</span> <span class="fl">1e-12</span>)</span>
+<span id="cb61-50"><a href="NonGATSM.html#cb61-50" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">length</span>(idx_zero) <span class="sc">&gt;=</span> <span class="dv">2</span>)</span>
+<span id="cb61-51"><a href="NonGATSM.html#cb61-51" tabindex="-1"></a>i_low  <span class="ot">&lt;-</span> idx_zero[<span class="fu">which.min</span>(simX[idx_zero, <span class="dv">2</span>])]</span>
+<span id="cb61-52"><a href="NonGATSM.html#cb61-52" tabindex="-1"></a>i_high <span class="ot">&lt;-</span> idx_zero[<span class="fu">which.max</span>(simX[idx_zero, <span class="dv">2</span>])]</span>
+<span id="cb61-53"><a href="NonGATSM.html#cb61-53" tabindex="-1"></a></span>
+<span id="cb61-54"><a href="NonGATSM.html#cb61-54" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">1</span>), <span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">3.2</span>, <span class="fl">4.2</span>, <span class="fl">2.8</span>, <span class="fl">1.2</span>))</span>
+<span id="cb61-55"><a href="NonGATSM.html#cb61-55" tabindex="-1"></a></span>
+<span id="cb61-56"><a href="NonGATSM.html#cb61-56" tabindex="-1"></a><span class="co"># Panel (a): short rate and long yield through time.</span></span>
+<span id="cb61-57"><a href="NonGATSM.html#cb61-57" tabindex="-1"></a><span class="fu">plot</span>(</span>
+<span id="cb61-58"><a href="NonGATSM.html#cb61-58" tabindex="-1"></a>  <span class="dv">1</span><span class="sc">:</span>TT, <span class="dv">100</span> <span class="sc">*</span> yields[, H],</span>
+<span id="cb61-59"><a href="NonGATSM.html#cb61-59" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;l&quot;</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">&quot;black&quot;</span>, <span class="at">las =</span> <span class="dv">1</span>,</span>
+<span id="cb61-60"><a href="NonGATSM.html#cb61-60" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;time&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;in percent&quot;</span>,</span>
+<span id="cb61-61"><a href="NonGATSM.html#cb61-61" tabindex="-1"></a>  <span class="at">ylim =</span> <span class="dv">120</span> <span class="sc">*</span> <span class="fu">range</span>(<span class="fu">c</span>(simX[, <span class="dv">1</span>], yields[, H])),</span>
+<span id="cb61-62"><a href="NonGATSM.html#cb61-62" tabindex="-1"></a>  <span class="at">main =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;(a) Short-term rate and 10-period yield&quot;</span>))</span>
+<span id="cb61-63"><a href="NonGATSM.html#cb61-63" tabindex="-1"></a>)</span>
+<span id="cb61-64"><a href="NonGATSM.html#cb61-64" tabindex="-1"></a><span class="fu">grid</span>()</span>
+<span id="cb61-65"><a href="NonGATSM.html#cb61-65" tabindex="-1"></a><span class="fu">lines</span>(<span class="dv">1</span><span class="sc">:</span>TT, <span class="dv">100</span> <span class="sc">*</span> simX[, <span class="dv">1</span>], <span class="at">col =</span> <span class="st">&quot;darkgrey&quot;</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb61-66"><a href="NonGATSM.html#cb61-66" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> i_low,  <span class="at">col =</span> <span class="st">&quot;grey40&quot;</span>, <span class="at">lty =</span> <span class="dv">3</span>)</span>
+<span id="cb61-67"><a href="NonGATSM.html#cb61-67" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> i_high, <span class="at">col =</span> <span class="st">&quot;black&quot;</span>,  <span class="at">lty =</span> <span class="dv">3</span>)</span>
+<span id="cb61-68"><a href="NonGATSM.html#cb61-68" tabindex="-1"></a><span class="fu">legend</span>(</span>
+<span id="cb61-69"><a href="NonGATSM.html#cb61-69" tabindex="-1"></a>  <span class="st">&quot;topleft&quot;</span>,</span>
+<span id="cb61-70"><a href="NonGATSM.html#cb61-70" tabindex="-1"></a>  <span class="at">legend =</span> <span class="fu">c</span>(</span>
+<span id="cb61-71"><a href="NonGATSM.html#cb61-71" tabindex="-1"></a>    <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;Short-term rate (&quot;</span>,r[t],<span class="st">&quot;)&quot;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>)),</span>
+<span id="cb61-72"><a href="NonGATSM.html#cb61-72" tabindex="-1"></a>    <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;Long-term rate (&quot;</span>,r[t<span class="sc">*</span><span class="st">&quot;,&quot;</span><span class="sc">*</span><span class="dv">10</span>],<span class="st">&quot;)&quot;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>))</span>
+<span id="cb61-73"><a href="NonGATSM.html#cb61-73" tabindex="-1"></a>  ),</span>
+<span id="cb61-74"><a href="NonGATSM.html#cb61-74" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;darkgrey&quot;</span>, <span class="st">&quot;black&quot;</span>),</span>
+<span id="cb61-75"><a href="NonGATSM.html#cb61-75" tabindex="-1"></a>  <span class="at">lwd =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>),</span>
+<span id="cb61-76"><a href="NonGATSM.html#cb61-76" tabindex="-1"></a>  <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>),</span>
+<span id="cb61-77"><a href="NonGATSM.html#cb61-77" tabindex="-1"></a>  <span class="at">seg.len =</span> <span class="dv">3</span>,</span>
+<span id="cb61-78"><a href="NonGATSM.html#cb61-78" tabindex="-1"></a>  <span class="at">bty =</span> <span class="st">&quot;n&quot;</span></span>
+<span id="cb61-79"><a href="NonGATSM.html#cb61-79" tabindex="-1"></a>)</span>
+<span id="cb61-80"><a href="NonGATSM.html#cb61-80" tabindex="-1"></a></span>
+<span id="cb61-81"><a href="NonGATSM.html#cb61-81" tabindex="-1"></a><span class="co"># Panel (b): yield curves at two dates with the same current short rate r_t = 0.</span></span>
+<span id="cb61-82"><a href="NonGATSM.html#cb61-82" tabindex="-1"></a><span class="fu">plot</span>(</span>
+<span id="cb61-83"><a href="NonGATSM.html#cb61-83" tabindex="-1"></a>  <span class="dv">1</span><span class="sc">:</span>H, <span class="dv">100</span> <span class="sc">*</span> yields[i_low, ],</span>
+<span id="cb61-84"><a href="NonGATSM.html#cb61-84" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;l&quot;</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">&quot;grey70&quot;</span>, <span class="at">las =</span> <span class="dv">1</span>, <span class="at">lty =</span> <span class="dv">2</span>,</span>
+<span id="cb61-85"><a href="NonGATSM.html#cb61-85" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;maturity&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;in percent&quot;</span>,</span>
+<span id="cb61-86"><a href="NonGATSM.html#cb61-86" tabindex="-1"></a>  <span class="at">ylim =</span> <span class="dv">120</span> <span class="sc">*</span> <span class="fu">range</span>(yields[<span class="fu">c</span>(i_low, i_high), ]),</span>
+<span id="cb61-87"><a href="NonGATSM.html#cb61-87" tabindex="-1"></a>  <span class="at">main =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;(b) Yield curves at two dates with &quot;</span>,r[t],<span class="st">&quot; = 0&quot;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>))</span>
+<span id="cb61-88"><a href="NonGATSM.html#cb61-88" tabindex="-1"></a>)</span>
+<span id="cb61-89"><a href="NonGATSM.html#cb61-89" tabindex="-1"></a><span class="fu">grid</span>()</span>
+<span id="cb61-90"><a href="NonGATSM.html#cb61-90" tabindex="-1"></a><span class="fu">lines</span>(<span class="dv">1</span><span class="sc">:</span>H, <span class="dv">100</span> <span class="sc">*</span> yields[i_high, ], <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">&quot;black&quot;</span>)</span>
+<span id="cb61-91"><a href="NonGATSM.html#cb61-91" tabindex="-1"></a><span class="fu">legend</span>(</span>
+<span id="cb61-92"><a href="NonGATSM.html#cb61-92" tabindex="-1"></a>  <span class="st">&quot;topleft&quot;</span>,</span>
+<span id="cb61-93"><a href="NonGATSM.html#cb61-93" tabindex="-1"></a>  <span class="at">legend =</span> <span class="fu">c</span>(</span>
+<span id="cb61-94"><a href="NonGATSM.html#cb61-94" tabindex="-1"></a>    <span class="fu">bquote</span>(<span class="fu">paste</span>(<span class="st">&quot;date &quot;</span>, .(i_low), <span class="st">&quot;: &quot;</span>, r[t], <span class="st">&quot; = 0, &quot;</span>,</span>
+<span id="cb61-95"><a href="NonGATSM.html#cb61-95" tabindex="-1"></a>                 w[<span class="dv">2</span><span class="sc">*</span><span class="st">&quot;,&quot;</span><span class="sc">*</span>t], <span class="st">&quot; = &quot;</span>,</span>
+<span id="cb61-96"><a href="NonGATSM.html#cb61-96" tabindex="-1"></a>                 .(<span class="fu">format</span>(<span class="fu">round</span>(simX[i_low, <span class="dv">2</span>], <span class="dv">3</span>), <span class="at">nsmall =</span> <span class="dv">3</span>)))),</span>
+<span id="cb61-97"><a href="NonGATSM.html#cb61-97" tabindex="-1"></a>    <span class="fu">bquote</span>(<span class="fu">paste</span>(<span class="st">&quot;date &quot;</span>, .(i_high), <span class="st">&quot;: &quot;</span>, r[t], <span class="st">&quot; = 0, &quot;</span>,</span>
+<span id="cb61-98"><a href="NonGATSM.html#cb61-98" tabindex="-1"></a>                 w[<span class="dv">2</span><span class="sc">*</span><span class="st">&quot;,&quot;</span><span class="sc">*</span>t], <span class="st">&quot; = &quot;</span>,</span>
+<span id="cb61-99"><a href="NonGATSM.html#cb61-99" tabindex="-1"></a>                 .(<span class="fu">format</span>(<span class="fu">round</span>(simX[i_high, <span class="dv">2</span>], <span class="dv">3</span>), <span class="at">nsmall =</span> <span class="dv">3</span>))))</span>
+<span id="cb61-100"><a href="NonGATSM.html#cb61-100" tabindex="-1"></a>  ),</span>
+<span id="cb61-101"><a href="NonGATSM.html#cb61-101" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;grey70&quot;</span>, <span class="st">&quot;black&quot;</span>),</span>
+<span id="cb61-102"><a href="NonGATSM.html#cb61-102" tabindex="-1"></a>  <span class="at">lwd =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>),</span>
+<span id="cb61-103"><a href="NonGATSM.html#cb61-103" tabindex="-1"></a>  <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">1</span>),</span>
+<span id="cb61-104"><a href="NonGATSM.html#cb61-104" tabindex="-1"></a>  <span class="at">seg.len =</span> <span class="dv">3</span>,</span>
+<span id="cb61-105"><a href="NonGATSM.html#cb61-105" tabindex="-1"></a>  <span class="at">cex =</span> <span class="fl">1.0</span>,</span>
+<span id="cb61-106"><a href="NonGATSM.html#cb61-106" tabindex="-1"></a>  <span class="at">bty =</span> <span class="st">&quot;n&quot;</span></span>
+<span id="cb61-107"><a href="NonGATSM.html#cb61-107" tabindex="-1"></a>)</span>
+<span id="cb61-108"><a href="NonGATSM.html#cb61-108" tabindex="-1"></a></span>
+<span id="cb61-109"><a href="NonGATSM.html#cb61-109" tabindex="-1"></a><span class="co"># Panel (c): one-step-ahead probability that the short rate remains at zero.</span></span>
+<span id="cb61-110"><a href="NonGATSM.html#cb61-110" tabindex="-1"></a><span class="fu">plot</span>(</span>
+<span id="cb61-111"><a href="NonGATSM.html#cb61-111" tabindex="-1"></a>  <span class="dv">1</span><span class="sc">:</span>TT, <span class="dv">100</span> <span class="sc">*</span> <span class="fu">c</span>(p_stay_zero),</span>
+<span id="cb61-112"><a href="NonGATSM.html#cb61-112" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;l&quot;</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">&quot;black&quot;</span>, <span class="at">las =</span> <span class="dv">1</span>,</span>
+<span id="cb61-113"><a href="NonGATSM.html#cb61-113" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;time&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;in percent&quot;</span>,</span>
+<span id="cb61-114"><a href="NonGATSM.html#cb61-114" tabindex="-1"></a>  <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">105</span>),</span>
+<span id="cb61-115"><a href="NonGATSM.html#cb61-115" tabindex="-1"></a>  <span class="at">main =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;(c) One-step-ahead probability that &quot;</span>,r[t<span class="sc">+</span><span class="dv">1</span>],<span class="st">&quot; = 0&quot;</span>))</span>
+<span id="cb61-116"><a href="NonGATSM.html#cb61-116" tabindex="-1"></a>)</span>
+<span id="cb61-117"><a href="NonGATSM.html#cb61-117" tabindex="-1"></a><span class="fu">grid</span>()</span>
+<span id="cb61-118"><a href="NonGATSM.html#cb61-118" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> i_low,  <span class="at">col =</span> <span class="st">&quot;grey40&quot;</span>, <span class="at">lty =</span> <span class="dv">3</span>)</span>
+<span id="cb61-119"><a href="NonGATSM.html#cb61-119" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> i_high, <span class="at">col =</span> <span class="st">&quot;black&quot;</span>,  <span class="at">lty =</span> <span class="dv">3</span>)</span>
+<span id="cb61-120"><a href="NonGATSM.html#cb61-120" tabindex="-1"></a><span class="fu">legend</span>(</span>
+<span id="cb61-121"><a href="NonGATSM.html#cb61-121" tabindex="-1"></a>  <span class="st">&quot;topright&quot;</span>,</span>
+<span id="cb61-122"><a href="NonGATSM.html#cb61-122" tabindex="-1"></a>  <span class="at">legend =</span> <span class="fu">c</span>(<span class="fu">expression</span>(<span class="fu">P</span>(r[t<span class="sc">+</span><span class="dv">1</span>] <span class="sc">==</span> <span class="dv">0</span> <span class="sc">%.%</span> <span class="st">&quot;|&quot;</span> <span class="sc">%.%</span> <span class="fu">underline</span>(w[t])))),</span>
+<span id="cb61-123"><a href="NonGATSM.html#cb61-123" tabindex="-1"></a>  <span class="at">col =</span> <span class="st">&quot;black&quot;</span>,</span>
+<span id="cb61-124"><a href="NonGATSM.html#cb61-124" tabindex="-1"></a>  <span class="at">lwd =</span> <span class="dv">2</span>,</span>
+<span id="cb61-125"><a href="NonGATSM.html#cb61-125" tabindex="-1"></a>  <span class="at">lty =</span> <span class="dv">1</span>,</span>
+<span id="cb61-126"><a href="NonGATSM.html#cb61-126" tabindex="-1"></a>  <span class="at">seg.len =</span> <span class="dv">3</span>,</span>
+<span id="cb61-127"><a href="NonGATSM.html#cb61-127" tabindex="-1"></a>  <span class="at">bty =</span> <span class="st">&quot;n&quot;</span></span>
+<span id="cb61-128"><a href="NonGATSM.html#cb61-128" tabindex="-1"></a>)</span></code></pre></div>
+</details>
 <p><img src="_main_files/figure-html/fig_VARG_ZLB-1.png" width="576" /></p>
 <p>Panel (a) shows that the 10-period yield keeps moving while the short-term rate
 repeatedly returns to zero. Panel (b) makes the mechanism transparent: two
@@ -521,185 +524,187 @@ crises. In the extreme-crisis regime, the mean-reversion level of the short rate
 capturing the idea that the central bank pushes the short rate toward the lower
 bound. We then add priced regime risk by tilting risk-neutral transition
 probabilities toward the extreme-crisis regime.</p>
-<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="NonGATSM.html#cb70-1" tabindex="-1"></a><span class="co"># Purpose: This example illustrates a three-regime Gaussian regime-switching short-rate</span></span>
-<span id="cb70-2"><a href="NonGATSM.html#cb70-2" tabindex="-1"></a><span class="fu">library</span>(DTAM)</span>
-<span id="cb70-3"><a href="NonGATSM.html#cb70-3" tabindex="-1"></a></span>
-<span id="cb70-4"><a href="NonGATSM.html#cb70-4" tabindex="-1"></a><span class="co"># set.seed(123)</span></span>
-<span id="cb70-5"><a href="NonGATSM.html#cb70-5" tabindex="-1"></a></span>
-<span id="cb70-6"><a href="NonGATSM.html#cb70-6" tabindex="-1"></a>TT <span class="ot">&lt;-</span> <span class="dv">350</span></span>
-<span id="cb70-7"><a href="NonGATSM.html#cb70-7" tabindex="-1"></a>H  <span class="ot">&lt;-</span> <span class="dv">10</span></span>
-<span id="cb70-8"><a href="NonGATSM.html#cb70-8" tabindex="-1"></a></span>
-<span id="cb70-9"><a href="NonGATSM.html#cb70-9" tabindex="-1"></a>rho <span class="ot">&lt;-</span> <span class="fl">0.7</span></span>
-<span id="cb70-10"><a href="NonGATSM.html#cb70-10" tabindex="-1"></a></span>
-<span id="cb70-11"><a href="NonGATSM.html#cb70-11" tabindex="-1"></a><span class="co"># Regime-specific long-run means of the short rate.</span></span>
-<span id="cb70-12"><a href="NonGATSM.html#cb70-12" tabindex="-1"></a>mu_bar <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.03</span>, <span class="fl">0.01</span>, <span class="fl">0.00</span>)</span>
-<span id="cb70-13"><a href="NonGATSM.html#cb70-13" tabindex="-1"></a>mu <span class="ot">&lt;-</span> <span class="fu">matrix</span>((<span class="dv">1</span> <span class="sc">-</span> rho) <span class="sc">*</span> mu_bar, <span class="dv">1</span>, <span class="dv">3</span>)</span>
-<span id="cb70-14"><a href="NonGATSM.html#cb70-14" tabindex="-1"></a></span>
-<span id="cb70-15"><a href="NonGATSM.html#cb70-15" tabindex="-1"></a><span class="co"># Regime-specific volatilities.</span></span>
-<span id="cb70-16"><a href="NonGATSM.html#cb70-16" tabindex="-1"></a>sigma <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.003</span>, <span class="fl">0.00001</span>, <span class="fl">0.00001</span>)</span>
-<span id="cb70-17"><a href="NonGATSM.html#cb70-17" tabindex="-1"></a></span>
-<span id="cb70-18"><a href="NonGATSM.html#cb70-18" tabindex="-1"></a><span class="co"># Regime-transition matrix under the physical measure.</span></span>
-<span id="cb70-19"><a href="NonGATSM.html#cb70-19" tabindex="-1"></a>Pi <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(</span>
-<span id="cb70-20"><a href="NonGATSM.html#cb70-20" tabindex="-1"></a>  <span class="fl">0.95</span>, <span class="fl">0.05</span>, <span class="fl">0.00</span>,</span>
-<span id="cb70-21"><a href="NonGATSM.html#cb70-21" tabindex="-1"></a>  <span class="fl">0.05</span>, <span class="fl">0.90</span>, <span class="fl">0.05</span>,</span>
-<span id="cb70-22"><a href="NonGATSM.html#cb70-22" tabindex="-1"></a>  <span class="fl">0.05</span>, <span class="fl">0.00</span>, <span class="fl">0.95</span></span>
-<span id="cb70-23"><a href="NonGATSM.html#cb70-23" tabindex="-1"></a>), <span class="dv">3</span>, <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb70-24"><a href="NonGATSM.html#cb70-24" tabindex="-1"></a></span>
-<span id="cb70-25"><a href="NonGATSM.html#cb70-25" tabindex="-1"></a><span class="co"># Regime-risk prices: the SDF is high in the extreme-crisis regime.</span></span>
-<span id="cb70-26"><a href="NonGATSM.html#cb70-26" tabindex="-1"></a>gamma <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="fl">1.25</span>)</span>
-<span id="cb70-27"><a href="NonGATSM.html#cb70-27" tabindex="-1"></a>Pi_star <span class="ot">&lt;-</span> <span class="fu">sweep</span>(Pi, <span class="dv">2</span>, <span class="fu">exp</span>(gamma), <span class="st">`</span><span class="at">*</span><span class="st">`</span>)</span>
-<span id="cb70-28"><a href="NonGATSM.html#cb70-28" tabindex="-1"></a>Pi_star <span class="ot">&lt;-</span> Pi_star <span class="sc">/</span> <span class="fu">rowSums</span>(Pi_star)</span>
-<span id="cb70-29"><a href="NonGATSM.html#cb70-29" tabindex="-1"></a></span>
-<span id="cb70-30"><a href="NonGATSM.html#cb70-30" tabindex="-1"></a>regime_names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Normal times&quot;</span>, <span class="st">&quot;Small crisis&quot;</span>, <span class="st">&quot;Extreme crisis&quot;</span>)</span>
-<span id="cb70-31"><a href="NonGATSM.html#cb70-31" tabindex="-1"></a></span>
-<span id="cb70-32"><a href="NonGATSM.html#cb70-32" tabindex="-1"></a>model_P <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb70-33"><a href="NonGATSM.html#cb70-33" tabindex="-1"></a>  <span class="at">Phi =</span> <span class="fu">matrix</span>(rho, <span class="dv">1</span>, <span class="dv">1</span>),</span>
-<span id="cb70-34"><a href="NonGATSM.html#cb70-34" tabindex="-1"></a>  <span class="at">Pi =</span> Pi,</span>
-<span id="cb70-35"><a href="NonGATSM.html#cb70-35" tabindex="-1"></a>  <span class="at">mu =</span> mu,</span>
-<span id="cb70-36"><a href="NonGATSM.html#cb70-36" tabindex="-1"></a>  <span class="at">Sigma =</span> <span class="fu">array</span>(sigma<span class="sc">^</span><span class="dv">2</span>, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">3</span>))</span>
-<span id="cb70-37"><a href="NonGATSM.html#cb70-37" tabindex="-1"></a>)</span>
-<span id="cb70-38"><a href="NonGATSM.html#cb70-38" tabindex="-1"></a>model_Q <span class="ot">&lt;-</span> model_P</span>
-<span id="cb70-39"><a href="NonGATSM.html#cb70-39" tabindex="-1"></a>model_Q<span class="sc">$</span>Pi <span class="ot">&lt;-</span> Pi_star</span>
-<span id="cb70-40"><a href="NonGATSM.html#cb70-40" tabindex="-1"></a></span>
-<span id="cb70-41"><a href="NonGATSM.html#cb70-41" tabindex="-1"></a>xi0 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb70-42"><a href="NonGATSM.html#cb70-42" tabindex="-1"></a>xi1 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="fu">rep</span>(<span class="dv">0</span>, <span class="dv">3</span>)), <span class="at">ncol =</span> <span class="dv">1</span>)</span>
-<span id="cb70-43"><a href="NonGATSM.html#cb70-43" tabindex="-1"></a>AB_P <span class="ot">&lt;-</span> <span class="fu">compute_AB_classical</span>(</span>
-<span id="cb70-44"><a href="NonGATSM.html#cb70-44" tabindex="-1"></a>  <span class="at">xi0 =</span> xi0,</span>
-<span id="cb70-45"><a href="NonGATSM.html#cb70-45" tabindex="-1"></a>  <span class="at">xi1 =</span> xi1,</span>
-<span id="cb70-46"><a href="NonGATSM.html#cb70-46" tabindex="-1"></a>  <span class="at">H =</span> H,</span>
-<span id="cb70-47"><a href="NonGATSM.html#cb70-47" tabindex="-1"></a>  <span class="at">psi =</span> psi_RSVAR,</span>
-<span id="cb70-48"><a href="NonGATSM.html#cb70-48" tabindex="-1"></a>  <span class="at">psi.parameterization =</span> model_P</span>
-<span id="cb70-49"><a href="NonGATSM.html#cb70-49" tabindex="-1"></a>)</span>
-<span id="cb70-50"><a href="NonGATSM.html#cb70-50" tabindex="-1"></a>AB_Q <span class="ot">&lt;-</span> <span class="fu">compute_AB_classical</span>(</span>
-<span id="cb70-51"><a href="NonGATSM.html#cb70-51" tabindex="-1"></a>  <span class="at">xi0 =</span> xi0,</span>
-<span id="cb70-52"><a href="NonGATSM.html#cb70-52" tabindex="-1"></a>  <span class="at">xi1 =</span> xi1,</span>
-<span id="cb70-53"><a href="NonGATSM.html#cb70-53" tabindex="-1"></a>  <span class="at">H =</span> H,</span>
-<span id="cb70-54"><a href="NonGATSM.html#cb70-54" tabindex="-1"></a>  <span class="at">psi =</span> psi_RSVAR,</span>
-<span id="cb70-55"><a href="NonGATSM.html#cb70-55" tabindex="-1"></a>  <span class="at">psi.parameterization =</span> model_Q</span>
-<span id="cb70-56"><a href="NonGATSM.html#cb70-56" tabindex="-1"></a>)</span>
-<span id="cb70-57"><a href="NonGATSM.html#cb70-57" tabindex="-1"></a></span>
-<span id="cb70-58"><a href="NonGATSM.html#cb70-58" tabindex="-1"></a><span class="co"># Simulate regimes and short rates under the physical dynamics.</span></span>
-<span id="cb70-59"><a href="NonGATSM.html#cb70-59" tabindex="-1"></a>sim <span class="ot">&lt;-</span> <span class="fu">simul_RSVAR</span>(model_P, <span class="at">nb.sim =</span> TT, <span class="at">y0 =</span> mu_bar[<span class="dv">1</span>], <span class="at">z0 =</span> <span class="dv">1</span>)</span>
-<span id="cb70-60"><a href="NonGATSM.html#cb70-60" tabindex="-1"></a>r <span class="ot">&lt;-</span> <span class="fu">matrix</span>(sim<span class="sc">$</span>y[, <span class="dv">1</span>], TT, <span class="dv">1</span>)</span>
-<span id="cb70-61"><a href="NonGATSM.html#cb70-61" tabindex="-1"></a>z <span class="ot">&lt;-</span> sim<span class="sc">$</span>z</span>
-<span id="cb70-62"><a href="NonGATSM.html#cb70-62" tabindex="-1"></a>regime <span class="ot">&lt;-</span> sim<span class="sc">$</span>regime</span>
-<span id="cb70-63"><a href="NonGATSM.html#cb70-63" tabindex="-1"></a>W <span class="ot">&lt;-</span> sim<span class="sc">$</span>w</span>
-<span id="cb70-64"><a href="NonGATSM.html#cb70-64" tabindex="-1"></a>yields_P <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">1</span>, TT, <span class="dv">1</span>) <span class="sc">%*%</span> <span class="fu">matrix</span>(AB_P<span class="sc">$</span>b, <span class="at">nrow =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb70-65"><a href="NonGATSM.html#cb70-65" tabindex="-1"></a>  W <span class="sc">%*%</span> <span class="fu">matrix</span>(AB_P<span class="sc">$</span>a, <span class="fu">dim</span>(AB_P<span class="sc">$</span>a)[<span class="dv">1</span>], <span class="fu">dim</span>(AB_P<span class="sc">$</span>a)[<span class="dv">3</span>])</span>
-<span id="cb70-66"><a href="NonGATSM.html#cb70-66" tabindex="-1"></a>yields_Q <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">1</span>, TT, <span class="dv">1</span>) <span class="sc">%*%</span> <span class="fu">matrix</span>(AB_Q<span class="sc">$</span>b, <span class="at">nrow =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb70-67"><a href="NonGATSM.html#cb70-67" tabindex="-1"></a>  W <span class="sc">%*%</span> <span class="fu">matrix</span>(AB_Q<span class="sc">$</span>a, <span class="fu">dim</span>(AB_Q<span class="sc">$</span>a)[<span class="dv">1</span>], <span class="fu">dim</span>(AB_Q<span class="sc">$</span>a)[<span class="dv">3</span>])</span>
-<span id="cb70-68"><a href="NonGATSM.html#cb70-68" tabindex="-1"></a></span>
-<span id="cb70-69"><a href="NonGATSM.html#cb70-69" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">1</span>), <span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">3.2</span>, <span class="fl">4.2</span>, <span class="fl">2.8</span>, <span class="fl">1.2</span>))</span>
-<span id="cb70-70"><a href="NonGATSM.html#cb70-70" tabindex="-1"></a></span>
-<span id="cb70-71"><a href="NonGATSM.html#cb70-71" tabindex="-1"></a>add_regime_shading <span class="ot">&lt;-</span> <span class="cf">function</span>(regime, col_regime) {</span>
-<span id="cb70-72"><a href="NonGATSM.html#cb70-72" tabindex="-1"></a>  rr <span class="ot">&lt;-</span> <span class="fu">rle</span>(regime)</span>
-<span id="cb70-73"><a href="NonGATSM.html#cb70-73" tabindex="-1"></a>  end <span class="ot">&lt;-</span> <span class="fu">cumsum</span>(rr<span class="sc">$</span>lengths)</span>
-<span id="cb70-74"><a href="NonGATSM.html#cb70-74" tabindex="-1"></a>  start <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fu">head</span>(end, <span class="sc">-</span><span class="dv">1</span>) <span class="sc">+</span> <span class="dv">1</span>)</span>
-<span id="cb70-75"><a href="NonGATSM.html#cb70-75" tabindex="-1"></a>  usr <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="st">&quot;usr&quot;</span>)</span>
-<span id="cb70-76"><a href="NonGATSM.html#cb70-76" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(rr<span class="sc">$</span>values)) {</span>
-<span id="cb70-77"><a href="NonGATSM.html#cb70-77" tabindex="-1"></a>    col_i <span class="ot">&lt;-</span> col_regime[rr<span class="sc">$</span>values[i]]</span>
-<span id="cb70-78"><a href="NonGATSM.html#cb70-78" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.na</span>(col_i)) {</span>
-<span id="cb70-79"><a href="NonGATSM.html#cb70-79" tabindex="-1"></a>      <span class="fu">rect</span>(start[i] <span class="sc">-</span> <span class="fl">0.5</span>, usr[<span class="dv">3</span>], end[i] <span class="sc">+</span> <span class="fl">0.5</span>, usr[<span class="dv">4</span>],</span>
-<span id="cb70-80"><a href="NonGATSM.html#cb70-80" tabindex="-1"></a>           <span class="at">col =</span> col_i, <span class="at">border =</span> <span class="cn">NA</span>)</span>
-<span id="cb70-81"><a href="NonGATSM.html#cb70-81" tabindex="-1"></a>    }</span>
-<span id="cb70-82"><a href="NonGATSM.html#cb70-82" tabindex="-1"></a>  }</span>
-<span id="cb70-83"><a href="NonGATSM.html#cb70-83" tabindex="-1"></a>}</span>
-<span id="cb70-84"><a href="NonGATSM.html#cb70-84" tabindex="-1"></a></span>
-<span id="cb70-85"><a href="NonGATSM.html#cb70-85" tabindex="-1"></a><span class="fu">plot</span>(</span>
-<span id="cb70-86"><a href="NonGATSM.html#cb70-86" tabindex="-1"></a>  <span class="dv">1</span><span class="sc">:</span>TT, <span class="dv">100</span> <span class="sc">*</span> r,</span>
-<span id="cb70-87"><a href="NonGATSM.html#cb70-87" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;n&quot;</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">las =</span> <span class="dv">1</span>, <span class="at">col =</span> <span class="st">&quot;black&quot;</span>,</span>
-<span id="cb70-88"><a href="NonGATSM.html#cb70-88" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;time&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;in percent&quot;</span>,</span>
-<span id="cb70-89"><a href="NonGATSM.html#cb70-89" tabindex="-1"></a>  <span class="at">ylim =</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">range</span>(<span class="fu">c</span>(r, yields_P[, H], yields_Q[, H])),</span>
-<span id="cb70-90"><a href="NonGATSM.html#cb70-90" tabindex="-1"></a>  <span class="at">xlim=</span><span class="fu">c</span>(<span class="dv">1</span>,TT<span class="sc">*</span>(<span class="fl">1.2</span>)),</span>
-<span id="cb70-91"><a href="NonGATSM.html#cb70-91" tabindex="-1"></a>  <span class="at">main =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;(a) Regime-switching short rate&quot;</span>))</span>
-<span id="cb70-92"><a href="NonGATSM.html#cb70-92" tabindex="-1"></a>)</span>
-<span id="cb70-93"><a href="NonGATSM.html#cb70-93" tabindex="-1"></a><span class="fu">add_regime_shading</span>(regime, <span class="fu">c</span>(<span class="cn">NA</span>, <span class="st">&quot;grey90&quot;</span>, <span class="st">&quot;grey75&quot;</span>))</span>
-<span id="cb70-94"><a href="NonGATSM.html#cb70-94" tabindex="-1"></a><span class="fu">grid</span>()</span>
-<span id="cb70-95"><a href="NonGATSM.html#cb70-95" tabindex="-1"></a><span class="fu">lines</span>(<span class="dv">1</span><span class="sc">:</span>TT, <span class="dv">100</span> <span class="sc">*</span> r, <span class="at">col =</span> <span class="st">&quot;black&quot;</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
-<span id="cb70-96"><a href="NonGATSM.html#cb70-96" tabindex="-1"></a><span class="fu">lines</span>(<span class="dv">1</span><span class="sc">:</span>TT, <span class="dv">100</span> <span class="sc">*</span> yields_P[, H], <span class="at">col =</span> <span class="st">&quot;grey60&quot;</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
-<span id="cb70-97"><a href="NonGATSM.html#cb70-97" tabindex="-1"></a><span class="fu">lines</span>(<span class="dv">1</span><span class="sc">:</span>TT, <span class="dv">100</span> <span class="sc">*</span> yields_Q[, H], <span class="at">col =</span> <span class="st">&quot;black&quot;</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
-<span id="cb70-98"><a href="NonGATSM.html#cb70-98" tabindex="-1"></a><span class="fu">legend</span>(</span>
-<span id="cb70-99"><a href="NonGATSM.html#cb70-99" tabindex="-1"></a>  <span class="st">&quot;topright&quot;</span>,</span>
-<span id="cb70-100"><a href="NonGATSM.html#cb70-100" tabindex="-1"></a>  <span class="at">legend =</span> <span class="fu">c</span>(<span class="fu">expression</span>(r[t]), <span class="st">&quot;EH yield&quot;</span>, <span class="st">&quot;RN yield&quot;</span>),</span>
-<span id="cb70-101"><a href="NonGATSM.html#cb70-101" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;grey60&quot;</span>, <span class="st">&quot;black&quot;</span>),</span>
-<span id="cb70-102"><a href="NonGATSM.html#cb70-102" tabindex="-1"></a>  <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">1</span>),</span>
-<span id="cb70-103"><a href="NonGATSM.html#cb70-103" tabindex="-1"></a>  <span class="at">lwd =</span> <span class="dv">2</span>,</span>
-<span id="cb70-104"><a href="NonGATSM.html#cb70-104" tabindex="-1"></a>  <span class="at">bg =</span> <span class="st">&quot;white&quot;</span>,</span>
-<span id="cb70-105"><a href="NonGATSM.html#cb70-105" tabindex="-1"></a>  <span class="at">box.col =</span> <span class="st">&quot;white&quot;</span>,</span>
-<span id="cb70-106"><a href="NonGATSM.html#cb70-106" tabindex="-1"></a>  <span class="at">bty =</span> <span class="st">&quot;o&quot;</span></span>
-<span id="cb70-107"><a href="NonGATSM.html#cb70-107" tabindex="-1"></a>)</span>
-<span id="cb70-108"><a href="NonGATSM.html#cb70-108" tabindex="-1"></a><span class="fu">legend</span>(</span>
-<span id="cb70-109"><a href="NonGATSM.html#cb70-109" tabindex="-1"></a>  <span class="st">&quot;bottomright&quot;</span>,</span>
-<span id="cb70-110"><a href="NonGATSM.html#cb70-110" tabindex="-1"></a>  <span class="at">legend =</span> regime_names,</span>
-<span id="cb70-111"><a href="NonGATSM.html#cb70-111" tabindex="-1"></a>  <span class="at">fill =</span> <span class="fu">c</span>(<span class="st">&quot;white&quot;</span>, <span class="st">&quot;grey90&quot;</span>, <span class="st">&quot;grey75&quot;</span>),</span>
-<span id="cb70-112"><a href="NonGATSM.html#cb70-112" tabindex="-1"></a>  <span class="at">border =</span> <span class="fu">c</span>(<span class="st">&quot;grey60&quot;</span>, <span class="cn">NA</span>, <span class="cn">NA</span>),</span>
-<span id="cb70-113"><a href="NonGATSM.html#cb70-113" tabindex="-1"></a>  <span class="at">bg =</span> <span class="st">&quot;white&quot;</span>,</span>
-<span id="cb70-114"><a href="NonGATSM.html#cb70-114" tabindex="-1"></a>  <span class="at">box.col =</span> <span class="st">&quot;white&quot;</span>,</span>
-<span id="cb70-115"><a href="NonGATSM.html#cb70-115" tabindex="-1"></a>  <span class="at">bty =</span> <span class="st">&quot;o&quot;</span></span>
-<span id="cb70-116"><a href="NonGATSM.html#cb70-116" tabindex="-1"></a>)</span>
-<span id="cb70-117"><a href="NonGATSM.html#cb70-117" tabindex="-1"></a></span>
-<span id="cb70-118"><a href="NonGATSM.html#cb70-118" tabindex="-1"></a>curve_cols <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;grey75&quot;</span>, <span class="st">&quot;grey40&quot;</span>, <span class="st">&quot;black&quot;</span>)</span>
-<span id="cb70-119"><a href="NonGATSM.html#cb70-119" tabindex="-1"></a>band_cols <span class="ot">&lt;-</span> grDevices<span class="sc">::</span><span class="fu">adjustcolor</span>(curve_cols, <span class="at">alpha.f =</span> <span class="fl">0.18</span>)</span>
-<span id="cb70-120"><a href="NonGATSM.html#cb70-120" tabindex="-1"></a></span>
-<span id="cb70-121"><a href="NonGATSM.html#cb70-121" tabindex="-1"></a>regime_curve_summary <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="cf">function</span>(j) {</span>
-<span id="cb70-122"><a href="NonGATSM.html#cb70-122" tabindex="-1"></a>  y_q <span class="ot">&lt;-</span> yields_Q[regime <span class="sc">==</span> j, , drop <span class="ot">=</span> <span class="cn">FALSE</span>]</span>
-<span id="cb70-123"><a href="NonGATSM.html#cb70-123" tabindex="-1"></a>  y_p <span class="ot">&lt;-</span> yields_P[regime <span class="sc">==</span> j, , drop <span class="ot">=</span> <span class="cn">FALSE</span>]</span>
-<span id="cb70-124"><a href="NonGATSM.html#cb70-124" tabindex="-1"></a>  <span class="fu">list</span>(</span>
-<span id="cb70-125"><a href="NonGATSM.html#cb70-125" tabindex="-1"></a>    <span class="at">mean_Q =</span> <span class="fu">apply</span>(y_q, <span class="dv">2</span>, mean),</span>
-<span id="cb70-126"><a href="NonGATSM.html#cb70-126" tabindex="-1"></a>    <span class="at">mean_P =</span> <span class="fu">apply</span>(y_p, <span class="dv">2</span>, mean),</span>
-<span id="cb70-127"><a href="NonGATSM.html#cb70-127" tabindex="-1"></a>    <span class="at">q10_Q =</span> <span class="fu">apply</span>(y_q, <span class="dv">2</span>, quantile, <span class="at">probs =</span> <span class="fl">0.10</span>),</span>
-<span id="cb70-128"><a href="NonGATSM.html#cb70-128" tabindex="-1"></a>    <span class="at">q90_Q =</span> <span class="fu">apply</span>(y_q, <span class="dv">2</span>, quantile, <span class="at">probs =</span> <span class="fl">0.90</span>)</span>
-<span id="cb70-129"><a href="NonGATSM.html#cb70-129" tabindex="-1"></a>  )</span>
-<span id="cb70-130"><a href="NonGATSM.html#cb70-130" tabindex="-1"></a>})</span>
-<span id="cb70-131"><a href="NonGATSM.html#cb70-131" tabindex="-1"></a></span>
-<span id="cb70-132"><a href="NonGATSM.html#cb70-132" tabindex="-1"></a><span class="fu">plot</span>(</span>
-<span id="cb70-133"><a href="NonGATSM.html#cb70-133" tabindex="-1"></a>  <span class="dv">1</span><span class="sc">:</span>H, <span class="dv">100</span> <span class="sc">*</span> regime_curve_summary[[<span class="dv">1</span>]]<span class="sc">$</span>mean_Q,</span>
-<span id="cb70-134"><a href="NonGATSM.html#cb70-134" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;n&quot;</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">las =</span> <span class="dv">1</span>, <span class="at">col =</span> <span class="st">&quot;grey75&quot;</span>,</span>
-<span id="cb70-135"><a href="NonGATSM.html#cb70-135" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;maturity&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;in percent&quot;</span>,</span>
-<span id="cb70-136"><a href="NonGATSM.html#cb70-136" tabindex="-1"></a>  <span class="at">ylim =</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">range</span>(<span class="fu">unlist</span>(<span class="fu">lapply</span>(</span>
-<span id="cb70-137"><a href="NonGATSM.html#cb70-137" tabindex="-1"></a>    regime_curve_summary,</span>
-<span id="cb70-138"><a href="NonGATSM.html#cb70-138" tabindex="-1"></a>    <span class="cf">function</span>(x) <span class="fu">c</span>(x<span class="sc">$</span>q10_Q, x<span class="sc">$</span>q90_Q, x<span class="sc">$</span>mean_P)</span>
-<span id="cb70-139"><a href="NonGATSM.html#cb70-139" tabindex="-1"></a>  ))),</span>
-<span id="cb70-140"><a href="NonGATSM.html#cb70-140" tabindex="-1"></a>  <span class="at">xlim=</span><span class="fu">c</span>(<span class="dv">1</span>,H<span class="sc">*</span>(<span class="fl">1.2</span>)),</span>
-<span id="cb70-141"><a href="NonGATSM.html#cb70-141" tabindex="-1"></a>  <span class="at">main =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;(b) Yield curves by regime&quot;</span>))</span>
-<span id="cb70-142"><a href="NonGATSM.html#cb70-142" tabindex="-1"></a>)</span>
-<span id="cb70-143"><a href="NonGATSM.html#cb70-143" tabindex="-1"></a><span class="fu">grid</span>()</span>
-<span id="cb70-144"><a href="NonGATSM.html#cb70-144" tabindex="-1"></a><span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>) {</span>
-<span id="cb70-145"><a href="NonGATSM.html#cb70-145" tabindex="-1"></a>  <span class="fu">polygon</span>(</span>
-<span id="cb70-146"><a href="NonGATSM.html#cb70-146" tabindex="-1"></a>    <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span>H, H<span class="sc">:</span><span class="dv">1</span>),</span>
-<span id="cb70-147"><a href="NonGATSM.html#cb70-147" tabindex="-1"></a>    <span class="dv">100</span> <span class="sc">*</span> <span class="fu">c</span>(regime_curve_summary[[j]]<span class="sc">$</span>q10_Q, <span class="fu">rev</span>(regime_curve_summary[[j]]<span class="sc">$</span>q90_Q)),</span>
-<span id="cb70-148"><a href="NonGATSM.html#cb70-148" tabindex="-1"></a>    <span class="at">col =</span> band_cols[j],</span>
-<span id="cb70-149"><a href="NonGATSM.html#cb70-149" tabindex="-1"></a>    <span class="at">border =</span> <span class="cn">NA</span></span>
-<span id="cb70-150"><a href="NonGATSM.html#cb70-150" tabindex="-1"></a>  )</span>
-<span id="cb70-151"><a href="NonGATSM.html#cb70-151" tabindex="-1"></a>}</span>
-<span id="cb70-152"><a href="NonGATSM.html#cb70-152" tabindex="-1"></a><span class="fu">grid</span>()</span>
-<span id="cb70-153"><a href="NonGATSM.html#cb70-153" tabindex="-1"></a><span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>) {</span>
-<span id="cb70-154"><a href="NonGATSM.html#cb70-154" tabindex="-1"></a>  <span class="fu">lines</span>(<span class="dv">1</span><span class="sc">:</span>H, <span class="dv">100</span> <span class="sc">*</span> regime_curve_summary[[j]]<span class="sc">$</span>mean_P,</span>
-<span id="cb70-155"><a href="NonGATSM.html#cb70-155" tabindex="-1"></a>        <span class="at">col =</span> curve_cols[j], <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
-<span id="cb70-156"><a href="NonGATSM.html#cb70-156" tabindex="-1"></a>  <span class="fu">lines</span>(<span class="dv">1</span><span class="sc">:</span>H, <span class="dv">100</span> <span class="sc">*</span> regime_curve_summary[[j]]<span class="sc">$</span>mean_Q,</span>
-<span id="cb70-157"><a href="NonGATSM.html#cb70-157" tabindex="-1"></a>        <span class="at">col =</span> curve_cols[j], <span class="at">lwd =</span> <span class="dv">2</span>)</span>
-<span id="cb70-158"><a href="NonGATSM.html#cb70-158" tabindex="-1"></a>}</span>
-<span id="cb70-159"><a href="NonGATSM.html#cb70-159" tabindex="-1"></a><span class="fu">legend</span>(</span>
-<span id="cb70-160"><a href="NonGATSM.html#cb70-160" tabindex="-1"></a>  <span class="st">&quot;topright&quot;</span>,</span>
-<span id="cb70-161"><a href="NonGATSM.html#cb70-161" tabindex="-1"></a>  <span class="at">legend =</span> regime_names,</span>
-<span id="cb70-162"><a href="NonGATSM.html#cb70-162" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;grey75&quot;</span>, <span class="st">&quot;grey40&quot;</span>, <span class="st">&quot;black&quot;</span>),</span>
-<span id="cb70-163"><a href="NonGATSM.html#cb70-163" tabindex="-1"></a>  <span class="at">lwd =</span> <span class="dv">2</span>,</span>
-<span id="cb70-164"><a href="NonGATSM.html#cb70-164" tabindex="-1"></a>  <span class="at">bg =</span> <span class="st">&quot;white&quot;</span>,</span>
-<span id="cb70-165"><a href="NonGATSM.html#cb70-165" tabindex="-1"></a>  <span class="at">box.col =</span> <span class="st">&quot;white&quot;</span>,</span>
-<span id="cb70-166"><a href="NonGATSM.html#cb70-166" tabindex="-1"></a>  <span class="at">bty =</span> <span class="st">&quot;o&quot;</span>,</span>
-<span id="cb70-167"><a href="NonGATSM.html#cb70-167" tabindex="-1"></a>  <span class="at">cex=</span>.<span class="dv">9</span></span>
-<span id="cb70-168"><a href="NonGATSM.html#cb70-168" tabindex="-1"></a>)</span>
-<span id="cb70-169"><a href="NonGATSM.html#cb70-169" tabindex="-1"></a><span class="fu">legend</span>(</span>
-<span id="cb70-170"><a href="NonGATSM.html#cb70-170" tabindex="-1"></a>  <span class="st">&quot;bottomright&quot;</span>,</span>
-<span id="cb70-171"><a href="NonGATSM.html#cb70-171" tabindex="-1"></a>  <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">&quot;EH&quot;</span>, <span class="st">&quot;RN&quot;</span>),</span>
-<span id="cb70-172"><a href="NonGATSM.html#cb70-172" tabindex="-1"></a>  <span class="at">col =</span> <span class="st">&quot;black&quot;</span>,</span>
-<span id="cb70-173"><a href="NonGATSM.html#cb70-173" tabindex="-1"></a>  <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">1</span>),</span>
-<span id="cb70-174"><a href="NonGATSM.html#cb70-174" tabindex="-1"></a>  <span class="at">lwd =</span> <span class="dv">2</span>,</span>
-<span id="cb70-175"><a href="NonGATSM.html#cb70-175" tabindex="-1"></a>  <span class="at">bg =</span> <span class="st">&quot;white&quot;</span>,</span>
-<span id="cb70-176"><a href="NonGATSM.html#cb70-176" tabindex="-1"></a>  <span class="at">box.col =</span> <span class="st">&quot;white&quot;</span>,</span>
-<span id="cb70-177"><a href="NonGATSM.html#cb70-177" tabindex="-1"></a>  <span class="at">bty =</span> <span class="st">&quot;o&quot;</span>,</span>
-<span id="cb70-178"><a href="NonGATSM.html#cb70-178" tabindex="-1"></a>  <span class="at">cex=</span>.<span class="dv">9</span></span>
-<span id="cb70-179"><a href="NonGATSM.html#cb70-179" tabindex="-1"></a>)</span></code></pre></div>
+<details class=chunk-details><summary class=chunk-summary><span class=chunk-summary-text>Code</span></summary>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="NonGATSM.html#cb62-1" tabindex="-1"></a><span class="co"># Purpose: This example illustrates a three-regime Gaussian regime-switching short-rate</span></span>
+<span id="cb62-2"><a href="NonGATSM.html#cb62-2" tabindex="-1"></a><span class="fu">library</span>(DTAM)</span>
+<span id="cb62-3"><a href="NonGATSM.html#cb62-3" tabindex="-1"></a></span>
+<span id="cb62-4"><a href="NonGATSM.html#cb62-4" tabindex="-1"></a><span class="co"># set.seed(123)</span></span>
+<span id="cb62-5"><a href="NonGATSM.html#cb62-5" tabindex="-1"></a></span>
+<span id="cb62-6"><a href="NonGATSM.html#cb62-6" tabindex="-1"></a>TT <span class="ot">&lt;-</span> <span class="dv">350</span></span>
+<span id="cb62-7"><a href="NonGATSM.html#cb62-7" tabindex="-1"></a>H  <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb62-8"><a href="NonGATSM.html#cb62-8" tabindex="-1"></a></span>
+<span id="cb62-9"><a href="NonGATSM.html#cb62-9" tabindex="-1"></a>rho <span class="ot">&lt;-</span> <span class="fl">0.7</span></span>
+<span id="cb62-10"><a href="NonGATSM.html#cb62-10" tabindex="-1"></a></span>
+<span id="cb62-11"><a href="NonGATSM.html#cb62-11" tabindex="-1"></a><span class="co"># Regime-specific long-run means of the short rate.</span></span>
+<span id="cb62-12"><a href="NonGATSM.html#cb62-12" tabindex="-1"></a>mu_bar <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.03</span>, <span class="fl">0.01</span>, <span class="fl">0.00</span>)</span>
+<span id="cb62-13"><a href="NonGATSM.html#cb62-13" tabindex="-1"></a>mu <span class="ot">&lt;-</span> <span class="fu">matrix</span>((<span class="dv">1</span> <span class="sc">-</span> rho) <span class="sc">*</span> mu_bar, <span class="dv">1</span>, <span class="dv">3</span>)</span>
+<span id="cb62-14"><a href="NonGATSM.html#cb62-14" tabindex="-1"></a></span>
+<span id="cb62-15"><a href="NonGATSM.html#cb62-15" tabindex="-1"></a><span class="co"># Regime-specific volatilities.</span></span>
+<span id="cb62-16"><a href="NonGATSM.html#cb62-16" tabindex="-1"></a>sigma <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.003</span>, <span class="fl">0.00001</span>, <span class="fl">0.00001</span>)</span>
+<span id="cb62-17"><a href="NonGATSM.html#cb62-17" tabindex="-1"></a></span>
+<span id="cb62-18"><a href="NonGATSM.html#cb62-18" tabindex="-1"></a><span class="co"># Regime-transition matrix under the physical measure.</span></span>
+<span id="cb62-19"><a href="NonGATSM.html#cb62-19" tabindex="-1"></a>Pi <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(</span>
+<span id="cb62-20"><a href="NonGATSM.html#cb62-20" tabindex="-1"></a>  <span class="fl">0.95</span>, <span class="fl">0.05</span>, <span class="fl">0.00</span>,</span>
+<span id="cb62-21"><a href="NonGATSM.html#cb62-21" tabindex="-1"></a>  <span class="fl">0.05</span>, <span class="fl">0.90</span>, <span class="fl">0.05</span>,</span>
+<span id="cb62-22"><a href="NonGATSM.html#cb62-22" tabindex="-1"></a>  <span class="fl">0.05</span>, <span class="fl">0.00</span>, <span class="fl">0.95</span></span>
+<span id="cb62-23"><a href="NonGATSM.html#cb62-23" tabindex="-1"></a>), <span class="dv">3</span>, <span class="dv">3</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb62-24"><a href="NonGATSM.html#cb62-24" tabindex="-1"></a></span>
+<span id="cb62-25"><a href="NonGATSM.html#cb62-25" tabindex="-1"></a><span class="co"># Regime-risk prices: the SDF is high in the extreme-crisis regime.</span></span>
+<span id="cb62-26"><a href="NonGATSM.html#cb62-26" tabindex="-1"></a>gamma <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="fl">1.25</span>)</span>
+<span id="cb62-27"><a href="NonGATSM.html#cb62-27" tabindex="-1"></a>Pi_star <span class="ot">&lt;-</span> <span class="fu">sweep</span>(Pi, <span class="dv">2</span>, <span class="fu">exp</span>(gamma), <span class="st">`</span><span class="at">*</span><span class="st">`</span>)</span>
+<span id="cb62-28"><a href="NonGATSM.html#cb62-28" tabindex="-1"></a>Pi_star <span class="ot">&lt;-</span> Pi_star <span class="sc">/</span> <span class="fu">rowSums</span>(Pi_star)</span>
+<span id="cb62-29"><a href="NonGATSM.html#cb62-29" tabindex="-1"></a></span>
+<span id="cb62-30"><a href="NonGATSM.html#cb62-30" tabindex="-1"></a>regime_names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Normal times&quot;</span>, <span class="st">&quot;Small crisis&quot;</span>, <span class="st">&quot;Extreme crisis&quot;</span>)</span>
+<span id="cb62-31"><a href="NonGATSM.html#cb62-31" tabindex="-1"></a></span>
+<span id="cb62-32"><a href="NonGATSM.html#cb62-32" tabindex="-1"></a>model_P <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb62-33"><a href="NonGATSM.html#cb62-33" tabindex="-1"></a>  <span class="at">Phi =</span> <span class="fu">matrix</span>(rho, <span class="dv">1</span>, <span class="dv">1</span>),</span>
+<span id="cb62-34"><a href="NonGATSM.html#cb62-34" tabindex="-1"></a>  <span class="at">Pi =</span> Pi,</span>
+<span id="cb62-35"><a href="NonGATSM.html#cb62-35" tabindex="-1"></a>  <span class="at">mu =</span> mu,</span>
+<span id="cb62-36"><a href="NonGATSM.html#cb62-36" tabindex="-1"></a>  <span class="at">Sigma =</span> <span class="fu">array</span>(sigma<span class="sc">^</span><span class="dv">2</span>, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">3</span>))</span>
+<span id="cb62-37"><a href="NonGATSM.html#cb62-37" tabindex="-1"></a>)</span>
+<span id="cb62-38"><a href="NonGATSM.html#cb62-38" tabindex="-1"></a>model_Q <span class="ot">&lt;-</span> model_P</span>
+<span id="cb62-39"><a href="NonGATSM.html#cb62-39" tabindex="-1"></a>model_Q<span class="sc">$</span>Pi <span class="ot">&lt;-</span> Pi_star</span>
+<span id="cb62-40"><a href="NonGATSM.html#cb62-40" tabindex="-1"></a></span>
+<span id="cb62-41"><a href="NonGATSM.html#cb62-41" tabindex="-1"></a>xi0 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb62-42"><a href="NonGATSM.html#cb62-42" tabindex="-1"></a>xi1 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="fu">rep</span>(<span class="dv">0</span>, <span class="dv">3</span>)), <span class="at">ncol =</span> <span class="dv">1</span>)</span>
+<span id="cb62-43"><a href="NonGATSM.html#cb62-43" tabindex="-1"></a>AB_P <span class="ot">&lt;-</span> <span class="fu">compute_AB_classical</span>(</span>
+<span id="cb62-44"><a href="NonGATSM.html#cb62-44" tabindex="-1"></a>  <span class="at">xi0 =</span> xi0,</span>
+<span id="cb62-45"><a href="NonGATSM.html#cb62-45" tabindex="-1"></a>  <span class="at">xi1 =</span> xi1,</span>
+<span id="cb62-46"><a href="NonGATSM.html#cb62-46" tabindex="-1"></a>  <span class="at">H =</span> H,</span>
+<span id="cb62-47"><a href="NonGATSM.html#cb62-47" tabindex="-1"></a>  <span class="at">psi =</span> psi_RSVAR,</span>
+<span id="cb62-48"><a href="NonGATSM.html#cb62-48" tabindex="-1"></a>  <span class="at">psi.parameterization =</span> model_P</span>
+<span id="cb62-49"><a href="NonGATSM.html#cb62-49" tabindex="-1"></a>)</span>
+<span id="cb62-50"><a href="NonGATSM.html#cb62-50" tabindex="-1"></a>AB_Q <span class="ot">&lt;-</span> <span class="fu">compute_AB_classical</span>(</span>
+<span id="cb62-51"><a href="NonGATSM.html#cb62-51" tabindex="-1"></a>  <span class="at">xi0 =</span> xi0,</span>
+<span id="cb62-52"><a href="NonGATSM.html#cb62-52" tabindex="-1"></a>  <span class="at">xi1 =</span> xi1,</span>
+<span id="cb62-53"><a href="NonGATSM.html#cb62-53" tabindex="-1"></a>  <span class="at">H =</span> H,</span>
+<span id="cb62-54"><a href="NonGATSM.html#cb62-54" tabindex="-1"></a>  <span class="at">psi =</span> psi_RSVAR,</span>
+<span id="cb62-55"><a href="NonGATSM.html#cb62-55" tabindex="-1"></a>  <span class="at">psi.parameterization =</span> model_Q</span>
+<span id="cb62-56"><a href="NonGATSM.html#cb62-56" tabindex="-1"></a>)</span>
+<span id="cb62-57"><a href="NonGATSM.html#cb62-57" tabindex="-1"></a></span>
+<span id="cb62-58"><a href="NonGATSM.html#cb62-58" tabindex="-1"></a><span class="co"># Simulate regimes and short rates under the physical dynamics.</span></span>
+<span id="cb62-59"><a href="NonGATSM.html#cb62-59" tabindex="-1"></a>sim <span class="ot">&lt;-</span> <span class="fu">simul_RSVAR</span>(model_P, <span class="at">nb.sim =</span> TT, <span class="at">y0 =</span> mu_bar[<span class="dv">1</span>], <span class="at">z0 =</span> <span class="dv">1</span>)</span>
+<span id="cb62-60"><a href="NonGATSM.html#cb62-60" tabindex="-1"></a>r <span class="ot">&lt;-</span> <span class="fu">matrix</span>(sim<span class="sc">$</span>y[, <span class="dv">1</span>], TT, <span class="dv">1</span>)</span>
+<span id="cb62-61"><a href="NonGATSM.html#cb62-61" tabindex="-1"></a>z <span class="ot">&lt;-</span> sim<span class="sc">$</span>z</span>
+<span id="cb62-62"><a href="NonGATSM.html#cb62-62" tabindex="-1"></a>regime <span class="ot">&lt;-</span> sim<span class="sc">$</span>regime</span>
+<span id="cb62-63"><a href="NonGATSM.html#cb62-63" tabindex="-1"></a>W <span class="ot">&lt;-</span> sim<span class="sc">$</span>w</span>
+<span id="cb62-64"><a href="NonGATSM.html#cb62-64" tabindex="-1"></a>yields_P <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">1</span>, TT, <span class="dv">1</span>) <span class="sc">%*%</span> <span class="fu">matrix</span>(AB_P<span class="sc">$</span>b, <span class="at">nrow =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb62-65"><a href="NonGATSM.html#cb62-65" tabindex="-1"></a>  W <span class="sc">%*%</span> <span class="fu">matrix</span>(AB_P<span class="sc">$</span>a, <span class="fu">dim</span>(AB_P<span class="sc">$</span>a)[<span class="dv">1</span>], <span class="fu">dim</span>(AB_P<span class="sc">$</span>a)[<span class="dv">3</span>])</span>
+<span id="cb62-66"><a href="NonGATSM.html#cb62-66" tabindex="-1"></a>yields_Q <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">1</span>, TT, <span class="dv">1</span>) <span class="sc">%*%</span> <span class="fu">matrix</span>(AB_Q<span class="sc">$</span>b, <span class="at">nrow =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb62-67"><a href="NonGATSM.html#cb62-67" tabindex="-1"></a>  W <span class="sc">%*%</span> <span class="fu">matrix</span>(AB_Q<span class="sc">$</span>a, <span class="fu">dim</span>(AB_Q<span class="sc">$</span>a)[<span class="dv">1</span>], <span class="fu">dim</span>(AB_Q<span class="sc">$</span>a)[<span class="dv">3</span>])</span>
+<span id="cb62-68"><a href="NonGATSM.html#cb62-68" tabindex="-1"></a></span>
+<span id="cb62-69"><a href="NonGATSM.html#cb62-69" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">1</span>), <span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">3.2</span>, <span class="fl">4.2</span>, <span class="fl">2.8</span>, <span class="fl">1.2</span>))</span>
+<span id="cb62-70"><a href="NonGATSM.html#cb62-70" tabindex="-1"></a></span>
+<span id="cb62-71"><a href="NonGATSM.html#cb62-71" tabindex="-1"></a>add_regime_shading <span class="ot">&lt;-</span> <span class="cf">function</span>(regime, col_regime) {</span>
+<span id="cb62-72"><a href="NonGATSM.html#cb62-72" tabindex="-1"></a>  rr <span class="ot">&lt;-</span> <span class="fu">rle</span>(regime)</span>
+<span id="cb62-73"><a href="NonGATSM.html#cb62-73" tabindex="-1"></a>  end <span class="ot">&lt;-</span> <span class="fu">cumsum</span>(rr<span class="sc">$</span>lengths)</span>
+<span id="cb62-74"><a href="NonGATSM.html#cb62-74" tabindex="-1"></a>  start <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fu">head</span>(end, <span class="sc">-</span><span class="dv">1</span>) <span class="sc">+</span> <span class="dv">1</span>)</span>
+<span id="cb62-75"><a href="NonGATSM.html#cb62-75" tabindex="-1"></a>  usr <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="st">&quot;usr&quot;</span>)</span>
+<span id="cb62-76"><a href="NonGATSM.html#cb62-76" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(rr<span class="sc">$</span>values)) {</span>
+<span id="cb62-77"><a href="NonGATSM.html#cb62-77" tabindex="-1"></a>    col_i <span class="ot">&lt;-</span> col_regime[rr<span class="sc">$</span>values[i]]</span>
+<span id="cb62-78"><a href="NonGATSM.html#cb62-78" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.na</span>(col_i)) {</span>
+<span id="cb62-79"><a href="NonGATSM.html#cb62-79" tabindex="-1"></a>      <span class="fu">rect</span>(start[i] <span class="sc">-</span> <span class="fl">0.5</span>, usr[<span class="dv">3</span>], end[i] <span class="sc">+</span> <span class="fl">0.5</span>, usr[<span class="dv">4</span>],</span>
+<span id="cb62-80"><a href="NonGATSM.html#cb62-80" tabindex="-1"></a>           <span class="at">col =</span> col_i, <span class="at">border =</span> <span class="cn">NA</span>)</span>
+<span id="cb62-81"><a href="NonGATSM.html#cb62-81" tabindex="-1"></a>    }</span>
+<span id="cb62-82"><a href="NonGATSM.html#cb62-82" tabindex="-1"></a>  }</span>
+<span id="cb62-83"><a href="NonGATSM.html#cb62-83" tabindex="-1"></a>}</span>
+<span id="cb62-84"><a href="NonGATSM.html#cb62-84" tabindex="-1"></a></span>
+<span id="cb62-85"><a href="NonGATSM.html#cb62-85" tabindex="-1"></a><span class="fu">plot</span>(</span>
+<span id="cb62-86"><a href="NonGATSM.html#cb62-86" tabindex="-1"></a>  <span class="dv">1</span><span class="sc">:</span>TT, <span class="dv">100</span> <span class="sc">*</span> r,</span>
+<span id="cb62-87"><a href="NonGATSM.html#cb62-87" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;n&quot;</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">las =</span> <span class="dv">1</span>, <span class="at">col =</span> <span class="st">&quot;black&quot;</span>,</span>
+<span id="cb62-88"><a href="NonGATSM.html#cb62-88" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;time&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;in percent&quot;</span>,</span>
+<span id="cb62-89"><a href="NonGATSM.html#cb62-89" tabindex="-1"></a>  <span class="at">ylim =</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">range</span>(<span class="fu">c</span>(r, yields_P[, H], yields_Q[, H])),</span>
+<span id="cb62-90"><a href="NonGATSM.html#cb62-90" tabindex="-1"></a>  <span class="at">xlim=</span><span class="fu">c</span>(<span class="dv">1</span>,TT<span class="sc">*</span>(<span class="fl">1.2</span>)),</span>
+<span id="cb62-91"><a href="NonGATSM.html#cb62-91" tabindex="-1"></a>  <span class="at">main =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;(a) Regime-switching short rate&quot;</span>))</span>
+<span id="cb62-92"><a href="NonGATSM.html#cb62-92" tabindex="-1"></a>)</span>
+<span id="cb62-93"><a href="NonGATSM.html#cb62-93" tabindex="-1"></a><span class="fu">add_regime_shading</span>(regime, <span class="fu">c</span>(<span class="cn">NA</span>, <span class="st">&quot;grey90&quot;</span>, <span class="st">&quot;grey75&quot;</span>))</span>
+<span id="cb62-94"><a href="NonGATSM.html#cb62-94" tabindex="-1"></a><span class="fu">grid</span>()</span>
+<span id="cb62-95"><a href="NonGATSM.html#cb62-95" tabindex="-1"></a><span class="fu">lines</span>(<span class="dv">1</span><span class="sc">:</span>TT, <span class="dv">100</span> <span class="sc">*</span> r, <span class="at">col =</span> <span class="st">&quot;black&quot;</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb62-96"><a href="NonGATSM.html#cb62-96" tabindex="-1"></a><span class="fu">lines</span>(<span class="dv">1</span><span class="sc">:</span>TT, <span class="dv">100</span> <span class="sc">*</span> yields_P[, H], <span class="at">col =</span> <span class="st">&quot;grey60&quot;</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb62-97"><a href="NonGATSM.html#cb62-97" tabindex="-1"></a><span class="fu">lines</span>(<span class="dv">1</span><span class="sc">:</span>TT, <span class="dv">100</span> <span class="sc">*</span> yields_Q[, H], <span class="at">col =</span> <span class="st">&quot;black&quot;</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb62-98"><a href="NonGATSM.html#cb62-98" tabindex="-1"></a><span class="fu">legend</span>(</span>
+<span id="cb62-99"><a href="NonGATSM.html#cb62-99" tabindex="-1"></a>  <span class="st">&quot;topright&quot;</span>,</span>
+<span id="cb62-100"><a href="NonGATSM.html#cb62-100" tabindex="-1"></a>  <span class="at">legend =</span> <span class="fu">c</span>(<span class="fu">expression</span>(r[t]), <span class="st">&quot;EH yield&quot;</span>, <span class="st">&quot;RN yield&quot;</span>),</span>
+<span id="cb62-101"><a href="NonGATSM.html#cb62-101" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;grey60&quot;</span>, <span class="st">&quot;black&quot;</span>),</span>
+<span id="cb62-102"><a href="NonGATSM.html#cb62-102" tabindex="-1"></a>  <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">1</span>),</span>
+<span id="cb62-103"><a href="NonGATSM.html#cb62-103" tabindex="-1"></a>  <span class="at">lwd =</span> <span class="dv">2</span>,</span>
+<span id="cb62-104"><a href="NonGATSM.html#cb62-104" tabindex="-1"></a>  <span class="at">bg =</span> <span class="st">&quot;white&quot;</span>,</span>
+<span id="cb62-105"><a href="NonGATSM.html#cb62-105" tabindex="-1"></a>  <span class="at">box.col =</span> <span class="st">&quot;white&quot;</span>,</span>
+<span id="cb62-106"><a href="NonGATSM.html#cb62-106" tabindex="-1"></a>  <span class="at">bty =</span> <span class="st">&quot;o&quot;</span></span>
+<span id="cb62-107"><a href="NonGATSM.html#cb62-107" tabindex="-1"></a>)</span>
+<span id="cb62-108"><a href="NonGATSM.html#cb62-108" tabindex="-1"></a><span class="fu">legend</span>(</span>
+<span id="cb62-109"><a href="NonGATSM.html#cb62-109" tabindex="-1"></a>  <span class="st">&quot;bottomright&quot;</span>,</span>
+<span id="cb62-110"><a href="NonGATSM.html#cb62-110" tabindex="-1"></a>  <span class="at">legend =</span> regime_names,</span>
+<span id="cb62-111"><a href="NonGATSM.html#cb62-111" tabindex="-1"></a>  <span class="at">fill =</span> <span class="fu">c</span>(<span class="st">&quot;white&quot;</span>, <span class="st">&quot;grey90&quot;</span>, <span class="st">&quot;grey75&quot;</span>),</span>
+<span id="cb62-112"><a href="NonGATSM.html#cb62-112" tabindex="-1"></a>  <span class="at">border =</span> <span class="fu">c</span>(<span class="st">&quot;grey60&quot;</span>, <span class="cn">NA</span>, <span class="cn">NA</span>),</span>
+<span id="cb62-113"><a href="NonGATSM.html#cb62-113" tabindex="-1"></a>  <span class="at">bg =</span> <span class="st">&quot;white&quot;</span>,</span>
+<span id="cb62-114"><a href="NonGATSM.html#cb62-114" tabindex="-1"></a>  <span class="at">box.col =</span> <span class="st">&quot;white&quot;</span>,</span>
+<span id="cb62-115"><a href="NonGATSM.html#cb62-115" tabindex="-1"></a>  <span class="at">bty =</span> <span class="st">&quot;o&quot;</span></span>
+<span id="cb62-116"><a href="NonGATSM.html#cb62-116" tabindex="-1"></a>)</span>
+<span id="cb62-117"><a href="NonGATSM.html#cb62-117" tabindex="-1"></a></span>
+<span id="cb62-118"><a href="NonGATSM.html#cb62-118" tabindex="-1"></a>curve_cols <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;grey75&quot;</span>, <span class="st">&quot;grey40&quot;</span>, <span class="st">&quot;black&quot;</span>)</span>
+<span id="cb62-119"><a href="NonGATSM.html#cb62-119" tabindex="-1"></a>band_cols <span class="ot">&lt;-</span> grDevices<span class="sc">::</span><span class="fu">adjustcolor</span>(curve_cols, <span class="at">alpha.f =</span> <span class="fl">0.18</span>)</span>
+<span id="cb62-120"><a href="NonGATSM.html#cb62-120" tabindex="-1"></a></span>
+<span id="cb62-121"><a href="NonGATSM.html#cb62-121" tabindex="-1"></a>regime_curve_summary <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="cf">function</span>(j) {</span>
+<span id="cb62-122"><a href="NonGATSM.html#cb62-122" tabindex="-1"></a>  y_q <span class="ot">&lt;-</span> yields_Q[regime <span class="sc">==</span> j, , drop <span class="ot">=</span> <span class="cn">FALSE</span>]</span>
+<span id="cb62-123"><a href="NonGATSM.html#cb62-123" tabindex="-1"></a>  y_p <span class="ot">&lt;-</span> yields_P[regime <span class="sc">==</span> j, , drop <span class="ot">=</span> <span class="cn">FALSE</span>]</span>
+<span id="cb62-124"><a href="NonGATSM.html#cb62-124" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb62-125"><a href="NonGATSM.html#cb62-125" tabindex="-1"></a>    <span class="at">mean_Q =</span> <span class="fu">apply</span>(y_q, <span class="dv">2</span>, mean),</span>
+<span id="cb62-126"><a href="NonGATSM.html#cb62-126" tabindex="-1"></a>    <span class="at">mean_P =</span> <span class="fu">apply</span>(y_p, <span class="dv">2</span>, mean),</span>
+<span id="cb62-127"><a href="NonGATSM.html#cb62-127" tabindex="-1"></a>    <span class="at">q10_Q =</span> <span class="fu">apply</span>(y_q, <span class="dv">2</span>, quantile, <span class="at">probs =</span> <span class="fl">0.10</span>),</span>
+<span id="cb62-128"><a href="NonGATSM.html#cb62-128" tabindex="-1"></a>    <span class="at">q90_Q =</span> <span class="fu">apply</span>(y_q, <span class="dv">2</span>, quantile, <span class="at">probs =</span> <span class="fl">0.90</span>)</span>
+<span id="cb62-129"><a href="NonGATSM.html#cb62-129" tabindex="-1"></a>  )</span>
+<span id="cb62-130"><a href="NonGATSM.html#cb62-130" tabindex="-1"></a>})</span>
+<span id="cb62-131"><a href="NonGATSM.html#cb62-131" tabindex="-1"></a></span>
+<span id="cb62-132"><a href="NonGATSM.html#cb62-132" tabindex="-1"></a><span class="fu">plot</span>(</span>
+<span id="cb62-133"><a href="NonGATSM.html#cb62-133" tabindex="-1"></a>  <span class="dv">1</span><span class="sc">:</span>H, <span class="dv">100</span> <span class="sc">*</span> regime_curve_summary[[<span class="dv">1</span>]]<span class="sc">$</span>mean_Q,</span>
+<span id="cb62-134"><a href="NonGATSM.html#cb62-134" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;n&quot;</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">las =</span> <span class="dv">1</span>, <span class="at">col =</span> <span class="st">&quot;grey75&quot;</span>,</span>
+<span id="cb62-135"><a href="NonGATSM.html#cb62-135" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;maturity&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;in percent&quot;</span>,</span>
+<span id="cb62-136"><a href="NonGATSM.html#cb62-136" tabindex="-1"></a>  <span class="at">ylim =</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">range</span>(<span class="fu">unlist</span>(<span class="fu">lapply</span>(</span>
+<span id="cb62-137"><a href="NonGATSM.html#cb62-137" tabindex="-1"></a>    regime_curve_summary,</span>
+<span id="cb62-138"><a href="NonGATSM.html#cb62-138" tabindex="-1"></a>    <span class="cf">function</span>(x) <span class="fu">c</span>(x<span class="sc">$</span>q10_Q, x<span class="sc">$</span>q90_Q, x<span class="sc">$</span>mean_P)</span>
+<span id="cb62-139"><a href="NonGATSM.html#cb62-139" tabindex="-1"></a>  ))),</span>
+<span id="cb62-140"><a href="NonGATSM.html#cb62-140" tabindex="-1"></a>  <span class="at">xlim=</span><span class="fu">c</span>(<span class="dv">1</span>,H<span class="sc">*</span>(<span class="fl">1.2</span>)),</span>
+<span id="cb62-141"><a href="NonGATSM.html#cb62-141" tabindex="-1"></a>  <span class="at">main =</span> <span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;(b) Yield curves by regime&quot;</span>))</span>
+<span id="cb62-142"><a href="NonGATSM.html#cb62-142" tabindex="-1"></a>)</span>
+<span id="cb62-143"><a href="NonGATSM.html#cb62-143" tabindex="-1"></a><span class="fu">grid</span>()</span>
+<span id="cb62-144"><a href="NonGATSM.html#cb62-144" tabindex="-1"></a><span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>) {</span>
+<span id="cb62-145"><a href="NonGATSM.html#cb62-145" tabindex="-1"></a>  <span class="fu">polygon</span>(</span>
+<span id="cb62-146"><a href="NonGATSM.html#cb62-146" tabindex="-1"></a>    <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span>H, H<span class="sc">:</span><span class="dv">1</span>),</span>
+<span id="cb62-147"><a href="NonGATSM.html#cb62-147" tabindex="-1"></a>    <span class="dv">100</span> <span class="sc">*</span> <span class="fu">c</span>(regime_curve_summary[[j]]<span class="sc">$</span>q10_Q, <span class="fu">rev</span>(regime_curve_summary[[j]]<span class="sc">$</span>q90_Q)),</span>
+<span id="cb62-148"><a href="NonGATSM.html#cb62-148" tabindex="-1"></a>    <span class="at">col =</span> band_cols[j],</span>
+<span id="cb62-149"><a href="NonGATSM.html#cb62-149" tabindex="-1"></a>    <span class="at">border =</span> <span class="cn">NA</span></span>
+<span id="cb62-150"><a href="NonGATSM.html#cb62-150" tabindex="-1"></a>  )</span>
+<span id="cb62-151"><a href="NonGATSM.html#cb62-151" tabindex="-1"></a>}</span>
+<span id="cb62-152"><a href="NonGATSM.html#cb62-152" tabindex="-1"></a><span class="fu">grid</span>()</span>
+<span id="cb62-153"><a href="NonGATSM.html#cb62-153" tabindex="-1"></a><span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>) {</span>
+<span id="cb62-154"><a href="NonGATSM.html#cb62-154" tabindex="-1"></a>  <span class="fu">lines</span>(<span class="dv">1</span><span class="sc">:</span>H, <span class="dv">100</span> <span class="sc">*</span> regime_curve_summary[[j]]<span class="sc">$</span>mean_P,</span>
+<span id="cb62-155"><a href="NonGATSM.html#cb62-155" tabindex="-1"></a>        <span class="at">col =</span> curve_cols[j], <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb62-156"><a href="NonGATSM.html#cb62-156" tabindex="-1"></a>  <span class="fu">lines</span>(<span class="dv">1</span><span class="sc">:</span>H, <span class="dv">100</span> <span class="sc">*</span> regime_curve_summary[[j]]<span class="sc">$</span>mean_Q,</span>
+<span id="cb62-157"><a href="NonGATSM.html#cb62-157" tabindex="-1"></a>        <span class="at">col =</span> curve_cols[j], <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb62-158"><a href="NonGATSM.html#cb62-158" tabindex="-1"></a>}</span>
+<span id="cb62-159"><a href="NonGATSM.html#cb62-159" tabindex="-1"></a><span class="fu">legend</span>(</span>
+<span id="cb62-160"><a href="NonGATSM.html#cb62-160" tabindex="-1"></a>  <span class="st">&quot;topright&quot;</span>,</span>
+<span id="cb62-161"><a href="NonGATSM.html#cb62-161" tabindex="-1"></a>  <span class="at">legend =</span> regime_names,</span>
+<span id="cb62-162"><a href="NonGATSM.html#cb62-162" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;grey75&quot;</span>, <span class="st">&quot;grey40&quot;</span>, <span class="st">&quot;black&quot;</span>),</span>
+<span id="cb62-163"><a href="NonGATSM.html#cb62-163" tabindex="-1"></a>  <span class="at">lwd =</span> <span class="dv">2</span>,</span>
+<span id="cb62-164"><a href="NonGATSM.html#cb62-164" tabindex="-1"></a>  <span class="at">bg =</span> <span class="st">&quot;white&quot;</span>,</span>
+<span id="cb62-165"><a href="NonGATSM.html#cb62-165" tabindex="-1"></a>  <span class="at">box.col =</span> <span class="st">&quot;white&quot;</span>,</span>
+<span id="cb62-166"><a href="NonGATSM.html#cb62-166" tabindex="-1"></a>  <span class="at">bty =</span> <span class="st">&quot;o&quot;</span>,</span>
+<span id="cb62-167"><a href="NonGATSM.html#cb62-167" tabindex="-1"></a>  <span class="at">cex=</span>.<span class="dv">9</span></span>
+<span id="cb62-168"><a href="NonGATSM.html#cb62-168" tabindex="-1"></a>)</span>
+<span id="cb62-169"><a href="NonGATSM.html#cb62-169" tabindex="-1"></a><span class="fu">legend</span>(</span>
+<span id="cb62-170"><a href="NonGATSM.html#cb62-170" tabindex="-1"></a>  <span class="st">&quot;bottomright&quot;</span>,</span>
+<span id="cb62-171"><a href="NonGATSM.html#cb62-171" tabindex="-1"></a>  <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">&quot;EH&quot;</span>, <span class="st">&quot;RN&quot;</span>),</span>
+<span id="cb62-172"><a href="NonGATSM.html#cb62-172" tabindex="-1"></a>  <span class="at">col =</span> <span class="st">&quot;black&quot;</span>,</span>
+<span id="cb62-173"><a href="NonGATSM.html#cb62-173" tabindex="-1"></a>  <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">1</span>),</span>
+<span id="cb62-174"><a href="NonGATSM.html#cb62-174" tabindex="-1"></a>  <span class="at">lwd =</span> <span class="dv">2</span>,</span>
+<span id="cb62-175"><a href="NonGATSM.html#cb62-175" tabindex="-1"></a>  <span class="at">bg =</span> <span class="st">&quot;white&quot;</span>,</span>
+<span id="cb62-176"><a href="NonGATSM.html#cb62-176" tabindex="-1"></a>  <span class="at">box.col =</span> <span class="st">&quot;white&quot;</span>,</span>
+<span id="cb62-177"><a href="NonGATSM.html#cb62-177" tabindex="-1"></a>  <span class="at">bty =</span> <span class="st">&quot;o&quot;</span>,</span>
+<span id="cb62-178"><a href="NonGATSM.html#cb62-178" tabindex="-1"></a>  <span class="at">cex=</span>.<span class="dv">9</span></span>
+<span id="cb62-179"><a href="NonGATSM.html#cb62-179" tabindex="-1"></a>)</span></code></pre></div>
+</details>
 <p><img src="_main_files/figure-html/fig_RS_short_rate-1.png" width="864" /></p>
 <p>Panel (a) displays the simulated short rate together with the 10-period
 expectations-hypothesis yield and the risk-neutral yield. The background shading
