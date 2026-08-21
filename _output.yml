@@ -6,6 +6,7 @@ bookdown::gitbook:
       before: |
         <li><a href="./">Asset Pricing with Discrete-Time Affine Processes</a></li>
       after: |
+        <li><a href="index.html#copyright-and-licence">Copyright and licence</a></li>
         <li><a href="https://github.com/jrenne/MPRR_codes" target="_blank">Source code on GitHub</a></li>
     sharing:
       facebook: no

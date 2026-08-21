@@ -23,6 +23,12 @@ The aim of this material is twofold. First, it documents how the main figures an
 
 To run the examples, users should first install the companion package `DTAM`. The package can be installed either from the local source folder or from GitHub, for instance with `devtools::install_github("jrenne/DTAM")`, and then loaded in the usual way with `library(DTAM)`. Most chapters assume that `DTAM` is already available in the R session before the code chunks are executed.
 
+## Copyright and licence {-}
+
+Copyright © 2026 Jean-Paul Renne, Alain Monfort, Fulvio Pegoraro, and Guillaume Roussellet.
+
+Original source code in this companion repository is licensed under the [MIT Licence](https://github.com/jrenne/MPRR_codes/blob/main/LICENSE). That licence does not cover the book text or excerpts, rendered figures, datasets, provider templates, or other third-party material. Those materials remain subject to the rights, terms, and attribution requirements identified on this website or by their original providers. Where permission is not expressly stated, no additional reuse rights are granted.
+
 ```{r include=FALSE}
 knitr::opts_chunk$set(
   warning = FALSE,
