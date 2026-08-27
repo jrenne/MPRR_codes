@@ -744,14 +744,21 @@ legend("topright",
 
 ## Extended and Unscented Kalman filters
 
-This online-only example compares the first-order Extended Kalman Filter
-(EKF1), the second-order Extended Kalman Filter (EKF2), and the Unscented
-Kalman Filter (UKF) in a setting where the role of curvature is transparent.
+The following online-only examples compare the first-order Extended Kalman
+Filter (EKF1), the second-order Extended Kalman Filter (EKF2), and the
+Unscented Kalman Filter (UKF). The first example is deliberately quadratic:
+it isolates the second-order correction and provides a benchmark in which
+EKF2 and the UKF coincide. The second example uses a cubic measurement
+function to illustrate that this equivalence does not extend to general
+nonlinear models.
+
+### A quadratic benchmark
+
 Consider the scalar state-space model
 \[
-x_t = 0.08 + 0.85x_{t-1} + \varepsilon_t,
+x_t = 0.18 + 0.85x_{t-1} + \varepsilon_t,
 \qquad
-y_t = x_t + 0.45x_t^2 + \eta_t,
+y_t = x_t + x_t^2 + \eta_t,
 \]
 where $\varepsilon_t\sim\mathcal{N}(0,0.30^2)$ and
 $\eta_t\sim\mathcal{N}(0,0.20^2)$. EKF1 uses only the slope of the measurement
@@ -765,7 +772,7 @@ transform reproduces the same moments. EKF2 and the UKF should consequently
 coincide up to numerical precision; their comparison with EKF1 isolates the
 effect of the second-order correction.
 
-```{r fig_EKF_comparison, message=FALSE, warning=FALSE, fig.width=8, fig.height=8}
+```{r ekf-quadratic-figure, message=FALSE, warning=FALSE, fig.width=8, fig.height=8}
 # Purpose: Compare EKF1, EKF2, and UKF in a nonlinear measurement model.
 library(DTAM)
 
@@ -773,8 +780,8 @@ set.seed(2026)
 
 TT <- 160
 phi <- 0.85
-intercept <- 0.08
-curvature <- 0.45
+intercept <- 0.18
+curvature <- 1.00
 state.sd <- 0.30
 measurement.sd <- 0.20
 
@@ -837,32 +844,32 @@ legend(
   pt.bg = "white", lwd = c(2, 1.8, 2, NA), bty = "n"
 )
 
-correction.ekf2 <- curvature * fit.ekf2$predicted.cov[1, 1, ]
-correction.ukf <- fit.ukf$predicted.measurement[, 1] -
-  measurement(fit.ukf$predicted.mean[, 1], seq_len(TT))
+estimate.difference <- fit.ekf1$filtered.mean[, 1] -
+  fit.ekf2$filtered.mean[, 1]
+ukf.difference <- fit.ukf$filtered.mean[, 1] -
+  fit.ekf2$filtered.mean[, 1]
 
-plot(correction.ekf2, type = "l", lwd = 2,
-     xlab = "Date", ylab = "Correction",
-     main = "(b) Curvature contribution to the predictive measurement mean",
-     las = 1)
+plot(estimate.difference, type = "l", lwd = 2,
+     xlab = "Date", ylab = "Difference",
+     main = "(b) Difference from the EKF2 filtered estimate", las = 1)
 grid()
 abline(h = 0, lty = 3, col = "darkgrey")
-points(ukf.dates, correction.ukf[ukf.dates],
+points(ukf.dates, ukf.difference[ukf.dates],
        pch = 21, bg = "white", cex = 0.75)
 legend(
-  "topright", legend = c("EKF2 correction", "UKF correction"),
+  "topright", legend = c("EKF1 minus EKF2", "UKF minus EKF2"),
   lty = c(1, NA), pch = c(NA, 21), pt.bg = "white",
   lwd = c(2, NA), bty = "n"
 )
 ```
 
-The second panel displays the curvature term that EKF1 omits when the filters
-are evaluated at the same Gaussian predictive approximation. The UKF markers
-lie on the EKF2 line. The following error measures confirm that, in this
-experiment, incorporating curvature improves latent-state recovery and that
-EKF2 and the UKF produce the same recursion up to machine precision.
+The second panel makes the effect of the second-order correction visible by
+plotting the difference between the filtered estimates. The UKF markers lie
+on zero. The following error measures confirm that, in this experiment,
+incorporating curvature improves latent-state recovery and that EKF2 and the
+UKF produce the same recursion up to machine precision.
 
-```{r table_EKF_comparison}
+```{r ekf-quadratic-table}
 filtered.estimates <- cbind(
   EKF1 = fit.ekf1$filtered.mean[, 1],
   EKF2 = fit.ekf2$filtered.mean[, 1],
@@ -891,7 +898,156 @@ comparison <- data.frame(
 
 knitr::kable(
   comparison, digits = 3,
-  caption = "Accuracy of EKF1, EKF2, and UKF in the quadratic-measurement example."
+  caption = "Accuracy of EKF1, EKF2, and UKF in the quadratic benchmark."
+)
+```
+
+### Beyond the quadratic benchmark
+
+The coincidence above is useful as a check, but it is special to the
+quadratic measurement function. To see the distinction between the filters,
+consider instead
+\[
+x_t = 0.85x_{t-1} + \varepsilon_t,
+\qquad
+y_t = x_t + 0.4x_t^3 + \eta_t,
+\]
+where $\varepsilon_t\sim\mathcal{N}(0,0.50^2)$ and
+$\eta_t\sim\mathcal{N}(0,0.20^2)$. The measurement function remains strictly
+increasing because its derivative is $1+1.2x^2>0$. EKF2 uses the local slope
+and curvature at the predictive mean, whereas the UKF also evaluates the
+measurement function away from that mean. With a cubic function, the two
+approximations therefore need not agree.
+
+```{r ekf-cubic-figure, message=FALSE, warning=FALSE, fig.width=8, fig.height=8}
+# Purpose: Contrast the three filters when the measurement function is cubic.
+set.seed(2028)
+
+TT.cubic <- 200
+phi.cubic <- 0.85
+curvature.cubic <- 0.40
+state.sd.cubic <- 0.50
+measurement.sd.cubic <- 0.20
+
+transition.cubic <- function(x, t) phi.cubic * x
+transition.jacobian.cubic <- function(x, t) matrix(phi.cubic)
+measurement.cubic <- function(x, t) x + curvature.cubic * x^3
+measurement.jacobian.cubic <- function(x, t) {
+  matrix(1 + 3 * curvature.cubic * x^2)
+}
+measurement.hessian.cubic <- function(x, t) {
+  matrix(6 * curvature.cubic * x)
+}
+
+state.cubic <- observation.cubic <- numeric(TT.cubic)
+previous.state <- 0
+for (t in seq_len(TT.cubic)) {
+  state.cubic[t] <- transition.cubic(previous.state, t) +
+    rnorm(1, sd = state.sd.cubic)
+  observation.cubic[t] <- measurement.cubic(state.cubic[t], t) +
+    rnorm(1, sd = measurement.sd.cubic)
+  previous.state <- state.cubic[t]
+}
+
+Y.cubic <- matrix(observation.cubic)
+Q.cubic <- matrix(state.sd.cubic^2)
+R.cubic <- matrix(measurement.sd.cubic^2)
+x0.cubic <- 0
+P0.cubic <- matrix(state.sd.cubic^2 / (1 - phi.cubic^2))
+
+fit.ekf1.cubic <- EKF1(
+  Y.cubic, transition.cubic, measurement.cubic,
+  transition.jacobian.cubic, measurement.jacobian.cubic,
+  Q.cubic, R.cubic, x0.cubic, P0.cubic
+)
+
+fit.ekf2.cubic <- EKF2(
+  Y.cubic, transition.cubic, measurement.cubic,
+  transition.jacobian.cubic, measurement.jacobian.cubic,
+  measurement.hessian.cubic,
+  Q.cubic, R.cubic, x0.cubic, P0.cubic
+)
+
+fit.ukf.cubic <- UKF(
+  Y.cubic, transition.cubic, measurement.cubic,
+  Q.cubic, R.cubic, x0.cubic, P0.cubic,
+  alpha = 1, beta = 2, kappa = 2
+)
+
+par(mfrow = c(2, 1), mar = c(3.6, 4.0, 2.6, 1.0))
+
+cubic.plot.range <- range(
+  state.cubic,
+  fit.ekf1.cubic$filtered.mean[, 1],
+  fit.ekf2.cubic$filtered.mean[, 1],
+  fit.ukf.cubic$filtered.mean[, 1]
+)
+
+plot(state.cubic, type = "l", col = "darkgrey", lwd = 2,
+     ylim = cubic.plot.range, xlab = "", ylab = "State",
+     main = "(a) Latent state and filtered estimates", las = 1)
+grid()
+lines(fit.ekf1.cubic$filtered.mean[, 1], lty = 3, lwd = 1.8)
+lines(fit.ekf2.cubic$filtered.mean[, 1], lty = 2, lwd = 1.8)
+lines(fit.ukf.cubic$filtered.mean[, 1], lwd = 2)
+legend(
+  "topleft",
+  legend = c("Latent state", "EKF1", "EKF2", "UKF"),
+  col = c("darkgrey", "black", "black", "black"),
+  lty = c(1, 3, 2, 1), lwd = c(2, 1.8, 1.8, 2), bty = "n"
+)
+
+plot(fit.ekf1.cubic$filtered.mean[, 1] -
+       fit.ukf.cubic$filtered.mean[, 1],
+     type = "l", lty = 3, lwd = 1.8,
+     xlab = "Date", ylab = "Difference",
+     main = "(b) Difference from the UKF filtered estimate", las = 1)
+grid()
+abline(h = 0, lty = 3, col = "darkgrey")
+lines(fit.ekf2.cubic$filtered.mean[, 1] -
+        fit.ukf.cubic$filtered.mean[, 1],
+      lty = 2, lwd = 1.8)
+legend(
+  "topright", legend = c("EKF1 minus UKF", "EKF2 minus UKF"),
+  lty = c(3, 2), lwd = c(1.8, 1.8), bty = "n"
+)
+```
+
+The second panel now shows that EKF2 and the UKF no longer coincide. In this
+particular simulation, accounting for curvature improves on EKF1, and the UKF
+is more accurate than EKF2. This ranking is not a general result: it depends
+on the nonlinearities, noise distributions, and calibration. The point of
+the example is that EKF2 is a local second-order approximation, whereas the
+UKF uses function evaluations at a set of sigma points.
+
+```{r ekf-cubic-table}
+filtered.estimates.cubic <- cbind(
+  EKF1 = fit.ekf1.cubic$filtered.mean[, 1],
+  EKF2 = fit.ekf2.cubic$filtered.mean[, 1],
+  UKF = fit.ukf.cubic$filtered.mean[, 1]
+)
+
+maximum.difference.cubic <- apply(
+  filtered.estimates.cubic, 2,
+  function(x) max(abs(x - filtered.estimates.cubic[, "UKF"]))
+)
+
+comparison.cubic <- data.frame(
+  Filter = colnames(filtered.estimates.cubic),
+  RMSE = apply(filtered.estimates.cubic, 2, function(x) {
+    sqrt(mean((x - state.cubic)^2))
+  }),
+  `Mean absolute error` = apply(filtered.estimates.cubic, 2, function(x) {
+    mean(abs(x - state.cubic))
+  }),
+  `Maximum difference from UKF` = maximum.difference.cubic,
+  check.names = FALSE,
+  row.names = NULL
+)
+
+knitr::kable(
+  comparison.cubic, digits = 3,
+  caption = "Accuracy of EKF1, EKF2, and UKF with a cubic measurement function."
 )
 ```
 
