@@ -12,7 +12,7 @@
   <meta property="og:type" content="book" />
   
   <meta property="og:description" content="This website gathers the code used to replicate the tables and figures of the book." />
-  <meta name="github-repo" content="rstudio/bookdown-demo" />
+  <meta name="github-repo" content="jrenne/MPRR_codes" />
 
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="Chapter 14 Filtering | Asset Pricing with Discrete-Time Affine Processes" />
@@ -23,7 +23,7 @@
 <meta name="author" content="Jean-Paul Renne, Alain Monfort, Fulvio Pegoraro, and Guillaume Roussellet" />
 
 
-<meta name="date" content="2026-08-20" />
+<meta name="date" content="2026-08-27" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -56,8 +56,9 @@
 
 
 <style type="text/css">
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -67,7 +68,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -129,7 +130,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
-  margin-bottom: 0em;
 }
 .hanging div.csl-entry {
   margin-left:2em;
@@ -164,7 +164,10 @@ div.csl-indent {
 <li><a href="./">Asset Pricing with Discrete-Time Affine Processes</a></li>
 
 <li class="divider"></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>About</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>About</a>
+<ul>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#copyright-and-licence"><i class="fa fa-check"></i>Copyright and licence</a></li>
+</ul></li>
 <li class="chapter" data-level="1" data-path="affine.html"><a href="affine.html"><i class="fa fa-check"></i><b>1</b> Affine processes</a>
 <ul>
 <li class="chapter" data-level="1.1" data-path="affine.html"><a href="affine.html#a-simple-gaussian-ar1-generates-nonlinear-transforms-such-as-squared-states"><i class="fa fa-check"></i><b>1.1</b> A simple Gaussian AR(1) generates nonlinear transforms such as squared states</a></li>
@@ -301,7 +304,8 @@ div.csl-indent {
 <li class="chapter" data-level="14.2.4" data-path="Filtering.html"><a href="Filtering.html#a-richer-affine-term-structure-filtering-exercise"><i class="fa fa-check"></i><b>14.2.4</b> A richer affine term-structure filtering exercise</a></li>
 </ul></li>
 <li class="chapter" data-level="14.3" data-path="Filtering.html"><a href="Filtering.html#quadratic-kalman-filter"><i class="fa fa-check"></i><b>14.3</b> Quadratic Kalman Filter</a></li>
-<li class="chapter" data-level="14.4" data-path="Filtering.html"><a href="Filtering.html#kitagawa-hamilton-filter"><i class="fa fa-check"></i><b>14.4</b> Kitagawa-Hamilton filter</a></li>
+<li class="chapter" data-level="14.4" data-path="Filtering.html"><a href="Filtering.html#extended-and-unscented-kalman-filters"><i class="fa fa-check"></i><b>14.4</b> Extended and Unscented Kalman filters</a></li>
+<li class="chapter" data-level="14.5" data-path="Filtering.html"><a href="Filtering.html#kitagawa-hamilton-filter"><i class="fa fa-check"></i><b>14.5</b> Kitagawa-Hamilton filter</a></li>
 </ul></li>
 <li class="chapter" data-level="15" data-path="Estimation.html"><a href="Estimation.html"><i class="fa fa-check"></i><b>15</b> Estimation</a>
 <ul>
@@ -1084,178 +1088,359 @@ div.csl-indent {
 </details>
 <p><img src="_main_files/figure-html/fig_QKF-1.png" width="768" /></p>
 </div>
-<div id="kitagawa-hamilton-filter" class="section level2 hasAnchor" number="14.4">
-<h2><span class="header-section-number">14.4</span> Kitagawa-Hamilton filter<a href="Filtering.html#kitagawa-hamilton-filter" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="extended-and-unscented-kalman-filters" class="section level2 hasAnchor" number="14.4">
+<h2><span class="header-section-number">14.4</span> Extended and Unscented Kalman filters<a href="Filtering.html#extended-and-unscented-kalman-filters" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>This online-only example compares the first-order Extended Kalman Filter
+(EKF1), the second-order Extended Kalman Filter (EKF2), and the Unscented
+Kalman Filter (UKF) in a setting where the role of curvature is transparent.
+Consider the scalar state-space model
+<span class="math display">\[
+x_t = 0.08 + 0.85x_{t-1} + \varepsilon_t,
+\qquad
+y_t = x_t + 0.45x_t^2 + \eta_t,
+\]</span>
+where <span class="math inline">\(\varepsilon_t\sim\mathcal{N}(0,0.30^2)\)</span> and
+<span class="math inline">\(\eta_t\sim\mathcal{N}(0,0.20^2)\)</span>. EKF1 uses only the slope of the measurement
+function. EKF2 also uses its Hessian and therefore corrects the predictive
+measurement mean and variance for curvature.</p>
+<p>Because the transition is affine and the measurement function is exactly
+quadratic, EKF2 computes the exact measurement moments under each Gaussian
+predictive approximation. With the parameters used below, the unscented
+transform reproduces the same moments. EKF2 and the UKF should consequently
+coincide up to numerical precision; their comparison with EKF1 isolates the
+effect of the second-order correction.</p>
+<details class=chunk-details><summary class=chunk-summary><span class=chunk-summary-text>Code</span></summary>
+<div class="sourceCode" id="cb132"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb132-1"><a href="Filtering.html#cb132-1" tabindex="-1"></a><span class="co"># Purpose: Compare EKF1, EKF2, and UKF in a nonlinear measurement model.</span></span>
+<span id="cb132-2"><a href="Filtering.html#cb132-2" tabindex="-1"></a><span class="fu">library</span>(DTAM)</span>
+<span id="cb132-3"><a href="Filtering.html#cb132-3" tabindex="-1"></a></span>
+<span id="cb132-4"><a href="Filtering.html#cb132-4" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
+<span id="cb132-5"><a href="Filtering.html#cb132-5" tabindex="-1"></a></span>
+<span id="cb132-6"><a href="Filtering.html#cb132-6" tabindex="-1"></a>TT <span class="ot">&lt;-</span> <span class="dv">160</span></span>
+<span id="cb132-7"><a href="Filtering.html#cb132-7" tabindex="-1"></a>phi <span class="ot">&lt;-</span> <span class="fl">0.85</span></span>
+<span id="cb132-8"><a href="Filtering.html#cb132-8" tabindex="-1"></a>intercept <span class="ot">&lt;-</span> <span class="fl">0.08</span></span>
+<span id="cb132-9"><a href="Filtering.html#cb132-9" tabindex="-1"></a>curvature <span class="ot">&lt;-</span> <span class="fl">0.45</span></span>
+<span id="cb132-10"><a href="Filtering.html#cb132-10" tabindex="-1"></a>state.sd <span class="ot">&lt;-</span> <span class="fl">0.30</span></span>
+<span id="cb132-11"><a href="Filtering.html#cb132-11" tabindex="-1"></a>measurement.sd <span class="ot">&lt;-</span> <span class="fl">0.20</span></span>
+<span id="cb132-12"><a href="Filtering.html#cb132-12" tabindex="-1"></a></span>
+<span id="cb132-13"><a href="Filtering.html#cb132-13" tabindex="-1"></a>transition <span class="ot">&lt;-</span> <span class="cf">function</span>(x, t) intercept <span class="sc">+</span> phi <span class="sc">*</span> x</span>
+<span id="cb132-14"><a href="Filtering.html#cb132-14" tabindex="-1"></a>transition.jacobian <span class="ot">&lt;-</span> <span class="cf">function</span>(x, t) <span class="fu">matrix</span>(phi)</span>
+<span id="cb132-15"><a href="Filtering.html#cb132-15" tabindex="-1"></a>measurement <span class="ot">&lt;-</span> <span class="cf">function</span>(x, t) x <span class="sc">+</span> curvature <span class="sc">*</span> x<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb132-16"><a href="Filtering.html#cb132-16" tabindex="-1"></a>measurement.jacobian <span class="ot">&lt;-</span> <span class="cf">function</span>(x, t) <span class="fu">matrix</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> curvature <span class="sc">*</span> x)</span>
+<span id="cb132-17"><a href="Filtering.html#cb132-17" tabindex="-1"></a>measurement.hessian <span class="ot">&lt;-</span> <span class="cf">function</span>(x, t) <span class="fu">matrix</span>(<span class="dv">2</span> <span class="sc">*</span> curvature)</span>
+<span id="cb132-18"><a href="Filtering.html#cb132-18" tabindex="-1"></a></span>
+<span id="cb132-19"><a href="Filtering.html#cb132-19" tabindex="-1"></a><span class="co"># Simulate the latent state and the nonlinear signal.</span></span>
+<span id="cb132-20"><a href="Filtering.html#cb132-20" tabindex="-1"></a>state <span class="ot">&lt;-</span> observation <span class="ot">&lt;-</span> <span class="fu">numeric</span>(TT)</span>
+<span id="cb132-21"><a href="Filtering.html#cb132-21" tabindex="-1"></a>previous.state <span class="ot">&lt;-</span> intercept <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">-</span> phi)</span>
+<span id="cb132-22"><a href="Filtering.html#cb132-22" tabindex="-1"></a><span class="cf">for</span> (t <span class="cf">in</span> <span class="fu">seq_len</span>(TT)) {</span>
+<span id="cb132-23"><a href="Filtering.html#cb132-23" tabindex="-1"></a>  state[t] <span class="ot">&lt;-</span> <span class="fu">transition</span>(previous.state, t) <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="dv">1</span>, <span class="at">sd =</span> state.sd)</span>
+<span id="cb132-24"><a href="Filtering.html#cb132-24" tabindex="-1"></a>  observation[t] <span class="ot">&lt;-</span> <span class="fu">measurement</span>(state[t], t) <span class="sc">+</span></span>
+<span id="cb132-25"><a href="Filtering.html#cb132-25" tabindex="-1"></a>    <span class="fu">rnorm</span>(<span class="dv">1</span>, <span class="at">sd =</span> measurement.sd)</span>
+<span id="cb132-26"><a href="Filtering.html#cb132-26" tabindex="-1"></a>  previous.state <span class="ot">&lt;-</span> state[t]</span>
+<span id="cb132-27"><a href="Filtering.html#cb132-27" tabindex="-1"></a>}</span>
+<span id="cb132-28"><a href="Filtering.html#cb132-28" tabindex="-1"></a></span>
+<span id="cb132-29"><a href="Filtering.html#cb132-29" tabindex="-1"></a>Y <span class="ot">&lt;-</span> <span class="fu">matrix</span>(observation)</span>
+<span id="cb132-30"><a href="Filtering.html#cb132-30" tabindex="-1"></a>Q <span class="ot">&lt;-</span> <span class="fu">matrix</span>(state.sd<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb132-31"><a href="Filtering.html#cb132-31" tabindex="-1"></a>R <span class="ot">&lt;-</span> <span class="fu">matrix</span>(measurement.sd<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb132-32"><a href="Filtering.html#cb132-32" tabindex="-1"></a>x0 <span class="ot">&lt;-</span> intercept <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">-</span> phi)</span>
+<span id="cb132-33"><a href="Filtering.html#cb132-33" tabindex="-1"></a>P0 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(state.sd<span class="sc">^</span><span class="dv">2</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">-</span> phi<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb132-34"><a href="Filtering.html#cb132-34" tabindex="-1"></a></span>
+<span id="cb132-35"><a href="Filtering.html#cb132-35" tabindex="-1"></a>fit.ekf1 <span class="ot">&lt;-</span> <span class="fu">EKF1</span>(</span>
+<span id="cb132-36"><a href="Filtering.html#cb132-36" tabindex="-1"></a>  Y, transition, measurement,</span>
+<span id="cb132-37"><a href="Filtering.html#cb132-37" tabindex="-1"></a>  transition.jacobian, measurement.jacobian,</span>
+<span id="cb132-38"><a href="Filtering.html#cb132-38" tabindex="-1"></a>  Q, R, x0, P0</span>
+<span id="cb132-39"><a href="Filtering.html#cb132-39" tabindex="-1"></a>)</span>
+<span id="cb132-40"><a href="Filtering.html#cb132-40" tabindex="-1"></a></span>
+<span id="cb132-41"><a href="Filtering.html#cb132-41" tabindex="-1"></a>fit.ekf2 <span class="ot">&lt;-</span> <span class="fu">EKF2</span>(</span>
+<span id="cb132-42"><a href="Filtering.html#cb132-42" tabindex="-1"></a>  Y, transition, measurement,</span>
+<span id="cb132-43"><a href="Filtering.html#cb132-43" tabindex="-1"></a>  transition.jacobian, measurement.jacobian, measurement.hessian,</span>
+<span id="cb132-44"><a href="Filtering.html#cb132-44" tabindex="-1"></a>  Q, R, x0, P0</span>
+<span id="cb132-45"><a href="Filtering.html#cb132-45" tabindex="-1"></a>)</span>
+<span id="cb132-46"><a href="Filtering.html#cb132-46" tabindex="-1"></a></span>
+<span id="cb132-47"><a href="Filtering.html#cb132-47" tabindex="-1"></a>fit.ukf <span class="ot">&lt;-</span> <span class="fu">UKF</span>(</span>
+<span id="cb132-48"><a href="Filtering.html#cb132-48" tabindex="-1"></a>  Y, transition, measurement, Q, R, x0, P0,</span>
+<span id="cb132-49"><a href="Filtering.html#cb132-49" tabindex="-1"></a>  <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">beta =</span> <span class="dv">2</span>, <span class="at">kappa =</span> <span class="dv">0</span></span>
+<span id="cb132-50"><a href="Filtering.html#cb132-50" tabindex="-1"></a>)</span>
+<span id="cb132-51"><a href="Filtering.html#cb132-51" tabindex="-1"></a></span>
+<span id="cb132-52"><a href="Filtering.html#cb132-52" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">1</span>), <span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">3.6</span>, <span class="fl">4.0</span>, <span class="fl">2.6</span>, <span class="fl">1.0</span>))</span>
+<span id="cb132-53"><a href="Filtering.html#cb132-53" tabindex="-1"></a></span>
+<span id="cb132-54"><a href="Filtering.html#cb132-54" tabindex="-1"></a><span class="co"># The UKF points lie on the EKF2 line in this quadratic example.</span></span>
+<span id="cb132-55"><a href="Filtering.html#cb132-55" tabindex="-1"></a><span class="fu">plot</span>(state, <span class="at">type =</span> <span class="st">&quot;l&quot;</span>, <span class="at">col =</span> <span class="st">&quot;darkgrey&quot;</span>, <span class="at">lwd =</span> <span class="dv">2</span>,</span>
+<span id="cb132-56"><a href="Filtering.html#cb132-56" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;State&quot;</span>,</span>
+<span id="cb132-57"><a href="Filtering.html#cb132-57" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">&quot;(a) Latent state and filtered estimates&quot;</span>, <span class="at">las =</span> <span class="dv">1</span>)</span>
+<span id="cb132-58"><a href="Filtering.html#cb132-58" tabindex="-1"></a><span class="fu">grid</span>()</span>
+<span id="cb132-59"><a href="Filtering.html#cb132-59" tabindex="-1"></a><span class="fu">lines</span>(fit.ekf1<span class="sc">$</span>filtered.mean[, <span class="dv">1</span>], <span class="at">lty =</span> <span class="dv">3</span>, <span class="at">lwd =</span> <span class="fl">1.8</span>)</span>
+<span id="cb132-60"><a href="Filtering.html#cb132-60" tabindex="-1"></a><span class="fu">lines</span>(fit.ekf2<span class="sc">$</span>filtered.mean[, <span class="dv">1</span>], <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb132-61"><a href="Filtering.html#cb132-61" tabindex="-1"></a>ukf.dates <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">1</span>, TT, <span class="at">by =</span> <span class="dv">8</span>)</span>
+<span id="cb132-62"><a href="Filtering.html#cb132-62" tabindex="-1"></a><span class="fu">points</span>(ukf.dates, fit.ukf<span class="sc">$</span>filtered.mean[ukf.dates, <span class="dv">1</span>],</span>
+<span id="cb132-63"><a href="Filtering.html#cb132-63" tabindex="-1"></a>       <span class="at">pch =</span> <span class="dv">21</span>, <span class="at">bg =</span> <span class="st">&quot;white&quot;</span>, <span class="at">cex =</span> <span class="fl">0.75</span>)</span>
+<span id="cb132-64"><a href="Filtering.html#cb132-64" tabindex="-1"></a><span class="fu">legend</span>(</span>
+<span id="cb132-65"><a href="Filtering.html#cb132-65" tabindex="-1"></a>  <span class="st">&quot;topleft&quot;</span>,</span>
+<span id="cb132-66"><a href="Filtering.html#cb132-66" tabindex="-1"></a>  <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">&quot;Latent state&quot;</span>, <span class="st">&quot;EKF1&quot;</span>, <span class="st">&quot;EKF2&quot;</span>, <span class="st">&quot;UKF&quot;</span>),</span>
+<span id="cb132-67"><a href="Filtering.html#cb132-67" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;darkgrey&quot;</span>, <span class="st">&quot;black&quot;</span>, <span class="st">&quot;black&quot;</span>, <span class="st">&quot;black&quot;</span>),</span>
+<span id="cb132-68"><a href="Filtering.html#cb132-68" tabindex="-1"></a>  <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">1</span>, <span class="cn">NA</span>), <span class="at">pch =</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="cn">NA</span>, <span class="cn">NA</span>, <span class="dv">21</span>),</span>
+<span id="cb132-69"><a href="Filtering.html#cb132-69" tabindex="-1"></a>  <span class="at">pt.bg =</span> <span class="st">&quot;white&quot;</span>, <span class="at">lwd =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="fl">1.8</span>, <span class="dv">2</span>, <span class="cn">NA</span>), <span class="at">bty =</span> <span class="st">&quot;n&quot;</span></span>
+<span id="cb132-70"><a href="Filtering.html#cb132-70" tabindex="-1"></a>)</span>
+<span id="cb132-71"><a href="Filtering.html#cb132-71" tabindex="-1"></a></span>
+<span id="cb132-72"><a href="Filtering.html#cb132-72" tabindex="-1"></a>correction.ekf2 <span class="ot">&lt;-</span> curvature <span class="sc">*</span> fit.ekf2<span class="sc">$</span>predicted.cov[<span class="dv">1</span>, <span class="dv">1</span>, ]</span>
+<span id="cb132-73"><a href="Filtering.html#cb132-73" tabindex="-1"></a>correction.ukf <span class="ot">&lt;-</span> fit.ukf<span class="sc">$</span>predicted.measurement[, <span class="dv">1</span>] <span class="sc">-</span></span>
+<span id="cb132-74"><a href="Filtering.html#cb132-74" tabindex="-1"></a>  <span class="fu">measurement</span>(fit.ukf<span class="sc">$</span>predicted.mean[, <span class="dv">1</span>], <span class="fu">seq_len</span>(TT))</span>
+<span id="cb132-75"><a href="Filtering.html#cb132-75" tabindex="-1"></a></span>
+<span id="cb132-76"><a href="Filtering.html#cb132-76" tabindex="-1"></a><span class="fu">plot</span>(correction.ekf2, <span class="at">type =</span> <span class="st">&quot;l&quot;</span>, <span class="at">lwd =</span> <span class="dv">2</span>,</span>
+<span id="cb132-77"><a href="Filtering.html#cb132-77" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;Date&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;Correction&quot;</span>,</span>
+<span id="cb132-78"><a href="Filtering.html#cb132-78" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">&quot;(b) Curvature contribution to the predictive measurement mean&quot;</span>,</span>
+<span id="cb132-79"><a href="Filtering.html#cb132-79" tabindex="-1"></a>     <span class="at">las =</span> <span class="dv">1</span>)</span>
+<span id="cb132-80"><a href="Filtering.html#cb132-80" tabindex="-1"></a><span class="fu">grid</span>()</span>
+<span id="cb132-81"><a href="Filtering.html#cb132-81" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">0</span>, <span class="at">lty =</span> <span class="dv">3</span>, <span class="at">col =</span> <span class="st">&quot;darkgrey&quot;</span>)</span>
+<span id="cb132-82"><a href="Filtering.html#cb132-82" tabindex="-1"></a><span class="fu">points</span>(ukf.dates, correction.ukf[ukf.dates],</span>
+<span id="cb132-83"><a href="Filtering.html#cb132-83" tabindex="-1"></a>       <span class="at">pch =</span> <span class="dv">21</span>, <span class="at">bg =</span> <span class="st">&quot;white&quot;</span>, <span class="at">cex =</span> <span class="fl">0.75</span>)</span>
+<span id="cb132-84"><a href="Filtering.html#cb132-84" tabindex="-1"></a><span class="fu">legend</span>(</span>
+<span id="cb132-85"><a href="Filtering.html#cb132-85" tabindex="-1"></a>  <span class="st">&quot;topright&quot;</span>, <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">&quot;EKF2 correction&quot;</span>, <span class="st">&quot;UKF correction&quot;</span>),</span>
+<span id="cb132-86"><a href="Filtering.html#cb132-86" tabindex="-1"></a>  <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="cn">NA</span>), <span class="at">pch =</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="dv">21</span>), <span class="at">pt.bg =</span> <span class="st">&quot;white&quot;</span>,</span>
+<span id="cb132-87"><a href="Filtering.html#cb132-87" tabindex="-1"></a>  <span class="at">lwd =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="cn">NA</span>), <span class="at">bty =</span> <span class="st">&quot;n&quot;</span></span>
+<span id="cb132-88"><a href="Filtering.html#cb132-88" tabindex="-1"></a>)</span></code></pre></div>
+</details>
+<p><img src="_main_files/figure-html/fig_EKF_comparison-1.png" width="768" /></p>
+<p>The second panel displays the curvature term that EKF1 omits when the filters
+are evaluated at the same Gaussian predictive approximation. The UKF markers
+lie on the EKF2 line. The following error measures confirm that, in this
+experiment, incorporating curvature improves latent-state recovery and that
+EKF2 and the UKF produce the same recursion up to machine precision.</p>
+<details class=chunk-details><summary class=chunk-summary><span class=chunk-summary-text>Code</span></summary>
+<div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb133-1"><a href="Filtering.html#cb133-1" tabindex="-1"></a>filtered.estimates <span class="ot">&lt;-</span> <span class="fu">cbind</span>(</span>
+<span id="cb133-2"><a href="Filtering.html#cb133-2" tabindex="-1"></a>  <span class="at">EKF1 =</span> fit.ekf1<span class="sc">$</span>filtered.mean[, <span class="dv">1</span>],</span>
+<span id="cb133-3"><a href="Filtering.html#cb133-3" tabindex="-1"></a>  <span class="at">EKF2 =</span> fit.ekf2<span class="sc">$</span>filtered.mean[, <span class="dv">1</span>],</span>
+<span id="cb133-4"><a href="Filtering.html#cb133-4" tabindex="-1"></a>  <span class="at">UKF =</span> fit.ukf<span class="sc">$</span>filtered.mean[, <span class="dv">1</span>]</span>
+<span id="cb133-5"><a href="Filtering.html#cb133-5" tabindex="-1"></a>)</span>
+<span id="cb133-6"><a href="Filtering.html#cb133-6" tabindex="-1"></a></span>
+<span id="cb133-7"><a href="Filtering.html#cb133-7" tabindex="-1"></a>maximum.difference <span class="ot">&lt;-</span> <span class="fu">apply</span>(</span>
+<span id="cb133-8"><a href="Filtering.html#cb133-8" tabindex="-1"></a>  filtered.estimates, <span class="dv">2</span>,</span>
+<span id="cb133-9"><a href="Filtering.html#cb133-9" tabindex="-1"></a>  <span class="cf">function</span>(x) <span class="fu">max</span>(<span class="fu">abs</span>(x <span class="sc">-</span> filtered.estimates[, <span class="st">&quot;EKF2&quot;</span>]))</span>
+<span id="cb133-10"><a href="Filtering.html#cb133-10" tabindex="-1"></a>)</span>
+<span id="cb133-11"><a href="Filtering.html#cb133-11" tabindex="-1"></a></span>
+<span id="cb133-12"><a href="Filtering.html#cb133-12" tabindex="-1"></a>comparison <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb133-13"><a href="Filtering.html#cb133-13" tabindex="-1"></a>  <span class="at">Filter =</span> <span class="fu">colnames</span>(filtered.estimates),</span>
+<span id="cb133-14"><a href="Filtering.html#cb133-14" tabindex="-1"></a>  <span class="at">RMSE =</span> <span class="fu">apply</span>(filtered.estimates, <span class="dv">2</span>, <span class="cf">function</span>(x) {</span>
+<span id="cb133-15"><a href="Filtering.html#cb133-15" tabindex="-1"></a>    <span class="fu">sqrt</span>(<span class="fu">mean</span>((x <span class="sc">-</span> state)<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb133-16"><a href="Filtering.html#cb133-16" tabindex="-1"></a>  }),</span>
+<span id="cb133-17"><a href="Filtering.html#cb133-17" tabindex="-1"></a>  <span class="st">`</span><span class="at">Mean absolute error</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">apply</span>(filtered.estimates, <span class="dv">2</span>, <span class="cf">function</span>(x) {</span>
+<span id="cb133-18"><a href="Filtering.html#cb133-18" tabindex="-1"></a>    <span class="fu">mean</span>(<span class="fu">abs</span>(x <span class="sc">-</span> state))</span>
+<span id="cb133-19"><a href="Filtering.html#cb133-19" tabindex="-1"></a>  }),</span>
+<span id="cb133-20"><a href="Filtering.html#cb133-20" tabindex="-1"></a>  <span class="st">`</span><span class="at">Maximum difference from EKF2</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">format</span>(</span>
+<span id="cb133-21"><a href="Filtering.html#cb133-21" tabindex="-1"></a>    maximum.difference, <span class="at">scientific =</span> <span class="cn">TRUE</span>, <span class="at">digits =</span> <span class="dv">3</span></span>
+<span id="cb133-22"><a href="Filtering.html#cb133-22" tabindex="-1"></a>  ),</span>
+<span id="cb133-23"><a href="Filtering.html#cb133-23" tabindex="-1"></a>  <span class="at">check.names =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb133-24"><a href="Filtering.html#cb133-24" tabindex="-1"></a>  <span class="at">row.names =</span> <span class="cn">NULL</span></span>
+<span id="cb133-25"><a href="Filtering.html#cb133-25" tabindex="-1"></a>)</span>
+<span id="cb133-26"><a href="Filtering.html#cb133-26" tabindex="-1"></a></span>
+<span id="cb133-27"><a href="Filtering.html#cb133-27" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb133-28"><a href="Filtering.html#cb133-28" tabindex="-1"></a>  comparison, <span class="at">digits =</span> <span class="dv">3</span>,</span>
+<span id="cb133-29"><a href="Filtering.html#cb133-29" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">&quot;Accuracy of EKF1, EKF2, and UKF in the quadratic-measurement example.&quot;</span></span>
+<span id="cb133-30"><a href="Filtering.html#cb133-30" tabindex="-1"></a>)</span></code></pre></div>
+</details>
+<table>
+<caption>(#tab:table_EKF_comparison)Accuracy of EKF1, EKF2, and UKF in the quadratic-measurement example.</caption>
+<thead>
+<tr class="header">
+<th align="left">Filter</th>
+<th align="right">RMSE</th>
+<th align="right">Mean absolute error</th>
+<th align="left">Maximum difference from EKF2</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">EKF1</td>
+<td align="right">0.170</td>
+<td align="right">0.128</td>
+<td align="left">8.92e-02</td>
+</tr>
+<tr class="even">
+<td align="left">EKF2</td>
+<td align="right">0.158</td>
+<td align="right">0.122</td>
+<td align="left">0.00e+00</td>
+</tr>
+<tr class="odd">
+<td align="left">UKF</td>
+<td align="right">0.158</td>
+<td align="right">0.122</td>
+<td align="left">4.44e-16</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="kitagawa-hamilton-filter" class="section level2 hasAnchor" number="14.5">
+<h2><span class="header-section-number">14.5</span> Kitagawa-Hamilton filter<a href="Filtering.html#kitagawa-hamilton-filter" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>This example reproduces the Hamilton-style regime-switching filtering exercise.</p>
 <details class=chunk-details><summary class=chunk-summary><span class=chunk-summary-text>Code</span></summary>
-<div class="sourceCode" id="cb132"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb132-1"><a href="Filtering.html#cb132-1" tabindex="-1"></a><span class="co"># Purpose: This example reproduces the Hamilton-style regime-switching filtering exercise</span></span>
-<span id="cb132-2"><a href="Filtering.html#cb132-2" tabindex="-1"></a><span class="fu">library</span>(DTAM)</span>
-<span id="cb132-3"><a href="Filtering.html#cb132-3" tabindex="-1"></a><span class="fu">library</span>(tis) <span class="co"># for NBER recession dates</span></span>
-<span id="cb132-4"><a href="Filtering.html#cb132-4" tabindex="-1"></a><span class="fu">library</span>(optimx)</span>
-<span id="cb132-5"><a href="Filtering.html#cb132-5" tabindex="-1"></a></span>
-<span id="cb132-6"><a href="Filtering.html#cb132-6" tabindex="-1"></a>first.date <span class="ot">&lt;-</span> Data_Macro_US_quarterly<span class="sc">$</span>date[<span class="dv">1</span>]</span>
-<span id="cb132-7"><a href="Filtering.html#cb132-7" tabindex="-1"></a>last.date  <span class="ot">&lt;-</span> <span class="st">&quot;2015-10-01&quot;</span></span>
-<span id="cb132-8"><a href="Filtering.html#cb132-8" tabindex="-1"></a></span>
-<span id="cb132-9"><a href="Filtering.html#cb132-9" tabindex="-1"></a><span class="co"># Build the GDP-growth data used in the Hamilton example.</span></span>
-<span id="cb132-10"><a href="Filtering.html#cb132-10" tabindex="-1"></a>Data_Macro_US_quarterly <span class="ot">&lt;-</span> Data_Macro_US_quarterly[</span>
-<span id="cb132-11"><a href="Filtering.html#cb132-11" tabindex="-1"></a>  (Data_Macro_US_quarterly<span class="sc">$</span>date <span class="sc">&gt;=</span> first.date)<span class="sc">&amp;</span></span>
-<span id="cb132-12"><a href="Filtering.html#cb132-12" tabindex="-1"></a>    (Data_Macro_US_quarterly<span class="sc">$</span>date <span class="sc">&lt;=</span> last.date),]</span>
-<span id="cb132-13"><a href="Filtering.html#cb132-13" tabindex="-1"></a>TT <span class="ot">&lt;-</span> <span class="fu">dim</span>(Data_Macro_US_quarterly)</span>
-<span id="cb132-14"><a href="Filtering.html#cb132-14" tabindex="-1"></a></span>
-<span id="cb132-15"><a href="Filtering.html#cb132-15" tabindex="-1"></a>logGDP <span class="ot">&lt;-</span> <span class="fu">log</span>(Data_Macro_US_quarterly<span class="sc">$</span>GDPC1)</span>
-<span id="cb132-16"><a href="Filtering.html#cb132-16" tabindex="-1"></a>dy   <span class="ot">&lt;-</span> logGDP[<span class="dv">6</span><span class="sc">:</span>(TT<span class="dv">-0</span>)] <span class="sc">-</span> logGDP[<span class="dv">5</span><span class="sc">:</span>(TT<span class="dv">-1</span>)]</span>
-<span id="cb132-17"><a href="Filtering.html#cb132-17" tabindex="-1"></a>dy_1 <span class="ot">&lt;-</span> logGDP[<span class="dv">5</span><span class="sc">:</span>(TT<span class="dv">-1</span>)] <span class="sc">-</span> logGDP[<span class="dv">4</span><span class="sc">:</span>(TT<span class="dv">-2</span>)]</span>
-<span id="cb132-18"><a href="Filtering.html#cb132-18" tabindex="-1"></a>dy_2 <span class="ot">&lt;-</span> logGDP[<span class="dv">4</span><span class="sc">:</span>(TT<span class="dv">-2</span>)] <span class="sc">-</span> logGDP[<span class="dv">3</span><span class="sc">:</span>(TT<span class="dv">-3</span>)]</span>
-<span id="cb132-19"><a href="Filtering.html#cb132-19" tabindex="-1"></a>dy_3 <span class="ot">&lt;-</span> logGDP[<span class="dv">3</span><span class="sc">:</span>(TT<span class="dv">-3</span>)] <span class="sc">-</span> logGDP[<span class="dv">2</span><span class="sc">:</span>(TT<span class="dv">-4</span>)]</span>
-<span id="cb132-20"><a href="Filtering.html#cb132-20" tabindex="-1"></a></span>
-<span id="cb132-21"><a href="Filtering.html#cb132-21" tabindex="-1"></a>vec_dates <span class="ot">&lt;-</span> Data_Macro_US_quarterly<span class="sc">$</span>date[<span class="dv">6</span><span class="sc">:</span>TT]</span>
-<span id="cb132-22"><a href="Filtering.html#cb132-22" tabindex="-1"></a></span>
-<span id="cb132-23"><a href="Filtering.html#cb132-23" tabindex="-1"></a>Y <span class="ot">&lt;-</span> <span class="dv">100</span><span class="sc">*</span><span class="fu">cbind</span>(dy,dy_1,dy_2,dy_3)</span>
-<span id="cb132-24"><a href="Filtering.html#cb132-24" tabindex="-1"></a></span>
-<span id="cb132-25"><a href="Filtering.html#cb132-25" tabindex="-1"></a>logistic <span class="ot">&lt;-</span> <span class="cf">function</span>(theta){</span>
-<span id="cb132-26"><a href="Filtering.html#cb132-26" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">exp</span>(theta)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">+</span><span class="fu">exp</span>(theta)))</span>
-<span id="cb132-27"><a href="Filtering.html#cb132-27" tabindex="-1"></a>}</span>
-<span id="cb132-28"><a href="Filtering.html#cb132-28" tabindex="-1"></a>invlogistic <span class="ot">&lt;-</span> <span class="cf">function</span>(theta){</span>
-<span id="cb132-29"><a href="Filtering.html#cb132-29" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">log</span>(theta<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>theta)))</span>
-<span id="cb132-30"><a href="Filtering.html#cb132-30" tabindex="-1"></a>}</span>
-<span id="cb132-31"><a href="Filtering.html#cb132-31" tabindex="-1"></a></span>
-<span id="cb132-32"><a href="Filtering.html#cb132-32" tabindex="-1"></a><span class="co"># Map constrained model parameters to an unconstrained optimizer vector.</span></span>
-<span id="cb132-33"><a href="Filtering.html#cb132-33" tabindex="-1"></a>model2param <span class="ot">&lt;-</span> <span class="cf">function</span>(model){</span>
-<span id="cb132-34"><a href="Filtering.html#cb132-34" tabindex="-1"></a>  param <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>,<span class="dv">8</span>,<span class="dv">1</span>)</span>
-<span id="cb132-35"><a href="Filtering.html#cb132-35" tabindex="-1"></a>  model<span class="sc">$</span>phi1 <span class="ot">-&gt;</span> param[<span class="dv">1</span>]</span>
-<span id="cb132-36"><a href="Filtering.html#cb132-36" tabindex="-1"></a>  model<span class="sc">$</span>phi2 <span class="ot">-&gt;</span> param[<span class="dv">2</span>]</span>
-<span id="cb132-37"><a href="Filtering.html#cb132-37" tabindex="-1"></a>  model<span class="sc">$</span>phi3 <span class="ot">-&gt;</span> param[<span class="dv">3</span>]</span>
-<span id="cb132-38"><a href="Filtering.html#cb132-38" tabindex="-1"></a>  model<span class="sc">$</span>mu2  <span class="ot">-&gt;</span> param[<span class="dv">4</span>]</span>
-<span id="cb132-39"><a href="Filtering.html#cb132-39" tabindex="-1"></a>  <span class="fu">log</span>(model<span class="sc">$</span>mu2 <span class="sc">-</span> model<span class="sc">$</span>mu1)  <span class="ot">-&gt;</span> param[<span class="dv">5</span>]</span>
-<span id="cb132-40"><a href="Filtering.html#cb132-40" tabindex="-1"></a>  <span class="fu">invlogistic</span>(model<span class="sc">$</span>pi11) <span class="ot">-&gt;</span> param[<span class="dv">6</span>]</span>
-<span id="cb132-41"><a href="Filtering.html#cb132-41" tabindex="-1"></a>  <span class="fu">invlogistic</span>(model<span class="sc">$</span>pi22) <span class="ot">-&gt;</span> param[<span class="dv">7</span>]</span>
-<span id="cb132-42"><a href="Filtering.html#cb132-42" tabindex="-1"></a>  <span class="fu">log</span>(model<span class="sc">$</span>sigma) <span class="ot">-&gt;</span> param[<span class="dv">8</span>]</span>
-<span id="cb132-43"><a href="Filtering.html#cb132-43" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">c</span>(param))</span>
-<span id="cb132-44"><a href="Filtering.html#cb132-44" tabindex="-1"></a>}</span>
-<span id="cb132-45"><a href="Filtering.html#cb132-45" tabindex="-1"></a></span>
-<span id="cb132-46"><a href="Filtering.html#cb132-46" tabindex="-1"></a><span class="co"># Map optimizer parameters back to the regime-switching model.</span></span>
-<span id="cb132-47"><a href="Filtering.html#cb132-47" tabindex="-1"></a>param2model <span class="ot">&lt;-</span> <span class="cf">function</span>(param){</span>
-<span id="cb132-48"><a href="Filtering.html#cb132-48" tabindex="-1"></a>  model <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
-<span id="cb132-49"><a href="Filtering.html#cb132-49" tabindex="-1"></a>  model<span class="sc">$</span>phi1 <span class="ot">&lt;-</span> param[<span class="dv">1</span>]</span>
-<span id="cb132-50"><a href="Filtering.html#cb132-50" tabindex="-1"></a>  model<span class="sc">$</span>phi2 <span class="ot">&lt;-</span> param[<span class="dv">2</span>]</span>
-<span id="cb132-51"><a href="Filtering.html#cb132-51" tabindex="-1"></a>  model<span class="sc">$</span>phi3 <span class="ot">&lt;-</span> param[<span class="dv">3</span>]</span>
-<span id="cb132-52"><a href="Filtering.html#cb132-52" tabindex="-1"></a>  model<span class="sc">$</span>mu2  <span class="ot">&lt;-</span> param[<span class="dv">4</span>]</span>
-<span id="cb132-53"><a href="Filtering.html#cb132-53" tabindex="-1"></a>  model<span class="sc">$</span>mu1  <span class="ot">&lt;-</span> model<span class="sc">$</span>mu2 <span class="sc">-</span> <span class="fu">exp</span>(param[<span class="dv">5</span>])</span>
-<span id="cb132-54"><a href="Filtering.html#cb132-54" tabindex="-1"></a>  model<span class="sc">$</span>pi11 <span class="ot">&lt;-</span> <span class="fu">logistic</span>(param[<span class="dv">6</span>])</span>
-<span id="cb132-55"><a href="Filtering.html#cb132-55" tabindex="-1"></a>  model<span class="sc">$</span>pi22 <span class="ot">&lt;-</span> <span class="fu">logistic</span>(param[<span class="dv">7</span>])</span>
-<span id="cb132-56"><a href="Filtering.html#cb132-56" tabindex="-1"></a>  model<span class="sc">$</span>sigma <span class="ot">&lt;-</span> <span class="fu">exp</span>(param[<span class="dv">8</span>])</span>
-<span id="cb132-57"><a href="Filtering.html#cb132-57" tabindex="-1"></a>  </span>
-<span id="cb132-58"><a href="Filtering.html#cb132-58" tabindex="-1"></a>  Pi <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(model<span class="sc">$</span>pi11,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span><span class="sc">-</span>model<span class="sc">$</span>pi22,</span>
-<span id="cb132-59"><a href="Filtering.html#cb132-59" tabindex="-1"></a>                 <span class="dv">1</span><span class="sc">-</span>model<span class="sc">$</span>pi11,<span class="dv">0</span>,<span class="dv">0</span>,model<span class="sc">$</span>pi22),<span class="dv">2</span>,<span class="dv">4</span>) <span class="sc">%x%</span> (<span class="fu">diag</span>(<span class="dv">4</span>) <span class="sc">%x%</span> <span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>))</span>
-<span id="cb132-60"><a href="Filtering.html#cb132-60" tabindex="-1"></a>  model<span class="sc">$</span>Pi <span class="ot">&lt;-</span> Pi</span>
-<span id="cb132-61"><a href="Filtering.html#cb132-61" tabindex="-1"></a>  model<span class="sc">$</span>mu <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(model<span class="sc">$</span>mu1,model<span class="sc">$</span>mu2),<span class="dv">2</span>,<span class="dv">1</span>) <span class="sc">%x%</span> <span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">8</span>,<span class="dv">1</span>)</span>
-<span id="cb132-62"><a href="Filtering.html#cb132-62" tabindex="-1"></a>  </span>
-<span id="cb132-63"><a href="Filtering.html#cb132-63" tabindex="-1"></a>  <span class="fu">return</span>(model)</span>
-<span id="cb132-64"><a href="Filtering.html#cb132-64" tabindex="-1"></a>}</span>
-<span id="cb132-65"><a href="Filtering.html#cb132-65" tabindex="-1"></a></span>
-<span id="cb132-66"><a href="Filtering.html#cb132-66" tabindex="-1"></a><span class="co"># Run the Kim-Hamilton filter, and optionally the smoother.</span></span>
-<span id="cb132-67"><a href="Filtering.html#cb132-67" tabindex="-1"></a>run_KH <span class="ot">&lt;-</span> <span class="cf">function</span>(model,Y,<span class="at">indic_smoother=</span><span class="cn">FALSE</span>){</span>
-<span id="cb132-68"><a href="Filtering.html#cb132-68" tabindex="-1"></a>  </span>
-<span id="cb132-69"><a href="Filtering.html#cb132-69" tabindex="-1"></a>  TT <span class="ot">&lt;-</span> <span class="fu">dim</span>(Y)[<span class="dv">1</span>]</span>
-<span id="cb132-70"><a href="Filtering.html#cb132-70" tabindex="-1"></a>  J  <span class="ot">&lt;-</span> <span class="dv">16</span> <span class="co"># number of regimes</span></span>
-<span id="cb132-71"><a href="Filtering.html#cb132-71" tabindex="-1"></a>  vec1TT <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">1</span>,TT,<span class="dv">1</span>)</span>
-<span id="cb132-72"><a href="Filtering.html#cb132-72" tabindex="-1"></a>  </span>
-<span id="cb132-73"><a href="Filtering.html#cb132-73" tabindex="-1"></a>  mu <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(model<span class="sc">$</span>mu1,model<span class="sc">$</span>mu2),<span class="dv">2</span>,<span class="dv">1</span>)</span>
-<span id="cb132-74"><a href="Filtering.html#cb132-74" tabindex="-1"></a>  </span>
-<span id="cb132-75"><a href="Filtering.html#cb132-75" tabindex="-1"></a>  mu0 <span class="ot">&lt;-</span> vec1TT <span class="sc">%*%</span> <span class="fu">t</span>(mu <span class="sc">%x%</span> <span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>) <span class="sc">%x%</span> <span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>) <span class="sc">%x%</span> <span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>))</span>
-<span id="cb132-76"><a href="Filtering.html#cb132-76" tabindex="-1"></a>  mu1 <span class="ot">&lt;-</span> vec1TT <span class="sc">%*%</span> <span class="fu">t</span>(<span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>) <span class="sc">%x%</span> mu <span class="sc">%x%</span> <span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>) <span class="sc">%x%</span> <span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>))</span>
-<span id="cb132-77"><a href="Filtering.html#cb132-77" tabindex="-1"></a>  mu2 <span class="ot">&lt;-</span> vec1TT <span class="sc">%*%</span> <span class="fu">t</span>(<span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>) <span class="sc">%x%</span> <span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>) <span class="sc">%x%</span> mu <span class="sc">%x%</span> <span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>))</span>
-<span id="cb132-78"><a href="Filtering.html#cb132-78" tabindex="-1"></a>  mu3 <span class="ot">&lt;-</span> vec1TT <span class="sc">%*%</span> <span class="fu">t</span>(<span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>) <span class="sc">%x%</span> <span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>) <span class="sc">%x%</span> <span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>) <span class="sc">%x%</span> mu)</span>
-<span id="cb132-79"><a href="Filtering.html#cb132-79" tabindex="-1"></a>  </span>
-<span id="cb132-80"><a href="Filtering.html#cb132-80" tabindex="-1"></a>  y0 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(Y[,<span class="dv">1</span>],TT,J)</span>
-<span id="cb132-81"><a href="Filtering.html#cb132-81" tabindex="-1"></a>  y1 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(Y[,<span class="dv">2</span>],TT,J)</span>
-<span id="cb132-82"><a href="Filtering.html#cb132-82" tabindex="-1"></a>  y2 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(Y[,<span class="dv">3</span>],TT,J)</span>
-<span id="cb132-83"><a href="Filtering.html#cb132-83" tabindex="-1"></a>  y3 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(Y[,<span class="dv">4</span>],TT,J)</span>
-<span id="cb132-84"><a href="Filtering.html#cb132-84" tabindex="-1"></a>  </span>
-<span id="cb132-85"><a href="Filtering.html#cb132-85" tabindex="-1"></a>  phi1 <span class="ot">&lt;-</span> model<span class="sc">$</span>phi1</span>
-<span id="cb132-86"><a href="Filtering.html#cb132-86" tabindex="-1"></a>  phi2 <span class="ot">&lt;-</span> model<span class="sc">$</span>phi2</span>
-<span id="cb132-87"><a href="Filtering.html#cb132-87" tabindex="-1"></a>  phi3 <span class="ot">&lt;-</span> model<span class="sc">$</span>phi3</span>
-<span id="cb132-88"><a href="Filtering.html#cb132-88" tabindex="-1"></a>  </span>
-<span id="cb132-89"><a href="Filtering.html#cb132-89" tabindex="-1"></a>  eps <span class="ot">&lt;-</span> y0 <span class="sc">-</span> mu0 <span class="sc">-</span> phi1<span class="sc">*</span>(y1 <span class="sc">-</span> mu1) <span class="sc">-</span> phi2<span class="sc">*</span>(y2 <span class="sc">-</span> mu2) <span class="sc">-</span> phi3<span class="sc">*</span>(y3 <span class="sc">-</span> mu3)</span>
-<span id="cb132-90"><a href="Filtering.html#cb132-90" tabindex="-1"></a>  </span>
-<span id="cb132-91"><a href="Filtering.html#cb132-91" tabindex="-1"></a>  sigma <span class="ot">&lt;-</span> model<span class="sc">$</span>sigma</span>
-<span id="cb132-92"><a href="Filtering.html#cb132-92" tabindex="-1"></a>  Eta <span class="ot">&lt;-</span> <span class="sc">-</span>.<span class="dv">5</span><span class="sc">*</span><span class="fu">log</span>(<span class="dv">2</span><span class="sc">*</span>pi<span class="sc">*</span>sigma<span class="sc">^</span><span class="dv">2</span>) <span class="sc">-</span> .<span class="dv">5</span><span class="sc">*</span>eps<span class="sc">^</span><span class="dv">2</span><span class="sc">/</span>sigma<span class="sc">^</span><span class="dv">2</span></span>
-<span id="cb132-93"><a href="Filtering.html#cb132-93" tabindex="-1"></a>  </span>
-<span id="cb132-94"><a href="Filtering.html#cb132-94" tabindex="-1"></a>  resKH <span class="ot">&lt;-</span> <span class="fu">KH_filter</span>(model<span class="sc">$</span>Pi, Eta)</span>
-<span id="cb132-95"><a href="Filtering.html#cb132-95" tabindex="-1"></a>  </span>
-<span id="cb132-96"><a href="Filtering.html#cb132-96" tabindex="-1"></a>  <span class="cf">if</span>(indic_smoother){</span>
-<span id="cb132-97"><a href="Filtering.html#cb132-97" tabindex="-1"></a>    resKH<span class="sc">$</span>ksi_matrix_smoothed <span class="ot">&lt;-</span> <span class="fu">KH_smoother</span>(model<span class="sc">$</span>Pi, Eta)</span>
-<span id="cb132-98"><a href="Filtering.html#cb132-98" tabindex="-1"></a>  }</span>
-<span id="cb132-99"><a href="Filtering.html#cb132-99" tabindex="-1"></a>  </span>
-<span id="cb132-100"><a href="Filtering.html#cb132-100" tabindex="-1"></a>  <span class="fu">return</span>(resKH)</span>
-<span id="cb132-101"><a href="Filtering.html#cb132-101" tabindex="-1"></a>}</span>
-<span id="cb132-102"><a href="Filtering.html#cb132-102" tabindex="-1"></a></span>
-<span id="cb132-103"><a href="Filtering.html#cb132-103" tabindex="-1"></a>loglik4optim <span class="ot">&lt;-</span> <span class="cf">function</span>(param,Y){</span>
-<span id="cb132-104"><a href="Filtering.html#cb132-104" tabindex="-1"></a>  model <span class="ot">&lt;-</span> <span class="fu">param2model</span>(param)</span>
-<span id="cb132-105"><a href="Filtering.html#cb132-105" tabindex="-1"></a>  resKH <span class="ot">&lt;-</span> <span class="fu">run_KH</span>(model,Y)</span>
-<span id="cb132-106"><a href="Filtering.html#cb132-106" tabindex="-1"></a>  <span class="fu">return</span>(<span class="sc">-</span>resKH<span class="sc">$</span>loglik)</span>
-<span id="cb132-107"><a href="Filtering.html#cb132-107" tabindex="-1"></a>}</span>
-<span id="cb132-108"><a href="Filtering.html#cb132-108" tabindex="-1"></a></span>
-<span id="cb132-109"><a href="Filtering.html#cb132-109" tabindex="-1"></a><span class="co"># Initial param (close to Hamilton, 1989)</span></span>
-<span id="cb132-110"><a href="Filtering.html#cb132-110" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">mu1=</span><span class="sc">-</span>.<span class="dv">5</span>,<span class="at">mu2=</span>.<span class="dv">9</span>,</span>
-<span id="cb132-111"><a href="Filtering.html#cb132-111" tabindex="-1"></a>              <span class="at">phi1=</span>.<span class="dv">27</span>,<span class="at">phi2=</span>.<span class="dv">34</span>,<span class="at">phi3=</span>.<span class="dv">13</span>,</span>
-<span id="cb132-112"><a href="Filtering.html#cb132-112" tabindex="-1"></a>              <span class="at">sigma=</span>.<span class="dv">9</span>,</span>
-<span id="cb132-113"><a href="Filtering.html#cb132-113" tabindex="-1"></a>              <span class="at">pi11=</span>.<span class="dv">9</span>,<span class="at">pi22=</span>.<span class="dv">98</span>)</span>
-<span id="cb132-114"><a href="Filtering.html#cb132-114" tabindex="-1"></a>param_est <span class="ot">&lt;-</span> <span class="fu">model2param</span>(model)</span>
-<span id="cb132-115"><a href="Filtering.html#cb132-115" tabindex="-1"></a></span>
-<span id="cb132-116"><a href="Filtering.html#cb132-116" tabindex="-1"></a>param_est <span class="ot">&lt;-</span> <span class="fu">model2param</span>(model)</span>
-<span id="cb132-117"><a href="Filtering.html#cb132-117" tabindex="-1"></a></span>
-<span id="cb132-118"><a href="Filtering.html#cb132-118" tabindex="-1"></a><span class="cf">if</span>(indic_reestim){</span>
-<span id="cb132-119"><a href="Filtering.html#cb132-119" tabindex="-1"></a>  </span>
-<span id="cb132-120"><a href="Filtering.html#cb132-120" tabindex="-1"></a>  nb_loop <span class="ot">&lt;-</span> <span class="dv">4</span></span>
-<span id="cb132-121"><a href="Filtering.html#cb132-121" tabindex="-1"></a>  </span>
-<span id="cb132-122"><a href="Filtering.html#cb132-122" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>nb_loop){</span>
-<span id="cb132-123"><a href="Filtering.html#cb132-123" tabindex="-1"></a>    <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">&quot;--- Loop &quot;</span>,i,<span class="st">&quot; ---&quot;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>))</span>
-<span id="cb132-124"><a href="Filtering.html#cb132-124" tabindex="-1"></a>    <span class="co"># for(method in c(&quot;nlminb&quot;)){</span></span>
-<span id="cb132-125"><a href="Filtering.html#cb132-125" tabindex="-1"></a>    <span class="cf">for</span>(method <span class="cf">in</span> <span class="fu">c</span>(<span class="st">&quot;nlminb&quot;</span>,<span class="st">&quot;Nelder-Mead&quot;</span>)){</span>
-<span id="cb132-126"><a href="Filtering.html#cb132-126" tabindex="-1"></a>      res.optim <span class="ot">&lt;-</span> <span class="fu">optimx</span>(<span class="at">par=</span>param_est,</span>
-<span id="cb132-127"><a href="Filtering.html#cb132-127" tabindex="-1"></a>                          <span class="at">fn=</span>loglik4optim,</span>
-<span id="cb132-128"><a href="Filtering.html#cb132-128" tabindex="-1"></a>                          <span class="at">Y=</span>Y,</span>
-<span id="cb132-129"><a href="Filtering.html#cb132-129" tabindex="-1"></a>                          <span class="at">method=</span>method,</span>
-<span id="cb132-130"><a href="Filtering.html#cb132-130" tabindex="-1"></a>                          <span class="at">control=</span><span class="fu">list</span>(<span class="at">trace=</span><span class="cn">FALSE</span>,</span>
-<span id="cb132-131"><a href="Filtering.html#cb132-131" tabindex="-1"></a>                                       <span class="at">maxit=</span><span class="fu">ifelse</span>(method<span class="sc">==</span><span class="st">&quot;Nelder-Mead&quot;</span>,<span class="dv">1000</span>,<span class="dv">20</span>),</span>
-<span id="cb132-132"><a href="Filtering.html#cb132-132" tabindex="-1"></a>                                       <span class="at">kkt =</span> <span class="cn">FALSE</span>))</span>
-<span id="cb132-133"><a href="Filtering.html#cb132-133" tabindex="-1"></a>      <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">&quot;--- Log-lik (&quot;</span>,method,<span class="st">&quot;): &quot;</span>,<span class="fu">round</span>(res.optim<span class="sc">$</span>value,<span class="dv">2</span>),<span class="st">&quot; ---&quot;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>))</span>
-<span id="cb132-134"><a href="Filtering.html#cb132-134" tabindex="-1"></a>      param_est  <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">as.matrix</span>(res.optim)[<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(param_est)])</span>
-<span id="cb132-135"><a href="Filtering.html#cb132-135" tabindex="-1"></a>    }</span>
-<span id="cb132-136"><a href="Filtering.html#cb132-136" tabindex="-1"></a>  }</span>
-<span id="cb132-137"><a href="Filtering.html#cb132-137" tabindex="-1"></a>  <span class="fu">save</span>(param_est,<span class="at">file=</span> <span class="st">&quot;stored_results/param_Hamilton89.Rdat&quot;</span>)</span>
-<span id="cb132-138"><a href="Filtering.html#cb132-138" tabindex="-1"></a>}<span class="cf">else</span>{</span>
-<span id="cb132-139"><a href="Filtering.html#cb132-139" tabindex="-1"></a>  <span class="co"># In that case, use paraemters estimated previously:</span></span>
-<span id="cb132-140"><a href="Filtering.html#cb132-140" tabindex="-1"></a>  <span class="fu">load</span>(<span class="at">file=</span> <span class="st">&quot;stored_results/param_Hamilton89.Rdat&quot;</span>)</span>
-<span id="cb132-141"><a href="Filtering.html#cb132-141" tabindex="-1"></a>}</span>
-<span id="cb132-142"><a href="Filtering.html#cb132-142" tabindex="-1"></a></span>
-<span id="cb132-143"><a href="Filtering.html#cb132-143" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">param2model</span>(param_est)</span>
-<span id="cb132-144"><a href="Filtering.html#cb132-144" tabindex="-1"></a>resKH <span class="ot">&lt;-</span> <span class="fu">run_KH</span>(model,Y,<span class="at">indic_smoother=</span><span class="cn">TRUE</span>)</span>
-<span id="cb132-145"><a href="Filtering.html#cb132-145" tabindex="-1"></a></span>
-<span id="cb132-146"><a href="Filtering.html#cb132-146" tabindex="-1"></a><span class="co"># Compute filtered probabilities xi_tilde:</span></span>
-<span id="cb132-147"><a href="Filtering.html#cb132-147" tabindex="-1"></a>xi_tilde <span class="ot">&lt;-</span> resKH<span class="sc">$</span>ksi_matrix <span class="sc">%*%</span> <span class="fu">t</span>(<span class="fu">diag</span>(<span class="dv">2</span>) <span class="sc">%x%</span> <span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">8</span>))</span>
-<span id="cb132-148"><a href="Filtering.html#cb132-148" tabindex="-1"></a>xi_tilde_smoothed <span class="ot">&lt;-</span> resKH<span class="sc">$</span>ksi_matrix_smoothed <span class="sc">%*%</span> <span class="fu">t</span>(<span class="fu">diag</span>(<span class="dv">2</span>) <span class="sc">%x%</span> <span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">8</span>))</span>
-<span id="cb132-149"><a href="Filtering.html#cb132-149" tabindex="-1"></a></span>
-<span id="cb132-150"><a href="Filtering.html#cb132-150" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">1</span>))</span>
-<span id="cb132-151"><a href="Filtering.html#cb132-151" tabindex="-1"></a><span class="fu">par</span>(<span class="at">plt=</span><span class="fu">c</span>(.<span class="dv">1</span>,.<span class="dv">96</span>,.<span class="dv">15</span>,.<span class="dv">8</span>))</span>
-<span id="cb132-152"><a href="Filtering.html#cb132-152" tabindex="-1"></a></span>
-<span id="cb132-153"><a href="Filtering.html#cb132-153" tabindex="-1"></a><span class="fu">plot</span>(vec_dates,Y[,<span class="dv">1</span>],<span class="at">col=</span><span class="st">&quot;white&quot;</span>,</span>
-<span id="cb132-154"><a href="Filtering.html#cb132-154" tabindex="-1"></a>     <span class="at">xlab=</span><span class="st">&quot;&quot;</span>,<span class="at">ylab=</span><span class="st">&quot;in percent&quot;</span>,<span class="at">las=</span><span class="dv">1</span>,</span>
-<span id="cb132-155"><a href="Filtering.html#cb132-155" tabindex="-1"></a>     <span class="at">main=</span><span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;(a) Quarterly GDP growth rate (&quot;</span>,y[t],<span class="st">&quot;)&quot;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>)))</span>
-<span id="cb132-156"><a href="Filtering.html#cb132-156" tabindex="-1"></a><span class="fu">grid</span>()</span>
-<span id="cb132-157"><a href="Filtering.html#cb132-157" tabindex="-1"></a><span class="fu">make_recessions</span>(<span class="at">col =</span> <span class="st">&quot;lightgrey&quot;</span>)</span>
-<span id="cb132-158"><a href="Filtering.html#cb132-158" tabindex="-1"></a><span class="fu">lines</span>(vec_dates,Y[,<span class="dv">1</span>],<span class="at">lwd=</span><span class="dv">2</span>)</span>
-<span id="cb132-159"><a href="Filtering.html#cb132-159" tabindex="-1"></a></span>
-<span id="cb132-160"><a href="Filtering.html#cb132-160" tabindex="-1"></a><span class="fu">plot</span>(vec_dates,<span class="dv">100</span><span class="sc">*</span>xi_tilde[,<span class="dv">1</span>],<span class="at">ylim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">100</span>),<span class="at">col=</span><span class="st">&quot;white&quot;</span>,<span class="at">las=</span><span class="dv">1</span>,</span>
-<span id="cb132-161"><a href="Filtering.html#cb132-161" tabindex="-1"></a>     <span class="at">xlab=</span><span class="st">&quot;&quot;</span>,<span class="at">ylab=</span><span class="st">&quot;in percent&quot;</span>,</span>
-<span id="cb132-162"><a href="Filtering.html#cb132-162" tabindex="-1"></a>     <span class="at">main=</span><span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;(b) Recession probabilities&quot;</span>,</span>
-<span id="cb132-163"><a href="Filtering.html#cb132-163" tabindex="-1"></a>                           <span class="st">&quot; (dotted = filtered; solid = smoothed)&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>)))</span>
-<span id="cb132-164"><a href="Filtering.html#cb132-164" tabindex="-1"></a></span>
-<span id="cb132-165"><a href="Filtering.html#cb132-165" tabindex="-1"></a><span class="fu">grid</span>()</span>
-<span id="cb132-166"><a href="Filtering.html#cb132-166" tabindex="-1"></a><span class="fu">make_recessions</span>(<span class="at">col =</span> <span class="st">&quot;lightgrey&quot;</span>)</span>
-<span id="cb132-167"><a href="Filtering.html#cb132-167" tabindex="-1"></a><span class="fu">lines</span>(vec_dates,<span class="dv">100</span><span class="sc">*</span>xi_tilde_smoothed[,<span class="dv">1</span>],<span class="at">lwd=</span><span class="dv">2</span>,<span class="at">col=</span><span class="st">&quot;black&quot;</span>)</span>
-<span id="cb132-168"><a href="Filtering.html#cb132-168" tabindex="-1"></a><span class="fu">lines</span>(vec_dates,<span class="dv">100</span><span class="sc">*</span>xi_tilde[,<span class="dv">1</span>],<span class="at">lwd=</span><span class="dv">2</span>,<span class="at">col=</span><span class="st">&quot;black&quot;</span>,<span class="at">lty=</span><span class="dv">3</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb134"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb134-1"><a href="Filtering.html#cb134-1" tabindex="-1"></a><span class="co"># Purpose: This example reproduces the Hamilton-style regime-switching filtering exercise</span></span>
+<span id="cb134-2"><a href="Filtering.html#cb134-2" tabindex="-1"></a><span class="fu">library</span>(DTAM)</span>
+<span id="cb134-3"><a href="Filtering.html#cb134-3" tabindex="-1"></a><span class="fu">library</span>(tis) <span class="co"># for NBER recession dates</span></span>
+<span id="cb134-4"><a href="Filtering.html#cb134-4" tabindex="-1"></a><span class="fu">library</span>(optimx)</span>
+<span id="cb134-5"><a href="Filtering.html#cb134-5" tabindex="-1"></a></span>
+<span id="cb134-6"><a href="Filtering.html#cb134-6" tabindex="-1"></a>first.date <span class="ot">&lt;-</span> Data_Macro_US_quarterly<span class="sc">$</span>date[<span class="dv">1</span>]</span>
+<span id="cb134-7"><a href="Filtering.html#cb134-7" tabindex="-1"></a>last.date  <span class="ot">&lt;-</span> <span class="st">&quot;2015-10-01&quot;</span></span>
+<span id="cb134-8"><a href="Filtering.html#cb134-8" tabindex="-1"></a></span>
+<span id="cb134-9"><a href="Filtering.html#cb134-9" tabindex="-1"></a><span class="co"># Build the GDP-growth data used in the Hamilton example.</span></span>
+<span id="cb134-10"><a href="Filtering.html#cb134-10" tabindex="-1"></a>Data_Macro_US_quarterly <span class="ot">&lt;-</span> Data_Macro_US_quarterly[</span>
+<span id="cb134-11"><a href="Filtering.html#cb134-11" tabindex="-1"></a>  (Data_Macro_US_quarterly<span class="sc">$</span>date <span class="sc">&gt;=</span> first.date)<span class="sc">&amp;</span></span>
+<span id="cb134-12"><a href="Filtering.html#cb134-12" tabindex="-1"></a>    (Data_Macro_US_quarterly<span class="sc">$</span>date <span class="sc">&lt;=</span> last.date),]</span>
+<span id="cb134-13"><a href="Filtering.html#cb134-13" tabindex="-1"></a>TT <span class="ot">&lt;-</span> <span class="fu">dim</span>(Data_Macro_US_quarterly)</span>
+<span id="cb134-14"><a href="Filtering.html#cb134-14" tabindex="-1"></a></span>
+<span id="cb134-15"><a href="Filtering.html#cb134-15" tabindex="-1"></a>logGDP <span class="ot">&lt;-</span> <span class="fu">log</span>(Data_Macro_US_quarterly<span class="sc">$</span>GDPC1)</span>
+<span id="cb134-16"><a href="Filtering.html#cb134-16" tabindex="-1"></a>dy   <span class="ot">&lt;-</span> logGDP[<span class="dv">6</span><span class="sc">:</span>(TT<span class="dv">-0</span>)] <span class="sc">-</span> logGDP[<span class="dv">5</span><span class="sc">:</span>(TT<span class="dv">-1</span>)]</span>
+<span id="cb134-17"><a href="Filtering.html#cb134-17" tabindex="-1"></a>dy_1 <span class="ot">&lt;-</span> logGDP[<span class="dv">5</span><span class="sc">:</span>(TT<span class="dv">-1</span>)] <span class="sc">-</span> logGDP[<span class="dv">4</span><span class="sc">:</span>(TT<span class="dv">-2</span>)]</span>
+<span id="cb134-18"><a href="Filtering.html#cb134-18" tabindex="-1"></a>dy_2 <span class="ot">&lt;-</span> logGDP[<span class="dv">4</span><span class="sc">:</span>(TT<span class="dv">-2</span>)] <span class="sc">-</span> logGDP[<span class="dv">3</span><span class="sc">:</span>(TT<span class="dv">-3</span>)]</span>
+<span id="cb134-19"><a href="Filtering.html#cb134-19" tabindex="-1"></a>dy_3 <span class="ot">&lt;-</span> logGDP[<span class="dv">3</span><span class="sc">:</span>(TT<span class="dv">-3</span>)] <span class="sc">-</span> logGDP[<span class="dv">2</span><span class="sc">:</span>(TT<span class="dv">-4</span>)]</span>
+<span id="cb134-20"><a href="Filtering.html#cb134-20" tabindex="-1"></a></span>
+<span id="cb134-21"><a href="Filtering.html#cb134-21" tabindex="-1"></a>vec_dates <span class="ot">&lt;-</span> Data_Macro_US_quarterly<span class="sc">$</span>date[<span class="dv">6</span><span class="sc">:</span>TT]</span>
+<span id="cb134-22"><a href="Filtering.html#cb134-22" tabindex="-1"></a></span>
+<span id="cb134-23"><a href="Filtering.html#cb134-23" tabindex="-1"></a>Y <span class="ot">&lt;-</span> <span class="dv">100</span><span class="sc">*</span><span class="fu">cbind</span>(dy,dy_1,dy_2,dy_3)</span>
+<span id="cb134-24"><a href="Filtering.html#cb134-24" tabindex="-1"></a></span>
+<span id="cb134-25"><a href="Filtering.html#cb134-25" tabindex="-1"></a>logistic <span class="ot">&lt;-</span> <span class="cf">function</span>(theta){</span>
+<span id="cb134-26"><a href="Filtering.html#cb134-26" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">exp</span>(theta)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">+</span><span class="fu">exp</span>(theta)))</span>
+<span id="cb134-27"><a href="Filtering.html#cb134-27" tabindex="-1"></a>}</span>
+<span id="cb134-28"><a href="Filtering.html#cb134-28" tabindex="-1"></a>invlogistic <span class="ot">&lt;-</span> <span class="cf">function</span>(theta){</span>
+<span id="cb134-29"><a href="Filtering.html#cb134-29" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">log</span>(theta<span class="sc">/</span>(<span class="dv">1</span><span class="sc">-</span>theta)))</span>
+<span id="cb134-30"><a href="Filtering.html#cb134-30" tabindex="-1"></a>}</span>
+<span id="cb134-31"><a href="Filtering.html#cb134-31" tabindex="-1"></a></span>
+<span id="cb134-32"><a href="Filtering.html#cb134-32" tabindex="-1"></a><span class="co"># Map constrained model parameters to an unconstrained optimizer vector.</span></span>
+<span id="cb134-33"><a href="Filtering.html#cb134-33" tabindex="-1"></a>model2param <span class="ot">&lt;-</span> <span class="cf">function</span>(model){</span>
+<span id="cb134-34"><a href="Filtering.html#cb134-34" tabindex="-1"></a>  param <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>,<span class="dv">8</span>,<span class="dv">1</span>)</span>
+<span id="cb134-35"><a href="Filtering.html#cb134-35" tabindex="-1"></a>  model<span class="sc">$</span>phi1 <span class="ot">-&gt;</span> param[<span class="dv">1</span>]</span>
+<span id="cb134-36"><a href="Filtering.html#cb134-36" tabindex="-1"></a>  model<span class="sc">$</span>phi2 <span class="ot">-&gt;</span> param[<span class="dv">2</span>]</span>
+<span id="cb134-37"><a href="Filtering.html#cb134-37" tabindex="-1"></a>  model<span class="sc">$</span>phi3 <span class="ot">-&gt;</span> param[<span class="dv">3</span>]</span>
+<span id="cb134-38"><a href="Filtering.html#cb134-38" tabindex="-1"></a>  model<span class="sc">$</span>mu2  <span class="ot">-&gt;</span> param[<span class="dv">4</span>]</span>
+<span id="cb134-39"><a href="Filtering.html#cb134-39" tabindex="-1"></a>  <span class="fu">log</span>(model<span class="sc">$</span>mu2 <span class="sc">-</span> model<span class="sc">$</span>mu1)  <span class="ot">-&gt;</span> param[<span class="dv">5</span>]</span>
+<span id="cb134-40"><a href="Filtering.html#cb134-40" tabindex="-1"></a>  <span class="fu">invlogistic</span>(model<span class="sc">$</span>pi11) <span class="ot">-&gt;</span> param[<span class="dv">6</span>]</span>
+<span id="cb134-41"><a href="Filtering.html#cb134-41" tabindex="-1"></a>  <span class="fu">invlogistic</span>(model<span class="sc">$</span>pi22) <span class="ot">-&gt;</span> param[<span class="dv">7</span>]</span>
+<span id="cb134-42"><a href="Filtering.html#cb134-42" tabindex="-1"></a>  <span class="fu">log</span>(model<span class="sc">$</span>sigma) <span class="ot">-&gt;</span> param[<span class="dv">8</span>]</span>
+<span id="cb134-43"><a href="Filtering.html#cb134-43" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">c</span>(param))</span>
+<span id="cb134-44"><a href="Filtering.html#cb134-44" tabindex="-1"></a>}</span>
+<span id="cb134-45"><a href="Filtering.html#cb134-45" tabindex="-1"></a></span>
+<span id="cb134-46"><a href="Filtering.html#cb134-46" tabindex="-1"></a><span class="co"># Map optimizer parameters back to the regime-switching model.</span></span>
+<span id="cb134-47"><a href="Filtering.html#cb134-47" tabindex="-1"></a>param2model <span class="ot">&lt;-</span> <span class="cf">function</span>(param){</span>
+<span id="cb134-48"><a href="Filtering.html#cb134-48" tabindex="-1"></a>  model <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb134-49"><a href="Filtering.html#cb134-49" tabindex="-1"></a>  model<span class="sc">$</span>phi1 <span class="ot">&lt;-</span> param[<span class="dv">1</span>]</span>
+<span id="cb134-50"><a href="Filtering.html#cb134-50" tabindex="-1"></a>  model<span class="sc">$</span>phi2 <span class="ot">&lt;-</span> param[<span class="dv">2</span>]</span>
+<span id="cb134-51"><a href="Filtering.html#cb134-51" tabindex="-1"></a>  model<span class="sc">$</span>phi3 <span class="ot">&lt;-</span> param[<span class="dv">3</span>]</span>
+<span id="cb134-52"><a href="Filtering.html#cb134-52" tabindex="-1"></a>  model<span class="sc">$</span>mu2  <span class="ot">&lt;-</span> param[<span class="dv">4</span>]</span>
+<span id="cb134-53"><a href="Filtering.html#cb134-53" tabindex="-1"></a>  model<span class="sc">$</span>mu1  <span class="ot">&lt;-</span> model<span class="sc">$</span>mu2 <span class="sc">-</span> <span class="fu">exp</span>(param[<span class="dv">5</span>])</span>
+<span id="cb134-54"><a href="Filtering.html#cb134-54" tabindex="-1"></a>  model<span class="sc">$</span>pi11 <span class="ot">&lt;-</span> <span class="fu">logistic</span>(param[<span class="dv">6</span>])</span>
+<span id="cb134-55"><a href="Filtering.html#cb134-55" tabindex="-1"></a>  model<span class="sc">$</span>pi22 <span class="ot">&lt;-</span> <span class="fu">logistic</span>(param[<span class="dv">7</span>])</span>
+<span id="cb134-56"><a href="Filtering.html#cb134-56" tabindex="-1"></a>  model<span class="sc">$</span>sigma <span class="ot">&lt;-</span> <span class="fu">exp</span>(param[<span class="dv">8</span>])</span>
+<span id="cb134-57"><a href="Filtering.html#cb134-57" tabindex="-1"></a>  </span>
+<span id="cb134-58"><a href="Filtering.html#cb134-58" tabindex="-1"></a>  Pi <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(model<span class="sc">$</span>pi11,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span><span class="sc">-</span>model<span class="sc">$</span>pi22,</span>
+<span id="cb134-59"><a href="Filtering.html#cb134-59" tabindex="-1"></a>                 <span class="dv">1</span><span class="sc">-</span>model<span class="sc">$</span>pi11,<span class="dv">0</span>,<span class="dv">0</span>,model<span class="sc">$</span>pi22),<span class="dv">2</span>,<span class="dv">4</span>) <span class="sc">%x%</span> (<span class="fu">diag</span>(<span class="dv">4</span>) <span class="sc">%x%</span> <span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>))</span>
+<span id="cb134-60"><a href="Filtering.html#cb134-60" tabindex="-1"></a>  model<span class="sc">$</span>Pi <span class="ot">&lt;-</span> Pi</span>
+<span id="cb134-61"><a href="Filtering.html#cb134-61" tabindex="-1"></a>  model<span class="sc">$</span>mu <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(model<span class="sc">$</span>mu1,model<span class="sc">$</span>mu2),<span class="dv">2</span>,<span class="dv">1</span>) <span class="sc">%x%</span> <span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">8</span>,<span class="dv">1</span>)</span>
+<span id="cb134-62"><a href="Filtering.html#cb134-62" tabindex="-1"></a>  </span>
+<span id="cb134-63"><a href="Filtering.html#cb134-63" tabindex="-1"></a>  <span class="fu">return</span>(model)</span>
+<span id="cb134-64"><a href="Filtering.html#cb134-64" tabindex="-1"></a>}</span>
+<span id="cb134-65"><a href="Filtering.html#cb134-65" tabindex="-1"></a></span>
+<span id="cb134-66"><a href="Filtering.html#cb134-66" tabindex="-1"></a><span class="co"># Run the Kim-Hamilton filter, and optionally the smoother.</span></span>
+<span id="cb134-67"><a href="Filtering.html#cb134-67" tabindex="-1"></a>run_KH <span class="ot">&lt;-</span> <span class="cf">function</span>(model,Y,<span class="at">indic_smoother=</span><span class="cn">FALSE</span>){</span>
+<span id="cb134-68"><a href="Filtering.html#cb134-68" tabindex="-1"></a>  </span>
+<span id="cb134-69"><a href="Filtering.html#cb134-69" tabindex="-1"></a>  TT <span class="ot">&lt;-</span> <span class="fu">dim</span>(Y)[<span class="dv">1</span>]</span>
+<span id="cb134-70"><a href="Filtering.html#cb134-70" tabindex="-1"></a>  J  <span class="ot">&lt;-</span> <span class="dv">16</span> <span class="co"># number of regimes</span></span>
+<span id="cb134-71"><a href="Filtering.html#cb134-71" tabindex="-1"></a>  vec1TT <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">1</span>,TT,<span class="dv">1</span>)</span>
+<span id="cb134-72"><a href="Filtering.html#cb134-72" tabindex="-1"></a>  </span>
+<span id="cb134-73"><a href="Filtering.html#cb134-73" tabindex="-1"></a>  mu <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(model<span class="sc">$</span>mu1,model<span class="sc">$</span>mu2),<span class="dv">2</span>,<span class="dv">1</span>)</span>
+<span id="cb134-74"><a href="Filtering.html#cb134-74" tabindex="-1"></a>  </span>
+<span id="cb134-75"><a href="Filtering.html#cb134-75" tabindex="-1"></a>  mu0 <span class="ot">&lt;-</span> vec1TT <span class="sc">%*%</span> <span class="fu">t</span>(mu <span class="sc">%x%</span> <span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>) <span class="sc">%x%</span> <span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>) <span class="sc">%x%</span> <span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>))</span>
+<span id="cb134-76"><a href="Filtering.html#cb134-76" tabindex="-1"></a>  mu1 <span class="ot">&lt;-</span> vec1TT <span class="sc">%*%</span> <span class="fu">t</span>(<span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>) <span class="sc">%x%</span> mu <span class="sc">%x%</span> <span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>) <span class="sc">%x%</span> <span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>))</span>
+<span id="cb134-77"><a href="Filtering.html#cb134-77" tabindex="-1"></a>  mu2 <span class="ot">&lt;-</span> vec1TT <span class="sc">%*%</span> <span class="fu">t</span>(<span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>) <span class="sc">%x%</span> <span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>) <span class="sc">%x%</span> mu <span class="sc">%x%</span> <span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>))</span>
+<span id="cb134-78"><a href="Filtering.html#cb134-78" tabindex="-1"></a>  mu3 <span class="ot">&lt;-</span> vec1TT <span class="sc">%*%</span> <span class="fu">t</span>(<span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>) <span class="sc">%x%</span> <span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>) <span class="sc">%x%</span> <span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">1</span>) <span class="sc">%x%</span> mu)</span>
+<span id="cb134-79"><a href="Filtering.html#cb134-79" tabindex="-1"></a>  </span>
+<span id="cb134-80"><a href="Filtering.html#cb134-80" tabindex="-1"></a>  y0 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(Y[,<span class="dv">1</span>],TT,J)</span>
+<span id="cb134-81"><a href="Filtering.html#cb134-81" tabindex="-1"></a>  y1 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(Y[,<span class="dv">2</span>],TT,J)</span>
+<span id="cb134-82"><a href="Filtering.html#cb134-82" tabindex="-1"></a>  y2 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(Y[,<span class="dv">3</span>],TT,J)</span>
+<span id="cb134-83"><a href="Filtering.html#cb134-83" tabindex="-1"></a>  y3 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(Y[,<span class="dv">4</span>],TT,J)</span>
+<span id="cb134-84"><a href="Filtering.html#cb134-84" tabindex="-1"></a>  </span>
+<span id="cb134-85"><a href="Filtering.html#cb134-85" tabindex="-1"></a>  phi1 <span class="ot">&lt;-</span> model<span class="sc">$</span>phi1</span>
+<span id="cb134-86"><a href="Filtering.html#cb134-86" tabindex="-1"></a>  phi2 <span class="ot">&lt;-</span> model<span class="sc">$</span>phi2</span>
+<span id="cb134-87"><a href="Filtering.html#cb134-87" tabindex="-1"></a>  phi3 <span class="ot">&lt;-</span> model<span class="sc">$</span>phi3</span>
+<span id="cb134-88"><a href="Filtering.html#cb134-88" tabindex="-1"></a>  </span>
+<span id="cb134-89"><a href="Filtering.html#cb134-89" tabindex="-1"></a>  eps <span class="ot">&lt;-</span> y0 <span class="sc">-</span> mu0 <span class="sc">-</span> phi1<span class="sc">*</span>(y1 <span class="sc">-</span> mu1) <span class="sc">-</span> phi2<span class="sc">*</span>(y2 <span class="sc">-</span> mu2) <span class="sc">-</span> phi3<span class="sc">*</span>(y3 <span class="sc">-</span> mu3)</span>
+<span id="cb134-90"><a href="Filtering.html#cb134-90" tabindex="-1"></a>  </span>
+<span id="cb134-91"><a href="Filtering.html#cb134-91" tabindex="-1"></a>  sigma <span class="ot">&lt;-</span> model<span class="sc">$</span>sigma</span>
+<span id="cb134-92"><a href="Filtering.html#cb134-92" tabindex="-1"></a>  Eta <span class="ot">&lt;-</span> <span class="sc">-</span>.<span class="dv">5</span><span class="sc">*</span><span class="fu">log</span>(<span class="dv">2</span><span class="sc">*</span>pi<span class="sc">*</span>sigma<span class="sc">^</span><span class="dv">2</span>) <span class="sc">-</span> .<span class="dv">5</span><span class="sc">*</span>eps<span class="sc">^</span><span class="dv">2</span><span class="sc">/</span>sigma<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb134-93"><a href="Filtering.html#cb134-93" tabindex="-1"></a>  </span>
+<span id="cb134-94"><a href="Filtering.html#cb134-94" tabindex="-1"></a>  resKH <span class="ot">&lt;-</span> <span class="fu">KH_filter</span>(model<span class="sc">$</span>Pi, Eta)</span>
+<span id="cb134-95"><a href="Filtering.html#cb134-95" tabindex="-1"></a>  </span>
+<span id="cb134-96"><a href="Filtering.html#cb134-96" tabindex="-1"></a>  <span class="cf">if</span>(indic_smoother){</span>
+<span id="cb134-97"><a href="Filtering.html#cb134-97" tabindex="-1"></a>    resKH<span class="sc">$</span>ksi_matrix_smoothed <span class="ot">&lt;-</span> <span class="fu">KH_smoother</span>(model<span class="sc">$</span>Pi, Eta)</span>
+<span id="cb134-98"><a href="Filtering.html#cb134-98" tabindex="-1"></a>  }</span>
+<span id="cb134-99"><a href="Filtering.html#cb134-99" tabindex="-1"></a>  </span>
+<span id="cb134-100"><a href="Filtering.html#cb134-100" tabindex="-1"></a>  <span class="fu">return</span>(resKH)</span>
+<span id="cb134-101"><a href="Filtering.html#cb134-101" tabindex="-1"></a>}</span>
+<span id="cb134-102"><a href="Filtering.html#cb134-102" tabindex="-1"></a></span>
+<span id="cb134-103"><a href="Filtering.html#cb134-103" tabindex="-1"></a>loglik4optim <span class="ot">&lt;-</span> <span class="cf">function</span>(param,Y){</span>
+<span id="cb134-104"><a href="Filtering.html#cb134-104" tabindex="-1"></a>  model <span class="ot">&lt;-</span> <span class="fu">param2model</span>(param)</span>
+<span id="cb134-105"><a href="Filtering.html#cb134-105" tabindex="-1"></a>  resKH <span class="ot">&lt;-</span> <span class="fu">run_KH</span>(model,Y)</span>
+<span id="cb134-106"><a href="Filtering.html#cb134-106" tabindex="-1"></a>  <span class="fu">return</span>(<span class="sc">-</span>resKH<span class="sc">$</span>loglik)</span>
+<span id="cb134-107"><a href="Filtering.html#cb134-107" tabindex="-1"></a>}</span>
+<span id="cb134-108"><a href="Filtering.html#cb134-108" tabindex="-1"></a></span>
+<span id="cb134-109"><a href="Filtering.html#cb134-109" tabindex="-1"></a><span class="co"># Initial param (close to Hamilton, 1989)</span></span>
+<span id="cb134-110"><a href="Filtering.html#cb134-110" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">mu1=</span><span class="sc">-</span>.<span class="dv">5</span>,<span class="at">mu2=</span>.<span class="dv">9</span>,</span>
+<span id="cb134-111"><a href="Filtering.html#cb134-111" tabindex="-1"></a>              <span class="at">phi1=</span>.<span class="dv">27</span>,<span class="at">phi2=</span>.<span class="dv">34</span>,<span class="at">phi3=</span>.<span class="dv">13</span>,</span>
+<span id="cb134-112"><a href="Filtering.html#cb134-112" tabindex="-1"></a>              <span class="at">sigma=</span>.<span class="dv">9</span>,</span>
+<span id="cb134-113"><a href="Filtering.html#cb134-113" tabindex="-1"></a>              <span class="at">pi11=</span>.<span class="dv">9</span>,<span class="at">pi22=</span>.<span class="dv">98</span>)</span>
+<span id="cb134-114"><a href="Filtering.html#cb134-114" tabindex="-1"></a>param_est <span class="ot">&lt;-</span> <span class="fu">model2param</span>(model)</span>
+<span id="cb134-115"><a href="Filtering.html#cb134-115" tabindex="-1"></a></span>
+<span id="cb134-116"><a href="Filtering.html#cb134-116" tabindex="-1"></a>param_est <span class="ot">&lt;-</span> <span class="fu">model2param</span>(model)</span>
+<span id="cb134-117"><a href="Filtering.html#cb134-117" tabindex="-1"></a></span>
+<span id="cb134-118"><a href="Filtering.html#cb134-118" tabindex="-1"></a><span class="cf">if</span>(indic_reestim){</span>
+<span id="cb134-119"><a href="Filtering.html#cb134-119" tabindex="-1"></a>  </span>
+<span id="cb134-120"><a href="Filtering.html#cb134-120" tabindex="-1"></a>  nb_loop <span class="ot">&lt;-</span> <span class="dv">4</span></span>
+<span id="cb134-121"><a href="Filtering.html#cb134-121" tabindex="-1"></a>  </span>
+<span id="cb134-122"><a href="Filtering.html#cb134-122" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>nb_loop){</span>
+<span id="cb134-123"><a href="Filtering.html#cb134-123" tabindex="-1"></a>    <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">&quot;--- Loop &quot;</span>,i,<span class="st">&quot; ---&quot;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>))</span>
+<span id="cb134-124"><a href="Filtering.html#cb134-124" tabindex="-1"></a>    <span class="co"># for(method in c(&quot;nlminb&quot;)){</span></span>
+<span id="cb134-125"><a href="Filtering.html#cb134-125" tabindex="-1"></a>    <span class="cf">for</span>(method <span class="cf">in</span> <span class="fu">c</span>(<span class="st">&quot;nlminb&quot;</span>,<span class="st">&quot;Nelder-Mead&quot;</span>)){</span>
+<span id="cb134-126"><a href="Filtering.html#cb134-126" tabindex="-1"></a>      res.optim <span class="ot">&lt;-</span> <span class="fu">optimx</span>(<span class="at">par=</span>param_est,</span>
+<span id="cb134-127"><a href="Filtering.html#cb134-127" tabindex="-1"></a>                          <span class="at">fn=</span>loglik4optim,</span>
+<span id="cb134-128"><a href="Filtering.html#cb134-128" tabindex="-1"></a>                          <span class="at">Y=</span>Y,</span>
+<span id="cb134-129"><a href="Filtering.html#cb134-129" tabindex="-1"></a>                          <span class="at">method=</span>method,</span>
+<span id="cb134-130"><a href="Filtering.html#cb134-130" tabindex="-1"></a>                          <span class="at">control=</span><span class="fu">list</span>(<span class="at">trace=</span><span class="cn">FALSE</span>,</span>
+<span id="cb134-131"><a href="Filtering.html#cb134-131" tabindex="-1"></a>                                       <span class="at">maxit=</span><span class="fu">ifelse</span>(method<span class="sc">==</span><span class="st">&quot;Nelder-Mead&quot;</span>,<span class="dv">1000</span>,<span class="dv">20</span>),</span>
+<span id="cb134-132"><a href="Filtering.html#cb134-132" tabindex="-1"></a>                                       <span class="at">kkt =</span> <span class="cn">FALSE</span>))</span>
+<span id="cb134-133"><a href="Filtering.html#cb134-133" tabindex="-1"></a>      <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">&quot;--- Log-lik (&quot;</span>,method,<span class="st">&quot;): &quot;</span>,<span class="fu">round</span>(res.optim<span class="sc">$</span>value,<span class="dv">2</span>),<span class="st">&quot; ---&quot;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>))</span>
+<span id="cb134-134"><a href="Filtering.html#cb134-134" tabindex="-1"></a>      param_est  <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">as.matrix</span>(res.optim)[<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(param_est)])</span>
+<span id="cb134-135"><a href="Filtering.html#cb134-135" tabindex="-1"></a>    }</span>
+<span id="cb134-136"><a href="Filtering.html#cb134-136" tabindex="-1"></a>  }</span>
+<span id="cb134-137"><a href="Filtering.html#cb134-137" tabindex="-1"></a>  <span class="fu">save</span>(param_est,<span class="at">file=</span> <span class="st">&quot;stored_results/param_Hamilton89.Rdat&quot;</span>)</span>
+<span id="cb134-138"><a href="Filtering.html#cb134-138" tabindex="-1"></a>}<span class="cf">else</span>{</span>
+<span id="cb134-139"><a href="Filtering.html#cb134-139" tabindex="-1"></a>  <span class="co"># In that case, use paraemters estimated previously:</span></span>
+<span id="cb134-140"><a href="Filtering.html#cb134-140" tabindex="-1"></a>  <span class="fu">load</span>(<span class="at">file=</span> <span class="st">&quot;stored_results/param_Hamilton89.Rdat&quot;</span>)</span>
+<span id="cb134-141"><a href="Filtering.html#cb134-141" tabindex="-1"></a>}</span>
+<span id="cb134-142"><a href="Filtering.html#cb134-142" tabindex="-1"></a></span>
+<span id="cb134-143"><a href="Filtering.html#cb134-143" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">param2model</span>(param_est)</span>
+<span id="cb134-144"><a href="Filtering.html#cb134-144" tabindex="-1"></a>resKH <span class="ot">&lt;-</span> <span class="fu">run_KH</span>(model,Y,<span class="at">indic_smoother=</span><span class="cn">TRUE</span>)</span>
+<span id="cb134-145"><a href="Filtering.html#cb134-145" tabindex="-1"></a></span>
+<span id="cb134-146"><a href="Filtering.html#cb134-146" tabindex="-1"></a><span class="co"># Compute filtered probabilities xi_tilde:</span></span>
+<span id="cb134-147"><a href="Filtering.html#cb134-147" tabindex="-1"></a>xi_tilde <span class="ot">&lt;-</span> resKH<span class="sc">$</span>ksi_matrix <span class="sc">%*%</span> <span class="fu">t</span>(<span class="fu">diag</span>(<span class="dv">2</span>) <span class="sc">%x%</span> <span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">8</span>))</span>
+<span id="cb134-148"><a href="Filtering.html#cb134-148" tabindex="-1"></a>xi_tilde_smoothed <span class="ot">&lt;-</span> resKH<span class="sc">$</span>ksi_matrix_smoothed <span class="sc">%*%</span> <span class="fu">t</span>(<span class="fu">diag</span>(<span class="dv">2</span>) <span class="sc">%x%</span> <span class="fu">matrix</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">8</span>))</span>
+<span id="cb134-149"><a href="Filtering.html#cb134-149" tabindex="-1"></a></span>
+<span id="cb134-150"><a href="Filtering.html#cb134-150" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">1</span>))</span>
+<span id="cb134-151"><a href="Filtering.html#cb134-151" tabindex="-1"></a><span class="fu">par</span>(<span class="at">plt=</span><span class="fu">c</span>(.<span class="dv">1</span>,.<span class="dv">96</span>,.<span class="dv">15</span>,.<span class="dv">8</span>))</span>
+<span id="cb134-152"><a href="Filtering.html#cb134-152" tabindex="-1"></a></span>
+<span id="cb134-153"><a href="Filtering.html#cb134-153" tabindex="-1"></a><span class="fu">plot</span>(vec_dates,Y[,<span class="dv">1</span>],<span class="at">col=</span><span class="st">&quot;white&quot;</span>,</span>
+<span id="cb134-154"><a href="Filtering.html#cb134-154" tabindex="-1"></a>     <span class="at">xlab=</span><span class="st">&quot;&quot;</span>,<span class="at">ylab=</span><span class="st">&quot;in percent&quot;</span>,<span class="at">las=</span><span class="dv">1</span>,</span>
+<span id="cb134-155"><a href="Filtering.html#cb134-155" tabindex="-1"></a>     <span class="at">main=</span><span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;(a) Quarterly GDP growth rate (&quot;</span>,y[t],<span class="st">&quot;)&quot;</span>,<span class="at">sep=</span><span class="st">&quot;&quot;</span>)))</span>
+<span id="cb134-156"><a href="Filtering.html#cb134-156" tabindex="-1"></a><span class="fu">grid</span>()</span>
+<span id="cb134-157"><a href="Filtering.html#cb134-157" tabindex="-1"></a><span class="fu">make_recessions</span>(<span class="at">col =</span> <span class="st">&quot;lightgrey&quot;</span>)</span>
+<span id="cb134-158"><a href="Filtering.html#cb134-158" tabindex="-1"></a><span class="fu">lines</span>(vec_dates,Y[,<span class="dv">1</span>],<span class="at">lwd=</span><span class="dv">2</span>)</span>
+<span id="cb134-159"><a href="Filtering.html#cb134-159" tabindex="-1"></a></span>
+<span id="cb134-160"><a href="Filtering.html#cb134-160" tabindex="-1"></a><span class="fu">plot</span>(vec_dates,<span class="dv">100</span><span class="sc">*</span>xi_tilde[,<span class="dv">1</span>],<span class="at">ylim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">100</span>),<span class="at">col=</span><span class="st">&quot;white&quot;</span>,<span class="at">las=</span><span class="dv">1</span>,</span>
+<span id="cb134-161"><a href="Filtering.html#cb134-161" tabindex="-1"></a>     <span class="at">xlab=</span><span class="st">&quot;&quot;</span>,<span class="at">ylab=</span><span class="st">&quot;in percent&quot;</span>,</span>
+<span id="cb134-162"><a href="Filtering.html#cb134-162" tabindex="-1"></a>     <span class="at">main=</span><span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">&quot;(b) Recession probabilities&quot;</span>,</span>
+<span id="cb134-163"><a href="Filtering.html#cb134-163" tabindex="-1"></a>                           <span class="st">&quot; (dotted = filtered; solid = smoothed)&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>)))</span>
+<span id="cb134-164"><a href="Filtering.html#cb134-164" tabindex="-1"></a></span>
+<span id="cb134-165"><a href="Filtering.html#cb134-165" tabindex="-1"></a><span class="fu">grid</span>()</span>
+<span id="cb134-166"><a href="Filtering.html#cb134-166" tabindex="-1"></a><span class="fu">make_recessions</span>(<span class="at">col =</span> <span class="st">&quot;lightgrey&quot;</span>)</span>
+<span id="cb134-167"><a href="Filtering.html#cb134-167" tabindex="-1"></a><span class="fu">lines</span>(vec_dates,<span class="dv">100</span><span class="sc">*</span>xi_tilde_smoothed[,<span class="dv">1</span>],<span class="at">lwd=</span><span class="dv">2</span>,<span class="at">col=</span><span class="st">&quot;black&quot;</span>)</span>
+<span id="cb134-168"><a href="Filtering.html#cb134-168" tabindex="-1"></a><span class="fu">lines</span>(vec_dates,<span class="dv">100</span><span class="sc">*</span>xi_tilde[,<span class="dv">1</span>],<span class="at">lwd=</span><span class="dv">2</span>,<span class="at">col=</span><span class="st">&quot;black&quot;</span>,<span class="at">lty=</span><span class="dv">3</span>)</span></code></pre></div>
 </details>
 <p><img src="_main_files/figure-html/fig_Hamilton89-1.png" width="768" /></p>
 
@@ -1283,14 +1468,14 @@ gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
   "sharing": {
     "github": false,
-    "facebook": true,
-    "twitter": true,
+    "facebook": false,
+    "twitter": false,
     "linkedin": false,
     "weibo": false,
     "instapaper": false,
     "vk": false,
     "whatsapp": false,
-    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+    "all": {}
   },
   "fontsettings": {
     "theme": "white",
@@ -1298,8 +1483,8 @@ gitbook.start({
     "size": 2
   },
   "edit": {
-    "link": "https://github.com/jrenne/MPRR_codes/edit/main/14-Filtering.Rmd",
-    "text": "Edit"
+    "link": null,
+    "text": null
   },
   "history": {
     "link": null,
