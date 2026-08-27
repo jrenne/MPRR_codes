@@ -742,6 +742,160 @@ legend("topright",
 
 
 
+## Extended and Unscented Kalman filters
+
+This online-only example compares the first-order Extended Kalman Filter
+(EKF1), the second-order Extended Kalman Filter (EKF2), and the Unscented
+Kalman Filter (UKF) in a setting where the role of curvature is transparent.
+Consider the scalar state-space model
+\[
+x_t = 0.08 + 0.85x_{t-1} + \varepsilon_t,
+\qquad
+y_t = x_t + 0.45x_t^2 + \eta_t,
+\]
+where $\varepsilon_t\sim\mathcal{N}(0,0.30^2)$ and
+$\eta_t\sim\mathcal{N}(0,0.20^2)$. EKF1 uses only the slope of the measurement
+function. EKF2 also uses its Hessian and therefore corrects the predictive
+measurement mean and variance for curvature.
+
+Because the transition is affine and the measurement function is exactly
+quadratic, EKF2 computes the exact measurement moments under each Gaussian
+predictive approximation. With the parameters used below, the unscented
+transform reproduces the same moments. EKF2 and the UKF should consequently
+coincide up to numerical precision; their comparison with EKF1 isolates the
+effect of the second-order correction.
+
+```{r fig_EKF_comparison, message=FALSE, warning=FALSE, fig.width=8, fig.height=8}
+# Purpose: Compare EKF1, EKF2, and UKF in a nonlinear measurement model.
+library(DTAM)
+
+set.seed(2026)
+
+TT <- 160
+phi <- 0.85
+intercept <- 0.08
+curvature <- 0.45
+state.sd <- 0.30
+measurement.sd <- 0.20
+
+transition <- function(x, t) intercept + phi * x
+transition.jacobian <- function(x, t) matrix(phi)
+measurement <- function(x, t) x + curvature * x^2
+measurement.jacobian <- function(x, t) matrix(1 + 2 * curvature * x)
+measurement.hessian <- function(x, t) matrix(2 * curvature)
+
+# Simulate the latent state and the nonlinear signal.
+state <- observation <- numeric(TT)
+previous.state <- intercept / (1 - phi)
+for (t in seq_len(TT)) {
+  state[t] <- transition(previous.state, t) + rnorm(1, sd = state.sd)
+  observation[t] <- measurement(state[t], t) +
+    rnorm(1, sd = measurement.sd)
+  previous.state <- state[t]
+}
+
+Y <- matrix(observation)
+Q <- matrix(state.sd^2)
+R <- matrix(measurement.sd^2)
+x0 <- intercept / (1 - phi)
+P0 <- matrix(state.sd^2 / (1 - phi^2))
+
+fit.ekf1 <- EKF1(
+  Y, transition, measurement,
+  transition.jacobian, measurement.jacobian,
+  Q, R, x0, P0
+)
+
+fit.ekf2 <- EKF2(
+  Y, transition, measurement,
+  transition.jacobian, measurement.jacobian, measurement.hessian,
+  Q, R, x0, P0
+)
+
+fit.ukf <- UKF(
+  Y, transition, measurement, Q, R, x0, P0,
+  alpha = 0.5, beta = 2, kappa = 0
+)
+
+par(mfrow = c(2, 1), mar = c(3.6, 4.0, 2.6, 1.0))
+
+# The UKF points lie on the EKF2 line in this quadratic example.
+plot(state, type = "l", col = "darkgrey", lwd = 2,
+     xlab = "", ylab = "State",
+     main = "(a) Latent state and filtered estimates", las = 1)
+grid()
+lines(fit.ekf1$filtered.mean[, 1], lty = 3, lwd = 1.8)
+lines(fit.ekf2$filtered.mean[, 1], lwd = 2)
+ukf.dates <- seq(1, TT, by = 8)
+points(ukf.dates, fit.ukf$filtered.mean[ukf.dates, 1],
+       pch = 21, bg = "white", cex = 0.75)
+legend(
+  "topleft",
+  legend = c("Latent state", "EKF1", "EKF2", "UKF"),
+  col = c("darkgrey", "black", "black", "black"),
+  lty = c(1, 3, 1, NA), pch = c(NA, NA, NA, 21),
+  pt.bg = "white", lwd = c(2, 1.8, 2, NA), bty = "n"
+)
+
+correction.ekf2 <- curvature * fit.ekf2$predicted.cov[1, 1, ]
+correction.ukf <- fit.ukf$predicted.measurement[, 1] -
+  measurement(fit.ukf$predicted.mean[, 1], seq_len(TT))
+
+plot(correction.ekf2, type = "l", lwd = 2,
+     xlab = "Date", ylab = "Correction",
+     main = "(b) Curvature contribution to the predictive measurement mean",
+     las = 1)
+grid()
+abline(h = 0, lty = 3, col = "darkgrey")
+points(ukf.dates, correction.ukf[ukf.dates],
+       pch = 21, bg = "white", cex = 0.75)
+legend(
+  "topright", legend = c("EKF2 correction", "UKF correction"),
+  lty = c(1, NA), pch = c(NA, 21), pt.bg = "white",
+  lwd = c(2, NA), bty = "n"
+)
+```
+
+The second panel displays the curvature term that EKF1 omits when the filters
+are evaluated at the same Gaussian predictive approximation. The UKF markers
+lie on the EKF2 line. The following error measures confirm that, in this
+experiment, incorporating curvature improves latent-state recovery and that
+EKF2 and the UKF produce the same recursion up to machine precision.
+
+```{r table_EKF_comparison}
+filtered.estimates <- cbind(
+  EKF1 = fit.ekf1$filtered.mean[, 1],
+  EKF2 = fit.ekf2$filtered.mean[, 1],
+  UKF = fit.ukf$filtered.mean[, 1]
+)
+
+maximum.difference <- apply(
+  filtered.estimates, 2,
+  function(x) max(abs(x - filtered.estimates[, "EKF2"]))
+)
+
+comparison <- data.frame(
+  Filter = colnames(filtered.estimates),
+  RMSE = apply(filtered.estimates, 2, function(x) {
+    sqrt(mean((x - state)^2))
+  }),
+  `Mean absolute error` = apply(filtered.estimates, 2, function(x) {
+    mean(abs(x - state))
+  }),
+  `Maximum difference from EKF2` = format(
+    maximum.difference, scientific = TRUE, digits = 3
+  ),
+  check.names = FALSE,
+  row.names = NULL
+)
+
+knitr::kable(
+  comparison, digits = 3,
+  caption = "Accuracy of EKF1, EKF2, and UKF in the quadratic-measurement example."
+)
+```
+
+
 ## Kitagawa-Hamilton filter
 
 This example reproduces the Hamilton-style regime-switching filtering exercise.
