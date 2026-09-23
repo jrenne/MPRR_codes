@@ -1,4 +1,4 @@
-# Consumption Capital Asset Pricing Model {#CCAPM}
+# Consumption-based Capital Asset Pricing Model {#CCAPM}
 
 ## Risk aversion and intertemporal substitution in the CCAPM
 
@@ -139,7 +139,8 @@ matrix_corresp_ctries <- rbind(c("AUS","BEL","CHE","DEU","DNK","ESP",
                                  "Portugal","Sweden","U.S.A."))
 
 # outputs: Sample-period,
-#          Average excess return, sd(return), sd(dc), Cor(dc,er), Cov(dc,er),
+#          Average excess return, sd(excess return), sd(dc),
+#          Cor(dc, excess return), Cov(dc, excess return),
 #          Sharpe ratio, RRA1, RRA2
 matrix_result <- array(NaN,c(length(list.of.JST.ctries),9,dim(matrix_periods)[1]))
 
@@ -170,17 +171,21 @@ for(period in 1:dim(matrix_periods)[1]){
     DATA.reduced <- DATA.reduced[which(DATA.reduced$year==first.year):
                                    which(DATA.reduced$year==last.year),]
     
-    sample <- range(DATA.reduced$year[complete.cases(DATA.reduced)])
-    
     DATA.reduced$Excess_return <- DATA.reduced$req_tr - DATA.reduced$rstir
-    
-    mean_er <- mean(DATA.reduced$Excess_return,na.rm=TRUE)
-    sd_er   <- sd(DATA.reduced$Excess_return,na.rm=TRUE)
-    sd_dc   <- sd(DATA.reduced$dc,na.rm=TRUE)
-    cor_er_dc <- cor(DATA.reduced$dc,DATA.reduced$req_tr,use="complete.obs")
-    cov_er_dc <- cov(DATA.reduced$dc,DATA.reduced$req_tr,use="complete.obs")
+
+    # Use one common set of country-year observations for every moment entering
+    # the empirical CCAPM approximation.
+    DATA.moments <- DATA.reduced[
+      complete.cases(DATA.reduced[,c("dc","Excess_return","rstir")]),]
+    sample <- range(DATA.moments$year)
+
+    mean_er <- mean(DATA.moments$Excess_return)
+    sd_er   <- sd(DATA.moments$Excess_return)
+    sd_dc   <- sd(DATA.moments$dc)
+    cor_er_dc <- cor(DATA.moments$dc,DATA.moments$Excess_return)
+    cov_er_dc <- cov(DATA.moments$dc,DATA.moments$Excess_return)
     SR <- mean_er/sd_er
-    mean_Rf <- mean(DATA.reduced$rstir,na.rm=TRUE)
+    mean_Rf <- mean(DATA.moments$rstir)
     RRA1 <- mean_er/(1 + mean_Rf)/cov_er_dc
     RRA2 <- mean_er/(1 + mean_Rf)/sd_er/sd_dc
     
@@ -449,7 +454,7 @@ for(t in seq(1,T,by=10)){
   lines(t+(1:h)-1,100*(b.h    + a.h    * x.sim[t]),col="black",lwd=2)
   lines(t+(1:h)-1,100*(b.h.EH + a.h.EH * x.sim[t]),col="black",lwd=2,lty=2)}
 legend("topleft",
-       c("Short-term rate","Term structure of real yields",
+       c("Short-term real rate","Term structure of real yields",
          "Term structure of real yields (without risk premiums)"),
        lwd=c(2),lty=c(1,1,2),col=c("grey","black","black"),seg.len = 4)
 ```

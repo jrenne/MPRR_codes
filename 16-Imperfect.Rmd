@@ -462,13 +462,13 @@ for(xi in all_xi){
   Sigma <- Sigma12 %*% t(Sigma12)
   
   # ------------------------------------------------------------------------------
-  # Measurement equation y_t = B + A w_t + Omega^(1/2) eta_t
+  # Measurement equation y_t = B + A w_t + Omega^(1/2) tilde_eta_t
   # ------------------------------------------------------------------------------
   A <- t(matrix(c(1,  1, -1,
                   1,  0,  0),n,2))       # Δc_t = g_t + x_t - x_{t-1}
   B <- matrix(0,2,1)
   Omega12 <- matrix(c(0,sigma_nu),2,1)
-  Omega <- Omega12^2
+  Omega <- Omega12 %*% t(Omega12)
   
   # ------------------------------------------------------------------------------
   # Bundle into a model list (optional)

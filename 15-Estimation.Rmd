@@ -1441,7 +1441,7 @@ filter_model_RS <- function(model,Y,Maturities_decompo,
     # Note in previous line: "+1" because the first column of Y is the target.
     loglik_pricing_error[,(J*(j-1)+1):(j*J)] <- 
       dmvnorm(pricing_error,
-              sigma = diag(c(model$std_pricing_error*vec_std_dev[matur_with_error]^2)),
+              sigma = diag(c(model$std_pricing_error^2*vec_std_dev[matur_with_error]^2)),
               log = TRUE)
     # Store modeled yields (for final outputs):
     Modeled_yields[,j,] <- modeled_yields
