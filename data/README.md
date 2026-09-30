@@ -55,7 +55,7 @@ Sources:
 - [Federal Reserve series `CORBLACBS`](https://fred.stlouisfed.org/series/CORBLACBS)
 - [Amato and Remolona (2003), "The credit spread puzzle"](https://www.bis.org/publ/qtrpdf/r_qt0312e.pdf)
 
-## Restricted source used locally
+## SIFMA U.S. Treasury statistics
 
 The Treasury issuance and outstanding-debt example in Chapter 3 uses the
 `Issuance` and `Outstanding` sheets of SIFMA Research's U.S. Treasury
@@ -63,7 +63,17 @@ Securities Statistics workbook:
 
 <https://www.sifma.org/research/statistics/us-fixed-income-securities-statistics>
 
-The workbook is not redistributed. An authorized local copy may be stored as
-`private_data/ta-us-treasury-sifma.xlsx`; that directory is excluded from Git.
+On 25 September 2026, SIFMA Research granted written permission to reproduce
+the resulting figure in the commercially published book and to redistribute
+the source workbook through this freely accessible, non-monetized companion
+repository. The authorized copy is stored as
+`data/ta-us-treasury-sifma.xlsx`.
+
 The workbook identifies the underlying sources for the series used in the book
 as the U.S. Department of the Treasury and the Bureau of the Fiscal Service.
+The Chapter 3 code selects the relevant date and instrument columns, converts
+the reported dates, calculates net issuance from gross issuance and
+retirements, and reshapes the outstanding amounts for plotting. Cite SIFMA and
+the underlying U.S. Treasury sources when reusing this material. The workbook
+remains subject to SIFMA's terms and is not covered by this repository's MIT
+software licence.

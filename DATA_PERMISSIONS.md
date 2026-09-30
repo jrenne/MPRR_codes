@@ -12,6 +12,12 @@ provider templates, or third-party material.
 - `data/FederalReserve_HQM_CreditLossProxy.xlsx` contains source and
   calculation material based on Federal Reserve Board data. Source links and
   transformations are documented in `data/README.md`.
+- `data/ta-us-treasury-sifma.xlsx` is the SIFMA U.S. Treasury Securities
+  Statistics workbook used for the issuance and outstanding-debt example.
+  SIFMA Research granted written permission on 25 September 2026 to reproduce
+  the resulting figure in the book and redistribute the source workbook
+  through the freely accessible, non-monetized companion repository. The
+  source and transformations are documented in `data/README.md`.
 - `data/Futures_extraction_template.xlsx` is a blank reconstruction template.
   It contains no licensed settlement-price observations.
 
@@ -24,8 +30,6 @@ Licence or grant permissions belonging to the original provider.
 Restricted inputs used to generate some figures are kept locally in the
 Git-ignored `private_data/` directory and are not distributed. These include:
 
-- the SIFMA Treasury-statistics workbook used for the issuance and
-  outstanding-debt example; and
 - natural-gas futures observations obtained through licensed LSEG Workspace
   and Datastream access.
 
@@ -37,8 +41,8 @@ Datastream via LSEG Workspace." This confirmation does not authorize
 redistribution of the underlying observations, which remain private and are
 not included in this repository or in DTAM.
 
-Readers should obtain these inputs from their original provider under terms
-applicable to their own access. Source pages are linked at the relevant point
+Readers should obtain this input from the original provider under terms
+applicable to their own access. The source page is linked at the relevant point
 in the Bookdown and in `data/README.md`.
 
 ## DTAM datasets

@@ -13,15 +13,40 @@ link-citations: yes
 github-repo: jrenne/MPRR_codes
 ---
 
-# About {-}
+# About this companion {-}
 
-This Bookdown project gathers the R code used to reproduce the tables, figures, and numerical illustrations of *Asset Pricing with Discrete-Time Affine Processes*.
+This is the companion website for *Asset Pricing with Discrete-Time Affine Processes*. It gathers the R code used to reproduce the book's tables, figures, simulations, and numerical illustrations, organized chapter by chapter.
 
-The chapters are organized around the themes of the book and illustrate how the theoretical objects introduced in the text can be implemented, simulated, and visualized in practice. Whenever possible, the examples rely on the companion package `DTAM`, which provides the core routines for simulation, affine transforms, filtering, shadow-rate models, credit-risk applications, and related asset-pricing exercises.
+The book, this website, and the `DTAM` package play different but complementary roles:
 
-The aim of this material is twofold. First, it documents how the main figures and quantitative examples of the book are produced. Second, it provides a practical entry point for readers who want to adapt the code to their own applications.
+| Component | Main role |
+|:--|:--|
+| **The book** | Develops the theory, derivations, economic interpretation, and empirical motivation. |
+| **This companion website** | Provides the chapter-specific scripts, calibrations, data instructions, and executable examples used to produce the book's quantitative results. |
+| **The [`DTAM` R package](https://github.com/jrenne/DTAM)** | Supplies reusable functions for simulating, filtering, estimating, and pricing discrete-time affine models, together with selected datasets and data helpers. |
 
-To run the examples, users should first install the companion package `DTAM`. The package can be installed either from the local source folder or from GitHub, for instance with `devtools::install_github("jrenne/DTAM")`, and then loaded in the usual way with `library(DTAM)`. Most chapters assume that `DTAM` is already available in the R session before the code chunks are executed.
+In other words, `DTAM` is the reusable computational toolkit; the code on this website shows how that toolkit is combined with chapter-specific specifications and data to implement the examples in the book. The examples can also serve as starting points for readers who want to adapt the methods to their own applications.
+
+## Start here {-}
+
+1. **Install `DTAM` from GitHub.** The package is currently under active development.
+
+   ```r
+   install.packages("remotes")
+   remotes::install_github("jrenne/DTAM")
+   library(DTAM)
+   ```
+
+2. **Choose a chapter** from the navigation menu. Each chapter contains the code and explanations associated with the corresponding part of the book.
+
+3. **Consult the source repositories when needed.** The [companion-code repository](https://github.com/jrenne/MPRR_codes) contains the Bookdown source and chapter files. The [`DTAM` repository](https://github.com/jrenne/DTAM) contains the package source, documentation, and software issue tracker.
+
+Most chapters assume that `DTAM` is installed and available in the R session. Some empirical applications also require external or restricted data that cannot be redistributed. Data sources and applicable permissions are documented in the relevant chapters and in the repository's [data-permissions file](https://github.com/jrenne/MPRR_codes/blob/main/DATA_PERMISSIONS.md).
+
+## Where to report problems {-}
+
+- Problems with a book example, a chapter script, or a figure reproduction: use the [`MPRR_codes` issue tracker](https://github.com/jrenne/MPRR_codes/issues).
+- Problems with a reusable `DTAM` function or package installation: use the [`DTAM` issue tracker](https://github.com/jrenne/DTAM/issues).
 
 ## Copyright and licence {-}
 
